@@ -4,72 +4,57 @@
     <meta charset="UTF-8">
     <title>Catan Pro TV - Rayco Edition</title>
     <style>
-        :root { --linea-hex: #000000; }
-        body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        :root { 
+            --linea-hex: #000000;
+            --zoom-manual: 1; /* Factor de corrección */
+        }
+        body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
         /* Menú Lateral */
         #menu-lateral { 
-            position: fixed; left: -250px; top: 0; width: 220px; height: 100%; 
-            background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px);
-            transition: 0.3s; z-index: 1000; padding: 20px; border-right: 2px solid #444;
-            display: flex; flex-direction: column; gap: 10px; overflow-y: auto;
+            position: fixed; left: -280px; top: 0; width: 250px; height: 100%; 
+            background: rgba(25, 25, 25, 0.98); backdrop-filter: blur(10px);
+            transition: 0.3s; z-index: 1000; padding: 15px; border-right: 2px solid #444;
+            display: flex; flex-direction: column; gap: 15px; overflow-y: auto;
         }
         #menu-lateral.abierto { left: 0; }
         #toggle-menu { position: fixed; left: 10px; top: 10px; z-index: 1001; cursor: pointer; background: #444; border: none; color: white; padding: 10px; border-radius: 5px; }
 
-        /* Cuadro de Información Técnica */
-        .info-tecnica {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.8em;
-            border: 1px solid #555;
-            margin-top: 10px;
-        }
-        .info-tecnica label { display: block; margin-top: 5px; color: #aaa; }
-        .info-tecnica input { 
-            width: 80%; background: #222; border: 1px solid #444; color: #00ff00; 
-            padding: 3px; border-radius: 3px; font-family: monospace;
-        }
-
-        .selector-recurso { 
-            display: flex; align-items: center; gap: 10px; padding: 10px; 
-            border-radius: 8px; cursor: pointer; transition: 0.2s; border: 2px solid transparent;
-        }
-        .selector-recurso:hover { background: #333; }
-        .selector-recurso.activo { border-color: #ffeb3b; background: #444; }
+        h3 { border-bottom: 1px solid #555; padding-bottom: 5px; margin-bottom: 5px; color: #ffeb3b; font-size: 1.1em; }
         
-        .mini { width: 30px; height: 30px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; }
+        /* Secciones */
+        .seccion { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        
+        /* Configuración */
+        .grid-config { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8em; }
+        .grid-config input { width: 90%; background: #111; border: 1px solid #444; color: #00ff00; padding: 3px; }
 
-        .contenedor-tablero { 
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: auto; background: #0a2333; 
+        /* Selector de Recursos */
+        .selector-recurso { 
+            display: flex; align-items: center; gap: 10px; padding: 8px; 
+            border-radius: 8px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; font-size: 0.9em;
         }
+        .selector-recurso.activo { border-color: #ffeb3b; background: #444; }
+        .mini { width: 25px; height: 25px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; }
 
-        .tablero { display: inline-grid; grid-template-columns: repeat(15, 87px); line-height: 0; padding: 50px; }
+        /* Tablero */
+        .contenedor-tablero { display: flex; justify-content: center; align-items: center; height: 100vh; overflow: auto; background: #0a2333; }
+        .tablero { display: inline-grid; grid-template-columns: repeat(15, 87px); line-height: 0; padding: 100px; transform: scale(var(--zoom-manual)); }
 
         .hex {
-            width: 100px; height: 115px;
-            background-size: cover; background-position: center;
+            width: 100px; height: 115px; background-size: cover; background-position: center;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: inline-flex; align-items: center; justify-content: center;
             cursor: pointer; margin-bottom: -28px; margin-right: -13px;
-            filter: drop-shadow(0 0 1px var(--linea-hex)) drop-shadow(0 0 1px var(--linea-hex));
-            position: relative;
+            filter: drop-shadow(0 0 1px var(--linea-hex)); position: relative;
         }
-
-        .hex::after {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            border: 2px solid var(--linea-hex); pointer-events: none;
-        }
+        .hex::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); border: 1px solid var(--linea-hex); pointer-events: none; }
 
         .hex:nth-child(30n+16), .hex:nth-child(30n+17), .hex:nth-child(30n+18), .hex:nth-child(30n+19), .hex:nth-child(30n+20),
         .hex:nth-child(30n+21), .hex:nth-child(30n+22), .hex:nth-child(30n+23), .hex:nth-child(30n+24), .hex:nth-child(30n+25),
-        .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) {
-            transform: translateX(44px);
-        }
+        .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) { transform: translateX(44px); }
 
+        /* Colores/Imágenes */
         .agua { background-image: url('images/agua.png'); background-color: #2980b9; }
         .bosque { background-image: url('images/bosque.png'); background-color: #27ae60; }
         .trigo { background-image: url('images/trigo.png'); background-color: #f1c40f;}
@@ -79,12 +64,10 @@
         .desierto { background-image: url('images/desierto.png'); background-color: #d35400;}
         .aleatorio { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold; }
 
-        .numero { 
-            background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; font-size: 16px; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        .rojo { color: red; }
+        .btn { width: 100%; padding: 8px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; margin-top: 5px; }
+        .btn-green { background: #27ae60; }
+        .btn-blue { background: #2980b9; }
+        .btn-red { background: #e74c3c; }
     </style>
 </head>
 <body>
@@ -92,31 +75,40 @@
 <button id="toggle-menu" onclick="toggleMenu()">☰ Menú</button>
 
 <div id="menu-lateral">
-    <h3>Recursos</h3>
-    <div class="selector-recurso activo" onclick="seleccionarTipo('agua', this)"><div class="mini agua"></div> Agua</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('bosque', this)"><div class="mini bosque"></div> Bosque</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('trigo', this)"><div class="mini trigo"></div> Trigo</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('oveja', this)"><div class="mini oveja"></div> Oveja</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('piedra', this)"><div class="mini piedra"></div> Piedra</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('arcilla', this)"><div class="mini arcilla"></div> Arcilla</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('desierto', this)"><div class="mini desierto"></div> Desierto</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('aleatorio', this)"><div class="mini aleatorio"></div> 🎲 Aleatorio (?)</div>
-    
-    <div class="info-tecnica">
-        <strong>⚙️ Datos de Pantalla</strong>
-        <label>Píxeles detectados:</label>
-        <input type="text" id="display-px" readonly>
-        
-        <label>Ancho Pantalla (cm):</label>
-        <input type="number" id="input-ancho-cm" value="121.2">
-        
-        <label>Alto Pantalla (cm):</label>
-        <input type="number" id="input-alto-cm" value="68">
+    <div class="seccion">
+        <h3>⚙️ Configuración</h3>
+        <div class="grid-config">
+            <span>Ancho (cm)</span> <span>Alto (cm)</span>
+            <input type="number" id="tv-w-cm" value="121.2">
+            <input type="number" id="tv-h-cm" value="68">
+            <span>PX Ancho</span> <span>PX Alto</span>
+            <input type="number" id="tv-w-px" value="1920">
+            <input type="number" id="tv-h-px" value="1080">
+        </div>
+        <button class="btn btn-blue" onclick="guardarConfig()">Guardar Config</button>
+        <div style="font-size: 0.7em; margin-top: 5px; color: #aaa;">Detección: <span id="real-res"></span></div>
     </div>
 
-    <hr>
-    <button onclick="generarTodo()" style="background: #27ae60; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">✨ Generar Mapa</button>
-    <button onclick="toggleFullScreen()" style="background: #e74c3c; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">📺 Pantalla Completa</button>
+    <div class="seccion">
+        <h3>🗺️ Tablero</h3>
+        <button class="btn btn-green" onclick="nuevoMapa()">+ Crear Nuevo Mapa</button>
+        <div id="lista-mapas" style="margin-top: 10px; font-size: 0.8em;">
+            </div>
+        <button class="btn btn-blue" onclick="guardarMapaActual()">💾 Guardar Mapa Actual</button>
+    </div>
+
+    <div class="seccion" id="editor-recursos">
+        <h3>🎨 Editor</h3>
+        <div class="selector-recurso activo" onclick="seleccionarTipo('agua', this)"><div class="mini agua"></div> Agua</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('bosque', this)"><div class="mini bosque"></div> Bosque</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('trigo', this)"><div class="mini trigo"></div> Trigo</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('oveja', this)"><div class="mini oveja"></div> Oveja</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('piedra', this)"><div class="mini piedra"></div> Piedra</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('arcilla', this)"><div class="mini arcilla"></div> Arcilla</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('desierto', this)"><div class="mini desierto"></div> Desierto</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('aleatorio', this)"><div class="mini aleatorio"></div> 🎲 Aleatorio</div>
+        <button class="btn btn-green" onclick="generarAleatorios()">✨ Ejecutar Dados</button>
+    </div>
 </div>
 
 <div class="contenedor-tablero">
@@ -125,13 +117,7 @@
 
 <script>
     let tipoSeleccionado = 'agua';
-    const tiposAleatorios = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
-
-    // Mostrar píxeles al cargar
-    window.onload = function() {
-        const resolution = window.screen.width + " x " + window.screen.height;
-        document.getElementById('display-px').value = resolution;
-    };
+    let mapasGuardados = JSON.parse(localStorage.getItem('catan_maps')) || {};
 
     function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
 
@@ -141,21 +127,85 @@
         elemento.classList.add('activo');
     }
 
+    // Inicializar Tablero
     const tablero = document.getElementById('tablero');
-    for (let i = 0; i < 150; i++) {
-        const hex = document.createElement('div');
-        hex.className = 'hex agua';
-        hex.onclick = () => { 
-            hex.className = 'hex ' + tipoSeleccionado; 
-            if(tipoSeleccionado === 'aleatorio') hex.innerText = '?'; 
-            else { hex.innerText = ''; hex.innerHTML = ''; }
-        };
-        tablero.appendChild(hex);
+    function crearCeldasVacias() {
+        tablero.innerHTML = '';
+        for (let i = 0; i < 150; i++) {
+            const hex = document.createElement('div');
+            hex.className = 'hex agua';
+            hex.onclick = () => { 
+                hex.className = 'hex ' + tipoSeleccionado; 
+                hex.innerText = tipoSeleccionado === 'aleatorio' ? '?' : ''; 
+                if(tipoSeleccionado !== 'aleatorio') hex.innerHTML = '';
+            };
+            tablero.appendChild(hex);
+        }
     }
 
-    function generarTodo() {
+    function nuevoMapa() {
+        if(confirm("¿Quieres limpiar el tablero actual?")) {
+            crearCeldasVacias();
+            toggleMenu();
+        }
+    }
+
+    function guardarConfig() {
+        const config = {
+            wcm: document.getElementById('tv-w-cm').value,
+            hcm: document.getElementById('tv-h-cm').value,
+            wpx: document.getElementById('tv-w-px').value,
+            hpx: document.getElementById('tv-h-px').value
+        };
+        localStorage.setItem('catan_config', JSON.stringify(config));
+        alert("Configuración de TV guardada.");
+    }
+
+    function guardarMapaActual() {
+        const nombre = prompt("Nombre del mapa (ej: Córcega):");
+        if (!nombre) return;
+        const celdas = Array.from(document.querySelectorAll('.hex')).map(h => h.className);
+        mapasGuardados[nombre] = celdas;
+        localStorage.setItem('catan_maps', JSON.stringify(mapasGuardados));
+        actualizarListaMapas();
+    }
+
+    function cargarMapa(nombre) {
+        const celdasData = mapasGuardados[nombre];
+        const hexes = document.querySelectorAll('.hex');
+        celdasData.forEach((clase, i) => {
+            hexes[i].className = clase;
+            hexes[i].innerText = clase.includes('aleatorio') ? '?' : '';
+        });
+        toggleMenu();
+    }
+
+    function actualizarListaMapas() {
+        const lista = document.getElementById('lista-mapas');
+        lista.innerHTML = '';
+        Object.keys(mapasGuardados).forEach(nombre => {
+            const item = document.createElement('div');
+            item.style = "display:flex; justify-content:space-between; margin-bottom:5px; background:#333; padding:5px; border-radius:3px;";
+            item.innerHTML = `
+                <span onclick="cargarMapa('${nombre}')" style="cursor:pointer; flex-grow:1;">📍 ${nombre}</span>
+                <span onclick="borrarMapa('${nombre}')" style="color:red; cursor:pointer; margin-left:10px;">✖</span>
+            `;
+            lista.appendChild(item);
+        });
+    }
+
+    function borrarMapa(nombre) {
+        if(confirm(`¿Borrar ${nombre}?`)) {
+            delete mapasGuardados[nombre];
+            localStorage.setItem('catan_maps', JSON.stringify(mapasGuardados));
+            actualizarListaMapas();
+        }
+    }
+
+    function generarAleatorios() {
+        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
         document.querySelectorAll('.hex.aleatorio').forEach(hex => {
-            const azar = tiposAleatorios[Math.floor(Math.random() * tiposAleatorios.length)];
+            const azar = tipos[Math.floor(Math.random() * tipos.length)];
             hex.className = 'hex ' + azar;
             hex.innerText = '';
             const num = [2,3,4,5,6,8,9,10,11,12][Math.floor(Math.random()*10)];
@@ -164,11 +214,20 @@
         toggleMenu();
     }
 
-    function toggleFullScreen() {
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-        else document.exitFullscreen();
-    }
-</script>
+    window.onload = () => {
+        document.getElementById('real-res').innerText = window.screen.width + "x" + window.screen.height;
+        // Cargar config previa si existe
+        const savedConfig = JSON.parse(localStorage.getItem('catan_config'));
+        if(savedConfig) {
+            document.getElementById('tv-w-cm').value = savedConfig.wcm;
+            document.getElementById('tv-h-cm').value = savedConfig.hcm;
+            document.getElementById('tv-w-px').value = savedConfig.wpx;
+            document.getElementById('tv-h-px').value = savedConfig.hpx;
+        }
+        crearCeldasVacias();
+        actualizarListaMapas();
+    };
 
+</script>
 </body>
 </html>
