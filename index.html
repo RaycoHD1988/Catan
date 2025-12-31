@@ -2,61 +2,58 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Catan Pro TV - Escala Real Rayco</title>
+    <title>Catan Pro TV - Rayco Edition</title>
     <style>
-        :root { 
-            /* CONSTANTES FÍSICAS DE TU TV */
-            --tv-ancho-cm: 121.2;
-            --tv-alto-cm: 68;
-            --pieza-catan-cm: 8; /* Ancho de punta a punta del hexágono real */
-            
-            /* CÁLCULO DE PÍXELES (se actualiza por JS) */
-            --px-por-cm: 15.8; /* Valor inicial estimado */
-            
-            --linea-hex: #000000;
-            --ancho-hex: calc(var(--pieza-catan-cm) * var(--px-por-cm));
-            --alto-hex: calc(var(--ancho-hex) * 1.1547); /* Proporción geométrica */
-        }
-
-        body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        :root { --linea-hex: #000000; }
+        body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
         
         /* Menú Lateral */
         #menu-lateral { 
             position: fixed; left: -250px; top: 0; width: 220px; height: 100%; 
             background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px);
             transition: 0.3s; z-index: 1000; padding: 20px; border-right: 2px solid #444;
-            display: flex; flex-direction: column; gap: 10px;
+            display: flex; flex-direction: column; gap: 10px; overflow-y: auto;
         }
         #menu-lateral.abierto { left: 0; }
         #toggle-menu { position: fixed; left: 10px; top: 10px; z-index: 1001; cursor: pointer; background: #444; border: none; color: white; padding: 10px; border-radius: 5px; }
 
-        .selector-recurso { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
-        .selector-recurso.activo { border-color: #ffeb3b; background: #444; }
-        .mini { width: 30px; height: 30px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; background-position: center; }
+        /* Cuadro de Información Técnica */
+        .info-tecnica {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            border: 1px solid #555;
+            margin-top: 10px;
+        }
+        .info-tecnica label { display: block; margin-top: 5px; color: #aaa; }
+        .info-tecnica input { 
+            width: 80%; background: #222; border: 1px solid #444; color: #00ff00; 
+            padding: 3px; border-radius: 3px; font-family: monospace;
+        }
 
-        /* Contenedor y Tablero */
+        .selector-recurso { 
+            display: flex; align-items: center; gap: 10px; padding: 10px; 
+            border-radius: 8px; cursor: pointer; transition: 0.2s; border: 2px solid transparent;
+        }
+        .selector-recurso:hover { background: #333; }
+        .selector-recurso.activo { border-color: #ffeb3b; background: #444; }
+        
+        .mini { width: 30px; height: 30px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; }
+
         .contenedor-tablero { 
             display: flex; justify-content: center; align-items: center;
             height: 100vh; overflow: auto; background: #0a2333; 
         }
 
-        .tablero { 
-            display: inline-grid; 
-            /* Encaje perfecto: 75% del ancho para la siguiente columna */
-            grid-template-columns: repeat(15, calc(var(--ancho-hex) * 0.76)); 
-            line-height: 0; padding: 100px; 
-        }
+        .tablero { display: inline-grid; grid-template-columns: repeat(15, 87px); line-height: 0; padding: 50px; }
 
         .hex {
-            width: var(--ancho-hex);
-            height: var(--alto-hex);
+            width: 100px; height: 115px;
             background-size: cover; background-position: center;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            /* Margen negativo para que los picos encajen verticalmente */
-            margin-bottom: calc(var(--alto-hex) * -0.26);
-            margin-right: calc(var(--ancho-hex) * -0.12);
+            cursor: pointer; margin-bottom: -28px; margin-right: -13px;
             filter: drop-shadow(0 0 1px var(--linea-hex)) drop-shadow(0 0 1px var(--linea-hex));
             position: relative;
         }
@@ -67,24 +64,26 @@
             border: 2px solid var(--linea-hex); pointer-events: none;
         }
 
-        /* Zig-zag corregido para 15 columnas */
         .hex:nth-child(30n+16), .hex:nth-child(30n+17), .hex:nth-child(30n+18), .hex:nth-child(30n+19), .hex:nth-child(30n+20),
         .hex:nth-child(30n+21), .hex:nth-child(30n+22), .hex:nth-child(30n+23), .hex:nth-child(30n+24), .hex:nth-child(30n+25),
         .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) {
-            transform: translateX(calc(var(--ancho-hex) * 0.38));
+            transform: translateX(44px);
         }
 
-        /* Recursos e Imágenes */
         .agua { background-image: url('images/agua.png'); background-color: #2980b9; }
         .bosque { background-image: url('images/bosque.png'); background-color: #27ae60; }
-        .trigo { background-image: url('images/trigo.png'); background-color: #f1c40f; }
-        .oveja { background-image: url('images/oveja.png'); background-color: #a2d149; }
-        .piedra { background-image: url('images/piedra.png'); background-color: #7f8c8d; }
-        .arcilla { background-image: url('images/arcilla.png'); background-color: #e67e22; }
-        .desierto { background-image: url('images/desierto.png'); background-color: #d35400; }
+        .trigo { background-image: url('images/trigo.png'); background-color: #f1c40f;}
+        .oveja { background-image: url('images/oveja.png'); background-color: #a2d149;}
+        .piedra { background-image: url('images/piedra.png'); background-color: #7f8c8d;}
+        .arcilla { background-image: url('images/arcilla.png'); background-color: #e67e22;}
+        .desierto { background-image: url('images/desierto.png'); background-color: #d35400;}
         .aleatorio { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold; }
 
-        .numero { background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; color: #333; }
+        .numero { 
+            background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; font-size: 16px; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
         .rojo { color: red; }
     </style>
 </head>
@@ -102,6 +101,19 @@
     <div class="selector-recurso" onclick="seleccionarTipo('arcilla', this)"><div class="mini arcilla"></div> Arcilla</div>
     <div class="selector-recurso" onclick="seleccionarTipo('desierto', this)"><div class="mini desierto"></div> Desierto</div>
     <div class="selector-recurso" onclick="seleccionarTipo('aleatorio', this)"><div class="mini aleatorio"></div> 🎲 Aleatorio (?)</div>
+    
+    <div class="info-tecnica">
+        <strong>⚙️ Datos de Pantalla</strong>
+        <label>Píxeles detectados:</label>
+        <input type="text" id="display-px" readonly>
+        
+        <label>Ancho Pantalla (cm):</label>
+        <input type="number" id="input-ancho-cm" value="121.2">
+        
+        <label>Alto Pantalla (cm):</label>
+        <input type="number" id="input-alto-cm" value="68">
+    </div>
+
     <hr>
     <button onclick="generarTodo()" style="background: #27ae60; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">✨ Generar Mapa</button>
     <button onclick="toggleFullScreen()" style="background: #e74c3c; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">📺 Pantalla Completa</button>
@@ -115,16 +127,11 @@
     let tipoSeleccionado = 'agua';
     const tiposAleatorios = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
 
-    // Función para calcular la escala real basada en tus medidas
-    function calibrarPantalla() {
-        const anchoPx = window.screen.width;
-        const anchoCm = 121.2; // Tu constante
-        const pxPorCm = anchoPx / anchoCm;
-        document.documentElement.style.setProperty('--px-por-cm', pxPorCm);
-    }
-
-    window.onload = calibrarPantalla;
-    window.onresize = calibrarPantalla;
+    // Mostrar píxeles al cargar
+    window.onload = function() {
+        const resolution = window.screen.width + " x " + window.screen.height;
+        document.getElementById('display-px').value = resolution;
+    };
 
     function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
 
@@ -140,8 +147,8 @@
         hex.className = 'hex agua';
         hex.onclick = () => { 
             hex.className = 'hex ' + tipoSeleccionado; 
-            hex.innerText = tipoSeleccionado === 'aleatorio' ? '?' : ''; 
-            hex.innerHTML = '';
+            if(tipoSeleccionado === 'aleatorio') hex.innerText = '?'; 
+            else { hex.innerText = ''; hex.innerHTML = ''; }
         };
         tablero.appendChild(hex);
     }
