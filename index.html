@@ -58,16 +58,15 @@
         .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) {
             transform: translateX(44px);
         }
-
-        /* Estilos de Recursos */
-        .agua { background-color: #2980b9; }
-        .bosque { background-color: #27ae60; }
-        .trigo { background-color: #f1c40f; }
-        .oveja { background-color: #a2d149; }
-        .piedra { background-color: #7f8c8d; }
-        .arcilla { background-color: #e67e22; }
-        .desierto { background-color: #d35400; }
-        .aleatorio { background-color: #ffffff; color: black; font-weight: bold; }
+        /* Imágenes de recursos */
+        .agua { background-image: url('images/agua.png'); background-color: #2980b9; } /* Color de respaldo */
+        .bosque { background-image: url('images/bosque.png'); }
+        .trigo { background-image: url('images/trigo.png'); }
+        .oveja { background-image: url('images/oveja.png'); }
+        .piedra { background-image: url('images/piedra.png'); }
+        .arcilla { background-image: url('images/arcilla.png'); }
+        .desierto { background-image: url('images/desierto.png'); }
+        .aleatorio { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold; }
 
         .numero { 
             background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; 
