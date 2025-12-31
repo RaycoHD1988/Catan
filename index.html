@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Catan TV Pro - Rayco</title>
+    <style>
+        body { background-color: #222; display: flex; flex-direction: column; align-items: center; margin: 0; overflow: hidden; font-family: sans-serif; }
+        #controles { background: #333; padding: 10px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 100; }
+        
+        .tablero { 
+            display: grid; 
+            grid-template-columns: repeat(15, 60px); /* Ajustable para tu TV de 55" */
+            gap: 5px; 
+            padding: 50px;
+            justify-content: center;
+        }
+
+        .hex {
+            width: 80px; 
+            height: 92px;
+            background-color: #444;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: -23px; /* Efecto panal */
+        }
+
+        /* Colores de recursos */
+        .agua { background-color: #2196F3; }
+        .bosque { background-color: #2E7D32; }
+        .trigo { background-color: #FBC02D; }
+        .oveja { background-color: #8BC34A; }
+        .piedra { background-color: #757575; }
+        .arcilla { background-color: #D84315; }
+        .desierto { background-color: #D7CCC8; }
+        .fijo { border: 3px solid white; box-sizing: border-box; }
+        
+        .numero { background: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
+        button { padding: 10px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="controles">
+    <button onclick="cambiarModo('fijo')" style="background: #ffeb3b;">Modo: Tierra Fija</button>
+    <button onclick="cambiarModo('aleatorio')" style="background: #81c784;">Modo: Aleatorio</button>
+    <button onclick="generarAleatorios()" style="background: #2196f3; color: white;">¡Generar Recursos!</button>
+</div>
+
+<div class="tablero" id="tablero">
+    </div>
+
+<script>
+    let modoActual = 'fijo';
+    const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
+    const tablero = document.getElementById('tablero');
+
+    // Crear 100 hexágonos iniciales (puedes aumentar según tu TV)
+    for (let i = 0; i < 120; i++) {
+        const hex = document.createElement('div');
+        hex.className = 'hex agua'; // Por defecto todos son agua
+        hex.onclick = () => manejarClick(hex);
+        tablero.appendChild(hex);
+    }
+
+    function cambiarModo(modo) {
+        modoActual = modo;
+        alert("Ahora estás en modo: " + modo.toUpperCase());
+    }
+
+    function manejarClick(el) {
+        if (modoActual === 'fijo') {
+            // Ciclo de tipos de tierra fija
+            if (el.classList.contains('agua')) { el.className = 'hex bosque fijo'; }
+            else if (el.classList.contains('bosque')) { el.className = 'hex trigo fijo'; }
+            else if (el.classList.contains('trigo')) { el.className = 'hex agua'; }
+        } else {
+            // Marcar para que sea aleatorio
+            el.className = 'hex aleatorio';
+            el.style.backgroundColor = '#fff';
+            el.innerHTML = '?';
+        }
+    }
+
+    function generarAleatorios() {
+        const celdas = document.querySelectorAll('.aleatoria');
+        const paraRellenar = document.querySelectorAll('.hex');
+        
+        paraRellenar.forEach(hex => {
+            if (hex.innerHTML === '?') {
+                const azar = tipos[Math.floor(Math.random() * tipos.length)];
+                hex.className = 'hex ' + azar;
+                hex.innerHTML = '<div class="numero">' + (Math.floor(Math.random() * 10) + 2) + '</div>';
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
