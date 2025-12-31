@@ -4,98 +4,124 @@
     <meta charset="UTF-8">
     <title>Catan TV Pro - Rayco</title>
     <style>
-        body { background-color: #222; display: flex; flex-direction: column; align-items: center; margin: 0; overflow: hidden; font-family: sans-serif; }
-        #controles { background: #333; padding: 10px; width: 100%; display: flex; justify-content: center; gap: 10px; z-index: 100; }
+        body { background-color: #1a1a1a; color: white; margin: 0; font-family: sans-serif; overflow: hidden; }
+        #controles { background: #333; padding: 10px; display: flex; justify-content: center; gap: 10px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #444; }
         
+        /* Contenedor del tablero */
+        .contenedor-tablero { 
+            padding: 40px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            height: 90vh;
+            overflow: auto;
+        }
+
         .tablero { 
-            display: grid; 
-            grid-template-columns: repeat(15, 60px); /* Ajustable para tu TV de 55" */
-            gap: 5px; 
-            padding: 50px;
-            justify-content: center;
+            display: inline-grid;
+            /* Ajustamos el espaciado para que encajen */
+            grid-template-columns: repeat(15, 85px); 
+            line-height: 0;
         }
 
         .hex {
-            width: 80px; 
-            height: 92px;
-            background-color: #444;
+            width: 100px; 
+            height: 115px;
+            background-color: #2c3e50;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: 0.3s;
-            margin-bottom: -23px; /* Efecto panal */
+            transition: transform 0.2s;
+            /* Este margen negativo hace que encajen como piezas de puzzle */
+            margin-bottom: -28px; 
+            margin-right: -15px;
         }
 
-        /* Colores de recursos */
-        .agua { background-color: #2196F3; }
-        .bosque { background-color: #2E7D32; }
-        .trigo { background-color: #FBC02D; }
-        .oveja { background-color: #8BC34A; }
-        .piedra { background-color: #757575; }
-        .arcilla { background-color: #D84315; }
-        .desierto { background-color: #D7CCC8; }
-        .fijo { border: 3px solid white; box-sizing: border-box; }
+        /* Desplazamiento de filas pares para efecto panal */
+        .hex:nth-child(30n+16), .hex:nth-child(30n+17), .hex:nth-child(30n+18), .hex:nth-child(30n+19), .hex:nth-child(30n+20),
+        .hex:nth-child(30n+21), .hex:nth-child(30n+22), .hex:nth-child(30n+23), .hex:nth-child(30n+24), .hex:nth-child(30n+25),
+        .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) {
+            transform: translateX(42px);
+        }
+
+        .hex:hover { transform: scale(1.05) z-index: 10; }
         
-        .numero { background: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
-        button { padding: 10px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; }
+        /* Colores */
+        .agua { background-color: #2980b9; }
+        .bosque { background-color: #27ae60; }
+        .trigo { background-color: #f1c40f; }
+        .oveja { background-color: #a2d149; }
+        .piedra { background-color: #7f8c8d; }
+        .arcilla { background-color: #e67e22; }
+        .aleatorio { background-color: #ecf0f1; color: black; font-weight: bold; }
+
+        button { padding: 10px 15px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; background: #eee; }
+        button:hover { background: #fff; }
+        .btn-pantalla { background: #e74c3c; color: white; }
     </style>
 </head>
 <body>
 
 <div id="controles">
-    <button onclick="cambiarModo('fijo')" style="background: #ffeb3b;">Modo: Tierra Fija</button>
-    <button onclick="cambiarModo('aleatorio')" style="background: #81c784;">Modo: Aleatorio</button>
-    <button onclick="generarAleatorios()" style="background: #2196f3; color: white;">¡Generar Recursos!</button>
+    <button onclick="cambiarModo('fijo')">🛠️ Tierra Fija</button>
+    <button onclick="cambiarModo('aleatorio')">🎲 Marcar Aleatorio</button>
+    <button onclick="generarAleatorios()" style="background: #27ae60; color: white;">✨ Generar Recursos</button>
+    <button class="btn-pantalla" onclick="toggleFullScreen()">📺 Pantalla Completa</button>
 </div>
 
-<div class="tablero" id="tablero">
-    </div>
+<div class="contenedor-tablero">
+    <div class="tablero" id="tablero"></div>
+</div>
 
 <script>
     let modoActual = 'fijo';
     const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
     const tablero = document.getElementById('tablero');
 
-    // Crear 100 hexágonos iniciales (puedes aumentar según tu TV)
-    for (let i = 0; i < 120; i++) {
+    // Generamos 150 hexágonos para cubrir la TV de 55"
+    for (let i = 0; i < 150; i++) {
         const hex = document.createElement('div');
-        hex.className = 'hex agua'; // Por defecto todos son agua
+        hex.className = 'hex agua';
         hex.onclick = () => manejarClick(hex);
         tablero.appendChild(hex);
     }
 
     function cambiarModo(modo) {
         modoActual = modo;
-        alert("Ahora estás en modo: " + modo.toUpperCase());
     }
 
     function manejarClick(el) {
         if (modoActual === 'fijo') {
-            // Ciclo de tipos de tierra fija
-            if (el.classList.contains('agua')) { el.className = 'hex bosque fijo'; }
-            else if (el.classList.contains('bosque')) { el.className = 'hex trigo fijo'; }
-            else if (el.classList.contains('trigo')) { el.className = 'hex agua'; }
+            if (el.classList.contains('agua')) el.className = 'hex bosque';
+            else if (el.classList.contains('bosque')) el.className = 'hex trigo';
+            else if (el.classList.contains('trigo')) el.className = 'hex oveja';
+            else if (el.classList.contains('oveja')) el.className = 'hex piedra';
+            else if (el.classList.contains('piedra')) el.className = 'hex arcilla';
+            else el.className = 'hex agua';
         } else {
-            // Marcar para que sea aleatorio
             el.className = 'hex aleatorio';
-            el.style.backgroundColor = '#fff';
-            el.innerHTML = '?';
+            el.innerText = '?';
         }
     }
 
     function generarAleatorios() {
-        const celdas = document.querySelectorAll('.aleatoria');
-        const paraRellenar = document.querySelectorAll('.hex');
-        
-        paraRellenar.forEach(hex => {
-            if (hex.innerHTML === '?') {
-                const azar = tipos[Math.floor(Math.random() * tipos.length)];
-                hex.className = 'hex ' + azar;
-                hex.innerHTML = '<div class="numero">' + (Math.floor(Math.random() * 10) + 2) + '</div>';
-            }
+        document.querySelectorAll('.aleatorio').forEach(hex => {
+            const azar = tipos[Math.floor(Math.random() * tipos.length)];
+            hex.className = 'hex ' + azar;
+            hex.innerText = '';
         });
+    }
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
     }
 </script>
 
