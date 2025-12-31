@@ -60,12 +60,12 @@
         }
         /* Imágenes de recursos */
         .agua { background-image: url('images/agua.png'); background-color: #2980b9; } /* Color de respaldo */
-        .bosque { background-image: url('images/bosque.png'); }
-        .trigo { background-image: url('images/trigo.png'); }
-        .oveja { background-image: url('images/oveja.png'); }
-        .piedra { background-image: url('images/piedra.png'); }
-        .arcilla { background-image: url('images/arcilla.png'); }
-        .desierto { background-image: url('images/desierto.png'); }
+        .bosque { background-image: url('images/bosque.png');  background-color: #27ae60; }
+        .trigo { background-image: url('images/trigo.png'); background-color: #f1c40f;}
+        .oveja { background-image: url('images/oveja.png'); background-color: #a2d149;}
+        .piedra { background-image: url('images/piedra.png'); background-color: #7f8c8d;}
+        .arcilla { background-image: url('images/arcilla.png'); background-color: #e67e22;}
+        .desierto { background-image: url('images/desierto.png'); background-color: #d35400;}
         .aleatorio { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold; }
 
         .numero { 
@@ -140,5 +140,167 @@
     }
 </script>
 
+</body>
+</html<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Catan Pro TV - Escala Real</title>
+    <style>
+        :root { 
+            --ancho-hex-cm: 8; /* Tamaño estándar de Catan */
+            --factor-zoom: 37.8; /* Conversión inicial px a cm */
+            --linea-hex: #000000; 
+        }
+        body { background-color: #0a1a25; color: white; margin: 0; font-family: sans-serif; overflow: hidden; }
+        
+        /* Menú Lateral */
+        #menu-lateral { 
+            position: fixed; left: -280px; top: 0; width: 250px; height: 100%; 
+            background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px);
+            transition: 0.3s; z-index: 1000; padding: 20px; border-right: 2px solid #444;
+            display: flex; flex-direction: column; gap: 8px; overflow-y: auto;
+        }
+        #menu-lateral.abierto { left: 0; }
+        #toggle-menu { position: fixed; left: 10px; top: 10px; z-index: 1001; cursor: pointer; background: #333; border: none; color: white; padding: 10px; border-radius: 5px; }
+
+        .selector-recurso { 
+            display: flex; align-items: center; gap: 10px; padding: 8px; 
+            border-radius: 8px; cursor: pointer; border: 2px solid transparent;
+        }
+        .selector-recurso.activo { border-color: #ffeb3b; background: #333; }
+        .mini { width: 30px; height: 30px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; border: 1px solid #555; }
+
+        /* Configuración de Pantalla */
+        .config-box { background: #222; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 0.8em; }
+        .config-box input { width: 50px; }
+
+        /* Tablero */
+        .contenedor-tablero { 
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100vw; overflow: auto;
+        }
+        .tablero { 
+            display: inline-grid; 
+            grid-template-columns: repeat(20, calc(var(--ancho-hex-cm) * var(--factor-zoom) * 0.75)); 
+            line-height: 0;
+        }
+
+        .hex {
+            width: calc(var(--ancho-hex-cm) * var(--factor-zoom));
+            height: calc(var(--ancho-hex-cm) * var(--factor-zoom) * 1.1547);
+            background-size: cover; background-position: center;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: calc(var(--ancho-hex-cm) * var(--factor-zoom) * -0.28);
+            margin-right: calc(var(--ancho-hex-cm) * var(--factor-zoom) * -0.13);
+            filter: drop-shadow(0 0 1px var(--linea-hex));
+            position: relative;
+        }
+        .hex::after {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            border: 2px solid var(--linea-hex); pointer-events: none;
+        }
+
+        /* Desplazamiento Panal */
+        .hex:nth-child(40n+21), .hex:nth-child(40n+22), .hex:nth-child(40n+23), .hex:nth-child(40n+24), .hex:nth-child(40n+25),
+        .hex:nth-child(40n+26), .hex:nth-child(40n+27), .hex:nth-child(40n+28), .hex:nth-child(40n+29), .hex:nth-child(40n+30),
+        .hex:nth-child(40n+31), .hex:nth-child(40n+32), .hex:nth-child(40n+33), .hex:nth-child(40n+34), .hex:nth-child(40n+35),
+        .hex:nth-child(40n+36), .hex:nth-child(40n+37), .hex:nth-child(40n+38), .hex:nth-child(40n+39), .hex:nth-child(40n+40) {
+            transform: translateX(calc(var(--ancho-hex-cm) * var(--factor-zoom) * 0.43));
+        }
+
+        /* Imágenes */
+        .bosque { background-image: url('images/bosque.png'); }
+        .trigo { background-image: url('images/trigo.png'); }
+        .oveja { background-image: url('images/oveja.png'); }
+        .piedra { background-image: url('images/piedra.png'); }
+        .arcilla { background-image: url('images/arcilla.png'); }
+        .desierto { background-image: url('images/desierto.png'); }
+        .agua { background-image: url('images/agua.png'); background-color: #2980b9; }
+        .aleatorio { background-color: white; color: black; font-weight: bold; }
+
+        .numero { background: rgba(255,255,255,0.8); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; border: 1px solid black; }
+        .rojo { color: red; }
+    </style>
+</head>
+<body>
+
+<button id="toggle-menu" onclick="toggleMenu()">☰ Menú</button>
+
+<div id="menu-lateral">
+    <h3>Recursos</h3>
+    <div class="selector-recurso activo" onclick="seleccionarTipo('agua', this)"><div class="mini agua"></div> Agua</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('bosque', this)"><div class="mini bosque"></div> Bosque</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('trigo', this)"><div class="mini trigo"></div> Trigo</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('oveja', this)"><div class="mini oveja"></div> Oveja</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('piedra', this)"><div class="mini piedra"></div> Piedra</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('arcilla', this)"><div class="mini arcilla"></div> Arcilla</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('desierto', this)"><div class="mini desierto"></div> Desierto</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('aleatorio', this)"><div class="mini aleatorio"></div> 🎲 Aleatorio</div>
+    
+    <div class="config-box">
+        <strong>Calibrar escala (TV 55")</strong><br>
+        Hex (cm): <input type="number" id="input-cm" value="8" onchange="ajustarEscala()"><br>
+        Ajuste Zoom: <input type="number" id="input-zoom" value="37.8" step="0.5" onchange="ajustarEscala()">
+        <p style="font-size: 0.7em;">Aumenta "Ajuste Zoom" si el hexágono es pequeño en la pantalla.</p>
+    </div>
+
+    <button onclick="generarMapa()" style="background: #27ae60; color: white; padding: 10px; border: none; margin-top: 10px; cursor: pointer;">✨ Generar Aleatorios</button>
+    <button onclick="toggleFullScreen()" style="background: #e74c3c; color: white; padding: 10px; border: none; cursor: pointer;">📺 Pantalla Completa</button>
+</div>
+
+<div class="contenedor-tablero">
+    <div class="tablero" id="tablero"></div>
+</div>
+
+<script>
+    let tipoSeleccionado = 'agua';
+    const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
+
+    function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
+    
+    function seleccionarTipo(tipo, el) {
+        tipoSeleccionado = tipo;
+        document.querySelectorAll('.selector-recurso').forEach(item => item.classList.remove('activo'));
+        el.classList.add('activo');
+    }
+
+    function ajustarEscala() {
+        const cm = document.getElementById('input-cm').value;
+        const zoom = document.getElementById('input-zoom').value;
+        document.documentElement.style.setProperty('--ancho-hex-cm', cm);
+        document.documentElement.style.setProperty('--factor-zoom', zoom);
+    }
+
+    const tablero = document.getElementById('tablero');
+    for (let i = 0; i < 200; i++) {
+        const hex = document.createElement('div');
+        hex.className = 'hex agua';
+        hex.onclick = () => {
+            hex.className = 'hex ' + tipoSeleccionado;
+            hex.innerText = tipoSeleccionado === 'aleatorio' ? '?' : '';
+            hex.innerHTML = ''; 
+        };
+        tablero.appendChild(hex);
+    }
+
+    function generarMapa() {
+        document.querySelectorAll('.aleatorio').forEach(hex => {
+            const azar = tipos[Math.floor(Math.random() * tipos.length)];
+            hex.className = 'hex ' + azar;
+            hex.innerText = '';
+            const n = [2,3,4,5,6,8,9,10,11,12][Math.floor(Math.random()*10)];
+            hex.innerHTML = `<div class="numero ${n===6||n===8?'rojo':''}">${n}</div>`;
+        });
+        toggleMenu();
+    }
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+    }
+</script>
 </body>
 </html>
