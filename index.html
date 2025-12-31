@@ -2,92 +2,98 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Catan TV Pro - Rayco</title>
+    <title>Catan Pro TV - Rayco Edition</title>
     <style>
-        body { background-color: #1a1a1a; color: white; margin: 0; font-family: sans-serif; overflow: hidden; }
-        #controles { background: #333; padding: 10px; display: flex; justify-content: center; gap: 10px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #444; }
+        :root { --linea-hex: #000000; } /* Color de la línea entre hexágonos */
+        body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
         
+        /* Menú Lateral */
+        #menu-lateral { 
+            position: fixed; left: -250px; top: 0; width: 220px; height: 100%; 
+            background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px);
+            transition: 0.3s; z-index: 1000; padding: 20px; border-right: 2px solid #444;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        #menu-lateral.abierto { left: 0; }
+        #toggle-menu { position: fixed; left: 10px; top: 10px; z-index: 1001; cursor: pointer; background: #444; border: none; color: white; padding: 10px; border-radius: 5px; }
+
+        .selector-recurso { 
+            display: flex; align-items: center; gap: 10px; padding: 10px; 
+            border-radius: 8px; cursor: pointer; transition: 0.2s; border: 2px solid transparent;
+        }
+        .selector-recurso:hover { background: #333; }
+        .selector-recurso.activo { border-color: #ffeb3b; background: #444; }
+        
+        /* Miniatura de color para el menú */
+        .mini { width: 30px; height: 30px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+
+        /* Contenedor del tablero */
         .contenedor-tablero { 
-            padding: 40px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            height: 90vh;
-            overflow: auto;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: auto; background: #0a2333; /* Color mar profundo */
         }
 
-        .tablero { 
-            display: inline-grid;
-            grid-template-columns: repeat(15, 85px); 
-            line-height: 0;
-        }
+        .tablero { display: inline-grid; grid-template-columns: repeat(15, 87px); line-height: 0; padding: 50px; }
 
         .hex {
-            width: 100px; 
-            height: 115px;
-            background-size: cover; /* Para que la imagen cubra todo el hexágono */
-            background-position: center;
+            width: 100px; height: 115px;
+            background-size: cover; background-position: center;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-bottom: -28px; 
-            margin-right: -15px;
-            border: 2px solid rgba(255, 255, 255, 0.1); /* Borde sutil */
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; margin-bottom: -28px; margin-right: -13px;
+            /* La línea negra: un filtro de sombra interna o borde */
+            filter: drop-shadow(0 0 1px var(--linea-hex)) drop-shadow(0 0 1px var(--linea-hex));
+            position: relative;
         }
 
-        /* Desplazamiento de filas pares para efecto panal */
+        /* Línea negra divisoria usando un pseudo-elemento */
+        .hex::after {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            border: 2px solid var(--linea-hex); pointer-events: none;
+        }
+
         .hex:nth-child(30n+16), .hex:nth-child(30n+17), .hex:nth-child(30n+18), .hex:nth-child(30n+19), .hex:nth-child(30n+20),
         .hex:nth-child(30n+21), .hex:nth-child(30n+22), .hex:nth-child(30n+23), .hex:nth-child(30n+24), .hex:nth-child(30n+25),
         .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) {
-            transform: translateX(42px);
+            transform: translateX(44px);
         }
 
-        .hex:hover { transform: scale(1.05) z-index: 10; }
-        
-        /* Imágenes de recursos */
-        .agua { background-image: url('images/agua.png'); background-color: #2980b9; } /* Color de respaldo */
-        .bosque { background-image: url('images/bosque.png'); }
-        .trigo { background-image: url('images/trigo.png'); }
-        .oveja { background-image: url('images/oveja.png'); }
-        .piedra { background-image: url('images/piedra.png'); }
-        .arcilla { background-image: url('images/arcilla.png'); }
-        .desierto { background-image: url('images/desierto.png'); }
-        .aleatorio { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold; }
+        /* Estilos de Recursos */
+        .agua { background-color: #2980b9; }
+        .bosque { background-color: #27ae60; }
+        .trigo { background-color: #f1c40f; }
+        .oveja { background-color: #a2d149; }
+        .piedra { background-color: #7f8c8d; }
+        .arcilla { background-color: #e67e22; }
+        .desierto { background-color: #d35400; }
+        .aleatorio { background-color: #ffffff; color: black; font-weight: bold; }
 
         .numero { 
-            background: rgba(255, 255, 255, 0.8); 
-            border-radius: 50%; 
-            width: 35px; 
-            height: 35px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            font-size: 18px; 
-            color: #333;
-            border: 2px solid #555;
-            position: relative;
-            z-index: 2; /* Para que esté por encima de la imagen */
+            background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; font-size: 16px; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        .numero.rojo { color: #c0392b; } /* Números críticos 6 y 8 */
-
-
-        button { padding: 10px 15px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; background: #eee; }
-        button:hover { background: #fff; }
-        .btn-pantalla { background: #e74c3c; color: white; }
+        .rojo { color: red; }
     </style>
 </head>
 <body>
 
-<div id="controles">
-    <button onclick="cambiarModo('agua')">🌊 Mar</button>
-    <button onclick="cambiarModo('fijo')">🛠️ Tierra Fija</button>
-    <button onclick="cambiarModo('aleatorio')">🎲 Marcar Aleatorio</button>
-    <button onclick="generarAleatorios()" style="background: #27ae60; color: white;">✨ Generar Recursos</button>
-    <button class="btn-pantalla" onclick="toggleFullScreen()">📺 Pantalla Completa</button>
+<button id="toggle-menu" onclick="toggleMenu()">☰ Menú</button>
+
+<div id="menu-lateral">
+    <h3>Recursos</h3>
+    <div class="selector-recurso activo" onclick="seleccionarTipo('agua', this)"><div class="mini agua"></div> Agua</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('bosque', this)"><div class="mini bosque"></div> Bosque (Leña)</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('trigo', this)"><div class="mini trigo"></div> Trigo</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('oveja', this)"><div class="mini oveja"></div> Oveja (Lana)</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('piedra', this)"><div class="mini piedra"></div> Piedra</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('arcilla', this)"><div class="mini arcilla"></div> Arcilla</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('desierto', this)"><div class="mini desierto"></div> Desierto</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('aleatorio', this)"><div class="mini aleatorio"></div> 🎲 Aleatorio (?)</div>
+    <hr>
+    <button onclick="generarTodo()" style="background: #27ae60; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">✨ Generar Mapa</button>
+    <button onclick="toggleFullScreen()" style="background: #e74c3c; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">📺 Pantalla Completa</button>
 </div>
 
 <div class="contenedor-tablero">
@@ -95,83 +101,43 @@
 </div>
 
 <script>
-    let modoActual = 'agua'; // Empezamos con modo agua
-    const tiposRecursos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla', 'desierto'];
-    const numerosCatan = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12]; // Números estándar de Catan
-    const tablero = document.getElementById('tablero');
+    let tipoSeleccionado = 'agua';
+    const tiposAleatorios = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
 
-    // Generamos 150 hexágonos para cubrir la TV de 55"
+    function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
+
+    function seleccionarTipo(tipo, elemento) {
+        tipoSeleccionado = tipo;
+        document.querySelectorAll('.selector-recurso').forEach(el => el.classList.remove('activo'));
+        elemento.classList.add('activo');
+    }
+
+    const tablero = document.getElementById('tablero');
     for (let i = 0; i < 150; i++) {
         const hex = document.createElement('div');
         hex.className = 'hex agua';
-        hex.onclick = () => manejarClick(hex);
+        hex.onclick = () => { hex.className = 'hex ' + tipoSeleccionado; if(tipoSeleccionado === 'aleatorio') hex.innerText = '?'; else hex.innerText = ''; };
         tablero.appendChild(hex);
     }
 
-    function cambiarModo(modo) {
-        modoActual = modo;
-    }
-
-    function manejarClick(el) {
-        if (modoActual === 'agua') {
-            el.className = 'hex agua';
-            el.innerHTML = '';
-        } else if (modoActual === 'fijo') {
-            // Ciclo de tipos de tierra fija (incluyendo desierto)
-            if (el.classList.contains('agua')) el.className = 'hex bosque';
-            else if (el.classList.contains('bosque')) el.className = 'hex trigo';
-            else if (el.classList.contains('trigo')) el.className = 'hex oveja';
-            else if (el.classList.contains('oveja')) el.className = 'hex piedra';
-            else if (el.classList.contains('piedra')) el.className = 'hex arcilla';
-            else if (el.classList.contains('arcilla')) el.className = 'hex desierto';
-            else el.className = 'hex agua'; // Vuelve a agua si ya era desierto
-            el.innerHTML = ''; // Limpiamos el número si lo hubiera
-        } else if (modoActual === 'aleatorio') {
-            el.className = 'hex aleatorio';
-            el.innerText = '?';
-        }
-    }
-
-    function generarAleatorios() {
-        const celdasAleatorias = document.querySelectorAll('.aleatorio');
-        
-        // Asignar recursos a las celdas marcadas como aleatorias
-        let tiposTemporales = [...tiposRecursos]; // Copia para no modificar el original
-        celdasAleatorias.forEach(hex => {
-            if (tiposTemporales.length === 0) tiposTemporales = [...tiposRecursos]; // Reiniciar si se acaban los tipos
-            const tipoAleatorio = tiposTemporales.splice(Math.floor(Math.random() * tiposTemporales.length), 1)[0];
-            hex.className = 'hex ' + tipoAleatorio;
-            hex.innerText = ''; // Limpiamos el '?'
-        });
-
-        // Asignar números (solo a los hexágonos que no sean desierto ni agua)
-        let numerosTemporales = [...numerosCatan]; // Copia de los números
-        document.querySelectorAll('.hex:not(.agua):not(.desierto)').forEach(hex => {
-            if (numerosTemporales.length === 0) { // Si se acaban los números, reiniciamos o manejamos el error
-                numerosTemporales = [...numerosCatan]; 
+    function generarTodo() {
+        const celdas = document.querySelectorAll('.hex');
+        celdas.forEach(hex => {
+            if (hex.classList.contains('aleatorio')) {
+                const azar = tiposAleatorios[Math.floor(Math.random() * tiposAleatorios.length)];
+                hex.className = 'hex ' + azar;
+                hex.innerText = '';
+                // Añadir número al azar
+                const num = [2,3,4,5,6,8,9,10,11,12][Math.floor(Math.random()*10)];
+                hex.innerHTML = `<div class="numero ${num===6||num===8?'rojo':''}">${num}</div>`;
             }
-            const numeroIndex = Math.floor(Math.random() * numerosTemporales.length);
-            const numero = numerosTemporales.splice(numeroIndex, 1)[0];
-            
-            const numeroDiv = document.createElement('div');
-            numeroDiv.className = 'numero';
-            if (numero === 6 || numero === 8) {
-                numeroDiv.classList.add('rojo');
-            }
-            numeroDiv.innerText = numero;
-            hex.innerHTML = ''; // Limpiamos cualquier contenido previo
-            hex.appendChild(numeroDiv);
         });
+        toggleMenu();
     }
 
     function toggleFullScreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
-        }
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
     }
 </script>
 
