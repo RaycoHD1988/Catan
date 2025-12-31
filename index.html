@@ -2,10 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Catan Pro TV - Rayco Edition</title>
+    <title>Catan Pro TV - Escala Real Rayco</title>
     <style>
-        :root { --linea-hex: #000000; } /* Color de la línea entre hexágonos */
-        body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        :root { 
+            /* CONSTANTES FÍSICAS DE TU TV */
+            --tv-ancho-cm: 121.2;
+            --tv-alto-cm: 68;
+            --pieza-catan-cm: 8; /* Ancho de punta a punta del hexágono real */
+            
+            /* CÁLCULO DE PÍXELES (se actualiza por JS) */
+            --px-por-cm: 15.8; /* Valor inicial estimado */
+            
+            --linea-hex: #000000;
+            --ancho-hex: calc(var(--pieza-catan-cm) * var(--px-por-cm));
+            --alto-hex: calc(var(--ancho-hex) * 1.1547); /* Proporción geométrica */
+        }
+
+        body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
         /* Menú Lateral */
         #menu-lateral { 
@@ -17,62 +30,61 @@
         #menu-lateral.abierto { left: 0; }
         #toggle-menu { position: fixed; left: 10px; top: 10px; z-index: 1001; cursor: pointer; background: #444; border: none; color: white; padding: 10px; border-radius: 5px; }
 
-        .selector-recurso { 
-            display: flex; align-items: center; gap: 10px; padding: 10px; 
-            border-radius: 8px; cursor: pointer; transition: 0.2s; border: 2px solid transparent;
-        }
-        .selector-recurso:hover { background: #333; }
+        .selector-recurso { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
         .selector-recurso.activo { border-color: #ffeb3b; background: #444; }
-        
-        /* Miniatura de color para el menú */
-        .mini { width: 30px; height: 30px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+        .mini { width: 30px; height: 30px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; background-position: center; }
 
-        /* Contenedor del tablero */
+        /* Contenedor y Tablero */
         .contenedor-tablero { 
             display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: auto; background: #0a2333; /* Color mar profundo */
+            height: 100vh; overflow: auto; background: #0a2333; 
         }
 
-        .tablero { display: inline-grid; grid-template-columns: repeat(15, 87px); line-height: 0; padding: 50px; }
+        .tablero { 
+            display: inline-grid; 
+            /* Encaje perfecto: 75% del ancho para la siguiente columna */
+            grid-template-columns: repeat(15, calc(var(--ancho-hex) * 0.76)); 
+            line-height: 0; padding: 100px; 
+        }
 
         .hex {
-            width: 100px; height: 115px;
+            width: var(--ancho-hex);
+            height: var(--alto-hex);
             background-size: cover; background-position: center;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; margin-bottom: -28px; margin-right: -13px;
-            /* La línea negra: un filtro de sombra interna o borde */
+            cursor: pointer;
+            /* Margen negativo para que los picos encajen verticalmente */
+            margin-bottom: calc(var(--alto-hex) * -0.26);
+            margin-right: calc(var(--ancho-hex) * -0.12);
             filter: drop-shadow(0 0 1px var(--linea-hex)) drop-shadow(0 0 1px var(--linea-hex));
             position: relative;
         }
 
-        /* Línea negra divisoria usando un pseudo-elemento */
         .hex::after {
             content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             border: 2px solid var(--linea-hex); pointer-events: none;
         }
 
+        /* Zig-zag corregido para 15 columnas */
         .hex:nth-child(30n+16), .hex:nth-child(30n+17), .hex:nth-child(30n+18), .hex:nth-child(30n+19), .hex:nth-child(30n+20),
         .hex:nth-child(30n+21), .hex:nth-child(30n+22), .hex:nth-child(30n+23), .hex:nth-child(30n+24), .hex:nth-child(30n+25),
         .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) {
-            transform: translateX(44px);
+            transform: translateX(calc(var(--ancho-hex) * 0.38));
         }
-        /* Imágenes de recursos */
-        .agua { background-image: url('images/agua.png'); background-color: #2980b9; } /* Color de respaldo */
-        .bosque { background-image: url('images/bosque.png');  background-color: #27ae60; }
-        .trigo { background-image: url('images/trigo.png'); background-color: #f1c40f;}
-        .oveja { background-image: url('images/oveja.png'); background-color: #a2d149;}
-        .piedra { background-image: url('images/piedra.png'); background-color: #7f8c8d;}
-        .arcilla { background-image: url('images/arcilla.png'); background-color: #e67e22;}
-        .desierto { background-image: url('images/desierto.png'); background-color: #d35400;}
+
+        /* Recursos e Imágenes */
+        .agua { background-image: url('images/agua.png'); background-color: #2980b9; }
+        .bosque { background-image: url('images/bosque.png'); background-color: #27ae60; }
+        .trigo { background-image: url('images/trigo.png'); background-color: #f1c40f; }
+        .oveja { background-image: url('images/oveja.png'); background-color: #a2d149; }
+        .piedra { background-image: url('images/piedra.png'); background-color: #7f8c8d; }
+        .arcilla { background-image: url('images/arcilla.png'); background-color: #e67e22; }
+        .desierto { background-image: url('images/desierto.png'); background-color: #d35400; }
         .aleatorio { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold; }
 
-        .numero { 
-            background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; font-size: 16px; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
+        .numero { background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; color: #333; }
         .rojo { color: red; }
     </style>
 </head>
@@ -83,9 +95,9 @@
 <div id="menu-lateral">
     <h3>Recursos</h3>
     <div class="selector-recurso activo" onclick="seleccionarTipo('agua', this)"><div class="mini agua"></div> Agua</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('bosque', this)"><div class="mini bosque"></div> Bosque (Leña)</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('bosque', this)"><div class="mini bosque"></div> Bosque</div>
     <div class="selector-recurso" onclick="seleccionarTipo('trigo', this)"><div class="mini trigo"></div> Trigo</div>
-    <div class="selector-recurso" onclick="seleccionarTipo('oveja', this)"><div class="mini oveja"></div> Oveja (Lana)</div>
+    <div class="selector-recurso" onclick="seleccionarTipo('oveja', this)"><div class="mini oveja"></div> Oveja</div>
     <div class="selector-recurso" onclick="seleccionarTipo('piedra', this)"><div class="mini piedra"></div> Piedra</div>
     <div class="selector-recurso" onclick="seleccionarTipo('arcilla', this)"><div class="mini arcilla"></div> Arcilla</div>
     <div class="selector-recurso" onclick="seleccionarTipo('desierto', this)"><div class="mini desierto"></div> Desierto</div>
@@ -103,6 +115,17 @@
     let tipoSeleccionado = 'agua';
     const tiposAleatorios = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
 
+    // Función para calcular la escala real basada en tus medidas
+    function calibrarPantalla() {
+        const anchoPx = window.screen.width;
+        const anchoCm = 121.2; // Tu constante
+        const pxPorCm = anchoPx / anchoCm;
+        document.documentElement.style.setProperty('--px-por-cm', pxPorCm);
+    }
+
+    window.onload = calibrarPantalla;
+    window.onresize = calibrarPantalla;
+
     function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
 
     function seleccionarTipo(tipo, elemento) {
@@ -115,21 +138,21 @@
     for (let i = 0; i < 150; i++) {
         const hex = document.createElement('div');
         hex.className = 'hex agua';
-        hex.onclick = () => { hex.className = 'hex ' + tipoSeleccionado; if(tipoSeleccionado === 'aleatorio') hex.innerText = '?'; else hex.innerText = ''; };
+        hex.onclick = () => { 
+            hex.className = 'hex ' + tipoSeleccionado; 
+            hex.innerText = tipoSeleccionado === 'aleatorio' ? '?' : ''; 
+            hex.innerHTML = '';
+        };
         tablero.appendChild(hex);
     }
 
     function generarTodo() {
-        const celdas = document.querySelectorAll('.hex');
-        celdas.forEach(hex => {
-            if (hex.classList.contains('aleatorio')) {
-                const azar = tiposAleatorios[Math.floor(Math.random() * tiposAleatorios.length)];
-                hex.className = 'hex ' + azar;
-                hex.innerText = '';
-                // Añadir número al azar
-                const num = [2,3,4,5,6,8,9,10,11,12][Math.floor(Math.random()*10)];
-                hex.innerHTML = `<div class="numero ${num===6||num===8?'rojo':''}">${num}</div>`;
-            }
+        document.querySelectorAll('.hex.aleatorio').forEach(hex => {
+            const azar = tiposAleatorios[Math.floor(Math.random() * tiposAleatorios.length)];
+            hex.className = 'hex ' + azar;
+            hex.innerText = '';
+            const num = [2,3,4,5,6,8,9,10,11,12][Math.floor(Math.random()*10)];
+            hex.innerHTML = `<div class="numero ${num===6||num===8?'rojo':''}">${num}</div>`;
         });
         toggleMenu();
     }
@@ -141,4 +164,4 @@
 </script>
 
 </body>
-</html
+</html>
