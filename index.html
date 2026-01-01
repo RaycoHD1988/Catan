@@ -6,26 +6,20 @@
     <style>
         :root { 
             --linea-hex: #000000;
-            --zoom-manual: 1;
-            /* Estas variables las sobreescribe el JavaScript */
             --hex_wpx: 100px;
             --hex_hpx: 115px;
         }
         body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* Botones Flotantes */
         .btn-flotante { 
             position: fixed; left: 10px; z-index: 1001; cursor: pointer; 
             background: #444; border: none; color: white; padding: 10px; 
             border-radius: 5px; width: 45px; height: 40px; display: flex; 
             align-items: center; justify-content: center; font-size: 20px;
-            transition: background 0.2s;
         }
-        .btn-flotante:hover { background: #666; }
         #toggle-menu { top: 10px; width: auto; padding: 10px 15px; }
         #toggle-fs { top: 60px; }
 
-        /* Menú Lateral */
         #menu-lateral { 
             position: fixed; left: -280px; top: 0; width: 250px; height: 100%; 
             background: rgba(25, 25, 25, 0.98); backdrop-filter: blur(10px);
@@ -34,49 +28,39 @@
         }
         #menu-lateral.abierto { left: 0; }
 
-        h3 { border-bottom: 1px solid #555; padding-bottom: 5px; margin-bottom: 5px; color: #ffeb3b; font-size: 1.1em; }
         .seccion { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
         .grid-config { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8em; }
         .grid-config input { width: 90%; background: #111; border: 1px solid #444; color: #00ff00; padding: 3px; }
 
-        .selector-recurso { 
-            display: flex; align-items: center; gap: 10px; padding: 8px; 
-            border-radius: 8px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; font-size: 0.9em;
+        .contenedor-tablero { 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; width: 100vw; overflow: auto; background: #0a2333; 
         }
-        .selector-recurso.activo { border-color: #ffeb3b; background: #444; }
-        .mini { width: 25px; height: 25px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background-size: cover; }
-
-        .contenedor-tablero { display: flex; justify-content: center; align-items: center; height: 100vh; overflow: auto; background: #0a2333; }
         
         .tablero { 
             display: inline-grid; 
-            /* El truco del 75% para que encajen los hexágonos horizontalmente */
+            /* El ancho de columna debe ser el 75% del ancho del hexágono para encajar horizontalmente */
             grid-template-columns: repeat(15, calc(var(--hex_wpx) * 0.75)); 
-            line-height: 0; padding: 120px; transform: scale(var(--zoom-manual)); 
+            padding: 50px;
         }
 
         .hex {
             width: var(--hex_wpx); 
             height: var(--hex_hpx); 
-            background-size: cover; background-position: center;
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; 
-            /* Margen negativo para solapar y eliminar huecos */
-            margin-bottom: calc(var(--hex_hpx) * -0.25);
-            margin-right: calc(var(--hex_wpx) * -0.125);
-            filter: drop-shadow(0 0 1px var(--linea-hex)); position: relative;
-        }
-        
-        .hex::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); border: 1px solid var(--linea-hex); pointer-events: none; }
-
-        /* Desplazamiento de filas pares para efecto panal */
-        .hex:nth-child(30n+16), .hex:nth-child(30n+17), .hex:nth-child(30n+18), .hex:nth-child(30n+19), .hex:nth-child(30n+20),
-        .hex:nth-child(30n+21), .hex:nth-child(30n+22), .hex:nth-child(30n+23), .hex:nth-child(30n+24), .hex:nth-child(30n+25),
-        .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) { 
-            transform: translateY(calc(var(--hex_hpx) * 0.5));
+            cursor: pointer;
+            margin-left: calc(var(--hex_wpx) * -0.25);
+            position: relative;
+            background-size: cover;
         }
 
+        /* Ajuste de filas impares para el zigzag */
+        .hex:nth-child(even) {
+            margin-top: calc(var(--hex_hpx) * 0.5);
+        }
+
+        /* Colores */
         .agua { background-color: #2980b9; }
         .bosque { background-color: #27ae60; }
         .trigo { background-color: #f1c40f;}
@@ -86,181 +70,75 @@
         .desierto { background-color: #d35400;}
         .aleatorio { background-color: #ecf0f1; color: black; font-weight: bold; }
 
-        .btn { width: 100%; padding: 8px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; margin-top: 5px; }
-        .btn-green { background: #27ae60; }
-        .btn-blue { background: #2980b9; }
-
-        .numero { background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .numero { background: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; border: 1px solid black; }
         .rojo { color: red; }
+        .btn { width: 100%; padding: 8px; margin-top: 5px; cursor: pointer; font-weight: bold; border-radius: 5px; border: none; color: white; }
+        .btn-blue { background: #2980b9; }
+        .btn-green { background: #27ae60; }
     </style>
 </head>
 <body>
 
 <button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
-<button id="toggle-fs" class="btn-flotante" onclick="toggleFullScreen()" title="Pantalla Completa">📺</button>
+<button id="toggle-fs" class="btn-flotante" onclick="toggleFullScreen()">📺</button>
 
 <div id="menu-lateral">
     <div class="seccion">
-        <h3>⚙️ Configuración</h3>
+        <h3>⚙️ Configuración TV</h3>
         <div class="grid-config">
-            <span>Ancho (cm)</span> <span>Alto (cm)</span>
-            <input type="number" id="tv-w-cm" value="121.2" step="0.1" oninput="aplicarDimensiones()">
-            <input type="number" id="tv-h-cm" value="68.0" step="0.1">
-            <span>PX Ancho</span> <span>PX Alto</span>
-            <input type="number" id="tv-w-px" value="1920" oninput="aplicarDimensiones()">
-            <input type="number" id="tv-h-px" value="1080">
+            <span>Ancho (cm)</span> <input type="number" id="tv-w-cm" value="121.2" step="0.1" oninput="aplicarDimensiones()">
+            <span>Alto (cm)</span> <input type="number" id="tv-h-cm" value="68.0" step="0.1">
+            <span>PX Ancho</span> <input type="number" id="tv-w-px" value="1920" oninput="aplicarDimensiones()">
+            <span>PX Alto</span> <input type="number" id="tv-h-px" value="1080">
         </div>
-        <div style="font-size: 0.7em; margin-top: 5px; color: #aaa;">Detección: <span id="real-res"></span></div>
         <button class="btn btn-blue" onclick="guardarConfig()">Guardar Config</button>
     </div>
-
-    <div class="seccion">
-        <h3>🗺️ Tablero</h3>
-        <button class="btn btn-green" onclick="nuevoMapa()">+ Crear Nuevo Mapa</button>
-        <div id="lista-mapas" style="margin-top: 10px; font-size: 0.8em;"></div>
-        <button class="btn btn-blue" onclick="guardarMapaActual()">💾 Guardar Mapa Actual</button>
     </div>
-
-    <div class="seccion" id="editor-recursos">
-        <h3>🎨 Crear nuevo</h3>
-        <div class="selector-recurso activo" onclick="seleccionarTipo('agua', this)"><div class="mini agua"></div> Agua</div>
-        <div class="selector-recurso" onclick="seleccionarTipo('bosque', this)"><div class="mini bosque"></div> Bosque</div>
-        <div class="selector-recurso" onclick="seleccionarTipo('trigo', this)"><div class="mini trigo"></div> Trigo</div>
-        <div class="selector-recurso" onclick="seleccionarTipo('oveja', this)"><div class="mini oveja"></div> Oveja</div>
-        <div class="selector-recurso" onclick="seleccionarTipo('piedra', this)"><div class="mini piedra"></div> Piedra</div>
-        <div class="selector-recurso" onclick="seleccionarTipo('arcilla', this)"><div class="mini arcilla"></div> Arcilla</div>
-        <div class="selector-recurso" onclick="seleccionarTipo('desierto', this)"><div class="mini desierto"></div> Desierto</div>
-        <div class="selector-recurso" onclick="seleccionarTipo('aleatorio', this)"><div class="mini aleatorio"></div> 🎲 Aleatorio</div>
-        <button class="btn btn-green" onclick="generarAleatorios()">✨ Generar Mapa</button>
-    </div>
-</div>
 
 <div class="contenedor-tablero">
-    <div class="tablero" id="tablero"></div>
+    <div id="tablero" class="tablero"></div>
 </div>
 
 <script>
-    const HEX_PIEZA_FISICA_CM = 7.7;
+    const HEX_PIEZA_CM = 7.7;
     let tipoSeleccionado = 'agua';
-    let mapasGuardados = JSON.parse(localStorage.getItem('catan_maps')) || {}; 
 
-    function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
-
-    function toggleFullScreen() {
-        const btn = document.getElementById('toggle-fs');
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-            btn.innerText = "✖";
-        } else {
-            document.exitFullscreen();
-            btn.innerText = "📺";
-        }
-    }
-    
     function aplicarDimensiones() {
         const wCm = parseFloat(document.getElementById('tv-w-cm').value);
-        const hCm = parseFloat(document.getElementById('tv-h-cm').value);
         const wPx = parseFloat(document.getElementById('tv-w-px').value);
-        const hPx = parseFloat(document.getElementById('tv-h-px').value);
+        
+        if (wCm > 0 && wPx > 0) {
+            // Calculamos píxeles por cm
+            const ppcm = wPx / wCm;
+            const hexW = HEX_PIEZA_CM * ppcm;
+            // El alto de un hexágono regular es W * cos(30) o W * 0.866 si es punta arriba
+            // Pero como Catan usa punta a los lados:
+            const hexH = hexW * 0.866; 
 
-        if (wCm > 0 && wPx > 0 && hCm > 0 && hPx > 0) {
-            const anchoHexPx = (wPx / wCm) * HEX_PIEZA_FISICA_CM;
-            // Un hexágono regular es un poco más alto que ancho (proporción 2/sqrt(3))
-            const altoHexPx = anchoHexPx * 1.1547; 
-
-            document.documentElement.style.setProperty('--hex_wpx', anchoHexPx + 'px');
-            document.documentElement.style.setProperty('--hex_hpx', altoHexPx + 'px');
+            document.documentElement.style.setProperty('--hex_wpx', hexW + 'px');
+            document.documentElement.style.setProperty('--hex_hpx', hexH + 'px');
         }
     }
 
-    function seleccionarTipo(tipo, elemento) {
-        tipoSeleccionado = tipo;
-        document.querySelectorAll('.selector-recurso').forEach(el => el.classList.remove('activo'));
-        elemento.classList.add('activo');
-    }
-
-    const tablero = document.getElementById('tablero');
+    // Mantén tus funciones de crearCeldas, guardarConfig, etc. igual que las tenías
     function crearCeldasVacias() {
+        const tablero = document.getElementById('tablero');
         tablero.innerHTML = '';
         for (let i = 0; i < 150; i++) {
             const hex = document.createElement('div');
             hex.className = 'hex agua';
-            hex.onclick = () => { 
-                hex.className = 'hex ' + tipoSeleccionado; 
-                hex.innerText = tipoSeleccionado === 'aleatorio' ? '?' : ''; 
-            };
+            hex.onclick = () => hex.className = 'hex ' + tipoSeleccionado;
             tablero.appendChild(hex);
         }
     }
 
-    function guardarConfig() {
-        const config = {
-            wcm: document.getElementById('tv-w-cm').value,
-            hcm: document.getElementById('tv-h-cm').value,
-            wpx: document.getElementById('tv-w-px').value,
-            hpx: document.getElementById('tv-h-px').value
-        };
-        localStorage.setItem('catan_config', JSON.stringify(config));
-        aplicarDimensiones();
-        alert("Configuración guardada para tu TV.");
-    }
-
-    function nuevoMapa() { if(confirm("¿Limpiar tablero?")) { crearCeldasVacias(); toggleMenu(); } }
-    
-    function guardarMapaActual() {
-        const nombre = prompt("Nombre del mapa:");
-        if (!nombre) return;
-        mapasGuardados[nombre] = Array.from(document.querySelectorAll('.hex')).map(h => h.className);
-        localStorage.setItem('catan_maps', JSON.stringify(mapasGuardados));
-        actualizarListaMapas();
-    }
-
-    function cargarMapa(nombre) {
-        const celdasData = mapasGuardados[nombre];
-        const hexes = document.querySelectorAll('.hex');
-        celdasData.forEach((clase, i) => {
-            if(hexes[i]) hexes[i].className = clase;
-        });
-        toggleMenu();
-    }
-
-    function actualizarListaMapas() {
-        const lista = document.getElementById('lista-mapas');
-        lista.innerHTML = '';
-        Object.keys(mapasGuardados).forEach(nombre => {
-            const item = document.createElement('div');
-            item.style = "display:flex; justify-content:space-between; margin-bottom:5px; background:#333; padding:5px; border-radius:3px;";
-            item.innerHTML = `<span onclick="cargarMapa('${nombre}')" style="cursor:pointer; flex-grow:1;">📍 ${nombre}</span><span onclick="borrarMapa('${nombre}')" style="color:red; cursor:pointer; margin-left:10px;">✖</span>`;
-            lista.appendChild(item);
-        });
-    }
-
-    function borrarMapa(nombre) { if(confirm(`¿Borrar ${nombre}?`)) { delete mapasGuardados[nombre]; localStorage.setItem('catan_maps', JSON.stringify(mapasGuardados)); actualizarListaMapas(); } }
-
-    function generarAleatorios() {
-        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
-        document.querySelectorAll('.hex.aleatorio').forEach(hex => {
-            const azar = tipos[Math.floor(Math.random() * tipos.length)];
-            hex.className = 'hex ' + azar; hex.innerText = '';
-            const num = [2,3,4,5,6,8,9,10,11,12][Math.floor(Math.random()*10)];
-            hex.innerHTML = `<div class="numero ${num===6||num===8?'rojo':''}">${num}</div>`;
-        });
-        toggleMenu();
-    }
-
     window.onload = () => {
-        document.getElementById('real-res').innerText = window.screen.width + "x" + window.screen.height;
-        const savedConfig = JSON.parse(localStorage.getItem('catan_config'));
-        if(savedConfig) {
-            document.getElementById('tv-w-cm').value = savedConfig.wcm;
-            document.getElementById('tv-h-cm').value = savedConfig.hcm;
-            document.getElementById('tv-w-px').value = savedConfig.wpx;
-            document.getElementById('tv-h-px').value = savedConfig.hpx;
-        }
         aplicarDimensiones();
         crearCeldasVacias();
-        actualizarListaMapas();
     };
+
+    function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
+    function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
 </script>
 </body>
 </html>
