@@ -7,12 +7,24 @@
         :root { 
             --linea-hex: #000000;
             --zoom-manual: 1;
-            /* Estos valores se calculan por JS */
             --ancho-hex-px: 100px; 
             --alto-hex-px: 115px;
         }
         body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
+        /* Botones Flotantes */
+        .btn-flotante { 
+            position: fixed; left: 10px; z-index: 1001; cursor: pointer; 
+            background: #444; border: none; color: white; padding: 10px; 
+            border-radius: 5px; width: 45px; height: 40px; display: flex; 
+            align-items: center; justify-content: center; font-size: 20px;
+            transition: background 0.2s;
+        }
+        .btn-flotante:hover { background: #666; }
+        #toggle-menu { top: 10px; width: auto; padding: 10px 15px; } /* El de menú es más ancho */
+        #toggle-fs { top: 60px; } /* Debajo del de menú */
+
+        /* Menú Lateral */
         #menu-lateral { 
             position: fixed; left: -280px; top: 0; width: 250px; height: 100%; 
             background: rgba(25, 25, 25, 0.98); backdrop-filter: blur(10px);
@@ -20,7 +32,6 @@
             display: flex; flex-direction: column; gap: 15px; overflow-y: auto;
         }
         #menu-lateral.abierto { left: 0; }
-        #toggle-menu { position: fixed; left: 10px; top: 10px; z-index: 1001; cursor: pointer; background: #444; border: none; color: white; padding: 10px; border-radius: 5px; }
 
         h3 { border-bottom: 1px solid #555; padding-bottom: 5px; margin-bottom: 5px; color: #ffeb3b; font-size: 1.1em; }
         .seccion { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
@@ -36,11 +47,10 @@
 
         .contenedor-tablero { display: flex; justify-content: center; align-items: center; height: 100vh; overflow: auto; background: #0a2333; }
         
-        /* Ajuste dinámico de la rejilla */
         .tablero { 
             display: inline-grid; 
             grid-template-columns: repeat(15, calc(var(--ancho-hex-px) * 0.75)); 
-            line-height: 0; padding: 100px; transform: scale(var(--zoom-manual)); 
+            line-height: 0; padding: 120px; transform: scale(var(--zoom-manual)); 
         }
 
         .hex {
@@ -50,7 +60,6 @@
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: inline-flex; align-items: center; justify-content: center;
             cursor: pointer; 
-            /* Márgenes para encaje perfecto */
             margin-bottom: calc(var(--alto-hex-px) * -0.25);
             margin-right: calc(var(--ancho-hex-px) * -0.125);
             filter: drop-shadow(0 0 1px var(--linea-hex)); position: relative;
@@ -58,7 +67,6 @@
         
         .hex::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); border: 1px solid var(--linea-hex); pointer-events: none; }
 
-        /* Zig-zag corregido para el nuevo ancho */
         .hex:nth-child(30n+16), .hex:nth-child(30n+17), .hex:nth-child(30n+18), .hex:nth-child(30n+19), .hex:nth-child(30n+20),
         .hex:nth-child(30n+21), .hex:nth-child(30n+22), .hex:nth-child(30n+23), .hex:nth-child(30n+24), .hex:nth-child(30n+25),
         .hex:nth-child(30n+26), .hex:nth-child(30n+27), .hex:nth-child(30n+28), .hex:nth-child(30n+29), .hex:nth-child(30n+30) { 
@@ -84,7 +92,8 @@
 </head>
 <body>
 
-<button id="toggle-menu" onclick="toggleMenu()">☰ Menú</button>
+<button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
+<button id="toggle-fs" class="btn-flotante" onclick="toggleFullScreen()" title="Pantalla Completa">📺</button>
 
 <div id="menu-lateral">
     <div class="seccion">
@@ -129,19 +138,29 @@
 <script>
     let tipoSeleccionado = 'agua';
     let mapasGuardados = JSON.parse(localStorage.getItem('catan_maps')) || {};
-    const HEX_WIDTH_CM = 7.7; // Tu constante de pieza real
+    const HEX_WIDTH_CM = 7.7; 
 
     function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
+
+    function toggleFullScreen() {
+        const btn = document.getElementById('toggle-fs');
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            btn.innerText = "✖";
+            btn.title = "Salir de Pantalla Completa";
+        } else {
+            document.exitFullscreen();
+            btn.innerText = "📺";
+            btn.title = "Pantalla Completa";
+        }
+    }
 
     function aplicarDimensiones() {
         const wCm = parseFloat(document.getElementById('tv-w-cm').value);
         const wPx = parseFloat(document.getElementById('tv-w-px').value);
-        
         if (wCm > 0 && wPx > 0) {
-            // FÓRMULA: (PX / CM) * 7.7
             const anchoPx = (wPx / wCm) * HEX_WIDTH_CM;
-            const altoPx = anchoPx * 1.1547; // Proporción geométrica del hexágono
-            
+            const altoPx = anchoPx * 1.1547; 
             document.documentElement.style.setProperty('--ancho-hex-px', anchoPx + 'px');
             document.documentElement.style.setProperty('--alto-hex-px', altoPx + 'px');
         }
@@ -177,11 +196,11 @@
         };
         localStorage.setItem('catan_config', JSON.stringify(config));
         aplicarDimensiones();
-        alert("Configuración y dimensiones aplicadas.");
+        alert("Configuración guardada.");
     }
 
-    // Funciones de gestión de mapas (se mantienen igual que tu versión)
     function nuevoMapa() { if(confirm("¿Limpiar tablero?")) { crearCeldasVacias(); toggleMenu(); } }
+    
     function guardarMapaActual() {
         const nombre = prompt("Nombre del mapa:");
         if (!nombre) return;
@@ -189,6 +208,7 @@
         localStorage.setItem('catan_maps', JSON.stringify(mapasGuardados));
         actualizarListaMapas();
     }
+
     function cargarMapa(nombre) {
         const celdasData = mapasGuardados[nombre];
         const hexes = document.querySelectorAll('.hex');
@@ -198,6 +218,7 @@
         });
         toggleMenu();
     }
+
     function actualizarListaMapas() {
         const lista = document.getElementById('lista-mapas');
         lista.innerHTML = '';
@@ -208,9 +229,11 @@
             lista.appendChild(item);
         });
     }
+
     function borrarMapa(nombre) { if(confirm(`¿Borrar ${nombre}?`)) { delete mapasGuardados[nombre]; localStorage.setItem('catan_maps', JSON.stringify(mapasGuardados)); actualizarListaMapas(); } }
+
     function generarAleatorios() {
-        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla','desierto'];
+        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla'];
         document.querySelectorAll('.hex.aleatorio').forEach(hex => {
             const azar = tipos[Math.floor(Math.random() * tipos.length)];
             hex.className = 'hex ' + azar; hex.innerText = '';
@@ -229,7 +252,7 @@
             document.getElementById('tv-w-px').value = savedConfig.wpx;
             document.getElementById('tv-h-px').value = savedConfig.hpx;
         }
-        aplicarDimensiones(); // Calcula el tamaño al cargar
+        aplicarDimensiones();
         crearCeldasVacias();
         actualizarListaMapas();
     };
