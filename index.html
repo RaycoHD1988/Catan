@@ -85,28 +85,39 @@
 
 <div id="menu-lateral">
     <div class="seccion">
-        <h3>⚙️ Configuración TV</h3>
+        <h3>⚙️ Configuración</h3>
         <div class="grid-config">
-            <span>Ancho (cm)</span> <input type="number" id="tv-w-cm" value="121.2" step="0.1" oninput="aplicarDimensiones()">
-            <span>Alto (cm)</span>  <input type="number" id="tv-h-cm" value="68.0"  step="0.1">
-            <span>PX Ancho</span>   <input type="number" id="tv-w-px" value="1920" oninput="aplicarDimensiones()">
-            <span>PX Alto</span>    <input type="number" id="tv-h-px" value="1080">
+            <span>Ancho (cm)</span> <span>Alto (cm)</span>
+            <input type="number" id="tv-w-cm" value="121.2" oninput="aplicarDimensiones()">
+            <input type="number" id="tv-h-cm" value="68">
+            <span>PX Ancho</span> <span>PX Alto</span>
+            <input type="number" id="tv-w-px" value="1920" oninput="aplicarDimensiones()">
+            <input type="number" id="tv-h-px" value="1080">
         </div>
+        <div style="font-size: 0.7em; margin-top: 5px; color: #aaa;">Detección: <span id="real-res"></span></div>
         <button class="btn btn-blue" onclick="guardarConfig()">Guardar Config</button>
     </div>
-    <h3>Recursos</h3>
-    <div class="selector-recurso activo" onclick="seleccionarTipo('agua',       this)"><div class="mini agua"     ></div> Agua</div>
-    <div class="selector-recurso"        onclick="seleccionarTipo('bosque',     this)"><div class="mini bosque"   ></div> Bosque</div>
-    <div class="selector-recurso"        onclick="seleccionarTipo('trigo',      this)"><div class="mini trigo"    ></div> Trigo</div>
-    <div class="selector-recurso"        onclick="seleccionarTipo('oveja',      this)"><div class="mini oveja"    ></div> Oveja</div>
-    <div class="selector-recurso"        onclick="seleccionarTipo('piedra',     this)"><div class="mini piedra"   ></div> Piedra</div>
-    <div class="selector-recurso"        onclick="seleccionarTipo('arcilla',    this)"><div class="mini arcilla"  ></div> Arcilla</div>
-    <div class="selector-recurso"        onclick="seleccionarTipo('desierto',   this)"><div class="mini desierto" ></div> Desierto</div>
-    <div class="selector-recurso"        onclick="seleccionarTipo('aleatorio',  this)"><div class="mini aleatorio"></div> 🎲 Aleatorio (?)</div>
-    <hr>
-    <button onclick="generarTodo()" style="background: #27ae60; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">✨ Generar Mapa</button>
-    <button onclick="toggleFullScreen()" style="background: #e74c3c; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">📺 Pantalla Completa</button>
+
+    <div class="seccion">
+        <h3>🗺️ Tablero</h3>
+        <button class="btn btn-green" onclick="nuevoMapa()">+ Crear Nuevo Mapa</button>
+        <div id="lista-mapas" style="margin-top: 10px; font-size: 0.8em;"></div>
+        <button class="btn btn-blue" onclick="guardarMapaActual()">💾 Guardar Mapa Actual</button>
     </div>
+
+    <div class="seccion" id="editor-recursos">
+        <h3>🎨 Crear nuevo</h3>
+        <div class="selector-recurso activo" onclick="seleccionarTipo('agua', this)"><div class="mini agua"></div> Agua</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('bosque', this)"><div class="mini bosque"></div> Bosque</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('trigo', this)"><div class="mini trigo"></div> Trigo</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('oveja', this)"><div class="mini oveja"></div> Oveja</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('piedra', this)"><div class="mini piedra"></div> Piedra</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('arcilla', this)"><div class="mini arcilla"></div> Arcilla</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('desierto', this)"><div class="mini desierto"></div> Desierto</div>
+        <div class="selector-recurso" onclick="seleccionarTipo('aleatorio', this)"><div class="mini aleatorio"></div> 🎲 Aleatorio</div>
+        <button class="btn btn-green" onclick="generarAleatorios()">✨ Generar Mapa</button>
+    </div>
+</div>
 
 <div class="contenedor-tablero">
     <div id="tablero" class="tablero"></div>
