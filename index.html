@@ -136,28 +136,29 @@
         </div>
     </div>
 
-<div class="seccion-colapsable">
-    <div class="cabecera-seccion" onclick="toggleSeccion(this)">⚙️ Configuración</div>
-    <div class="contenido-seccion">
-        <small style="color: #888;">Elegir Pantalla Preseteada:</small>
-        <select id="selector-pantalla" class="btn" style="background: #333; margin-bottom: 10px;" onchange="ajustarTamano()">
-            <!-- Opciones generadas dinámicamente -->
-        </select>
 
-        <div id="ajustes-manuales" style="display: none; border-top: 1px solid #444; padding-top: 10px; margin-top: 10px;">
-            <div class="grid-config">
-                <span>Ancho (cm)</span><span>Alto (cm)</span> 
-                <input type="number" id="tv-w-cm" value="121.2" oninput="ajustarTamano()">
-                <input type="number" id="tv-h-cm" value="68"    oninput="ajustarTamano()">
-                
-                <span>Ancho (PX)</span><span>Alto (PX)</span> 
-                <input type="number" id="tv-w-px" value="1920" oninput="ajustarTamano()">
-                <input type="number" id="tv-h-px" value="1080" oninput="ajustarTamano()">
-            </div>
-            <p style="font-size: 0.8em; color: #888; margin-top: 5px;">* Los cambios se aplican al escribir.</p>
+
+
+    <div class="seccion-colapsable">
+        <div class="cabecera-seccion" onclick="toggleSeccion(this)">📏 Tamaño Hexagono</div>
+        <div class="contenido-seccion">
+            <p style="font-size: 0.8em; color: #888; margin-bottom: 10px;">
+                Ajusta el ancho del hexágono hasta que mida exactamente 7.86 cm en tu pantalla.
+            </p>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
+            <button class="btn" style="width: 40px; margin:0; background: #e74c3c;" onclick="cambiarPixeles(-1)">◀</button>
+            
+            <input type="number" id="input-calibracion-px" value="150" 
+                style="width: 70px; text-align: center; font-size: 1.1em; font-weight: bold; background: transparent; color: #f1c40f; border: 1px solid #444; padding: 5px; -moz-appearance: textfield;"
+                oninput="setPixelesDirecto(this.value)">
+            
+            <button class="btn" style="width: 40px; margin:0; background: #27ae60;" onclick="cambiarPixeles(1)">▶</button>
+        </div>
+            <p style="font-size: 0.7em; color: #888; margin-top: 10px; text-align: center;">
+                Unidad: Píxeles por hexágono
+            </p>
         </div>
     </div>
-</div>
 </div>
 
 <div class="contenedor-tablero">
@@ -167,12 +168,8 @@
  <!-- ----------------------------------------------------------------------------------------------------- -->
 
 <script>
+    let pixelesHexagonoActual = 150;
     const HEXAGONO = {ancho_cm: 7.86, alto_cm: 9.076};
-    const PANTALLAS = {
-        portatil_Rayco: {ancho_cm: 346.0, alto_cm: 199.0, ancho_px: 1920, alto_px: 1080, nombre:"💻 Portátil Rayco (15\")"},
-        TV_Habitacion:  {ancho_cm: 121.2, alto_cm:  68.0, ancho_px: 1920, alto_px: 1080, nombre:"📺 TV Habitación (55\")"},
-        personalizado:  {ancho_cm: 121.2, alto_cm:  68.0, ancho_px: 1920, alto_px: 1080, nombre:"🛠️ Ajuste Personalizado"}
-    }
     const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'puerto_comercial', 'oasis'];
     const tablero = document.getElementById('tablero');
     const menu    = document.getElementById('menu-lateral');
@@ -185,40 +182,35 @@
         // 2. Cargamos el mapa del catan más básico.
         cargarMapa('Catan básico (3-4).json');
     }
-    function actualizarSelectorPantallas() {
-        const selector = document.getElementById('selector-pantalla');
-        selector.innerHTML = ''; // Limpiamos
 
-        // Recorremos el objeto PANTALLAS
-        for (const key in PANTALLAS) {
-            const opcion = document.createElement('option');
-            opcion.value = key;
-            opcion.innerText = PANTALLAS[key].nombre;
-            selector.appendChild(opcion);
+    function cambiarPixeles(delta) {
+        pixelesHexagonoActual += delta;
+        if (pixelesHexagonoActual < 10) pixelesHexagonoActual = 10; // Límite mínimo
+        actualizarVisualizacionCalibracion();
+    }
+
+    function setPixelesDirecto(valor) {
+        let num = parseInt(valor);
+        if (!isNaN(num) && num > 0) {
+            pixelesHexagonoActual = num;
+            actualizarVisualizacionCalibracion();
         }
     }
 
-    function ajustarTamano() {
-        const pantalla_seleccionada = document.getElementById('selector-pantalla').value;
-        const bloqueManual = document.getElementById('ajustes-manuales');
-        if (pantalla_seleccionada === 'personalizado') {
-            bloqueManual.style.display = 'block';
-            PANTALLAS.personalizado = {
-                ancho_cm: parseFloat(document.getElementById('tv-w-cm').value),
-                alto_cm:  parseFloat(document.getElementById('tv-h-cm').value),
-                ancho_px: parseInt(document.getElementById('tv-w-px').value),
-                alto_px:  parseInt(document.getElementById('tv-h-px').value)
-            }
-        }else {
-            bloqueManual.style.display = 'none';
-        }
-        document.getElementById('tv-w-cm').value = PANTALLAS[pantalla_seleccionada].ancho_cm;
-        document.getElementById('tv-h-cm').value = PANTALLAS[pantalla_seleccionada].alto_cm;
-        document.getElementById('tv-w-px').value = PANTALLAS[pantalla_seleccionada].ancho_px;
-        document.getElementById('tv-h-px').value = PANTALLAS[pantalla_seleccionada].alto_px;
-        document.documentElement.style.setProperty('--hex_wpx', PANTALLAS[pantalla_seleccionada].ancho_px * HEXAGONO.ancho_cm / PANTALLAS[pantalla_seleccionada].ancho_cm + 'px');
+    function actualizarVisualizacionCalibracion() {
+        // 1. Actualizamos el input por si el cambio vino de las flechas
+        document.getElementById('input-calibracion-px').value = pixelesHexagonoActual;
+        
+        // 2. Aplicamos el cambio al CSS
+        document.documentElement.style.setProperty('--hex_wpx', pixelesHexagonoActual + 'px');
+        
+        // 3. Re-renderizamos el mapa si ya hay uno cargado para que se ajuste al nuevo tamaño
         if (mapaActualData) renderizarMapa(mapaActualData);
     }
+
+
+
+
     function toggleMenu() {menu.classList.toggle('abierto');}
     function toggleSeccion(el) {el.parentElement.classList.toggle('activa');}
     function mostrarPantallaInicio() {
@@ -234,7 +226,6 @@
                 </p>
             </div>`;
     }
-
     async function cargarMapa(nombreMapa) {
         try {
             const respuesta = await fetch(`maps/${nombreMapa}`);
@@ -368,13 +359,9 @@
     }
 
     window.onload = () => {
-        actualizarSelectorPantallas(); // Genera el menú dinámicamente
+        pixelesHexagonoActual = 100;
+        actualizarVisualizacionCalibracion();
         mostrarPantallaInicio();       // Muestra el mensaje de bienvenida
-
-        // Define la pantalla personalizada por defecto.
-        document.getElementById('selector-pantalla').value = 'personalizado';
-        ajustarTamano(); 
-        
     };
 </script>
 
