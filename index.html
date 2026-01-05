@@ -148,9 +148,9 @@
         <div style="display: flex; align-items: center; justify-content: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
             <button class="btn" style="width: 40px; margin:0; background: #e74c3c;" onclick="cambiarPixeles(-1)">◀</button>
             
-            <input type="number" id="input-calibracion-px" value="150" 
-                style="width: 70px; text-align: center; font-size: 1.1em; font-weight: bold; background: transparent; color: #f1c40f; border: 1px solid #444; padding: 5px; -moz-appearance: textfield;"
-                oninput="setPixelesDirecto(this.value)">
+            <input type="number" id="input-calibracion-px" 
+            style="width: 70px; text-align: center; font-size: 1.1em; font-weight: bold; background: transparent; color: #f1c40f; border: 1px solid #444; padding: 5px; -moz-appearance: textfield;"
+            oninput="setPixelesDirecto(this.value)">
             
             <button class="btn" style="width: 40px; margin:0; background: #27ae60;" onclick="cambiarPixeles(1)">▶</button>
         </div>
@@ -168,8 +168,6 @@
  <!-- ----------------------------------------------------------------------------------------------------- -->
 
 <script>
-    let pixelesHexagonoActual = 150;
-    const HEXAGONO = {ancho_cm: 7.86, alto_cm: 9.076};
     const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'puerto_comercial', 'oasis'];
     const tablero = document.getElementById('tablero');
     const menu    = document.getElementById('menu-lateral');
@@ -177,39 +175,34 @@
 
 
     function iniciarTodo() {
-        // 1. Ponemos la pantalla completa
+        // 1. Ponemos la pantalla completa despues de que el usuario haya interactuado.
         toggleFullScreen();
         // 2. Cargamos el mapa del catan más básico.
         cargarMapa('Catan básico (3-4).json');
     }
 
     function cambiarPixeles(delta) {
-        pixelesHexagonoActual += delta;
-        if (pixelesHexagonoActual < 10) pixelesHexagonoActual = 10; // Límite mínimo
-        actualizarVisualizacionCalibracion();
+        let valorActual = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
+        let nuevoValor = valorActual + delta;
+        
+        if (nuevoValor < 10) nuevoValor = 10; // Límite mínimo
+        setPixelesDirecto(nuevoValor);
     }
 
     function setPixelesDirecto(valor) {
         let num = parseInt(valor);
         if (!isNaN(num) && num > 0) {
-            pixelesHexagonoActual = num;
-            actualizarVisualizacionCalibracion();
+            // 1. Aplicamos el cambio directamente al CSS
+            document.documentElement.style.setProperty('--hex_wpx', num + 'px');
+            
+            // 2. Sincronizamos el input visualmente
+            const input = document.getElementById('input-calibracion-px');
+            if (input) input.value = num;
+
+            // 3. Re-renderizamos el mapa
+            if (mapaActualData) renderizarMapa(mapaActualData);
         }
     }
-
-    function actualizarVisualizacionCalibracion() {
-        // 1. Actualizamos el input por si el cambio vino de las flechas
-        document.getElementById('input-calibracion-px').value = pixelesHexagonoActual;
-        
-        // 2. Aplicamos el cambio al CSS
-        document.documentElement.style.setProperty('--hex_wpx', pixelesHexagonoActual + 'px');
-        
-        // 3. Re-renderizamos el mapa si ya hay uno cargado para que se ajuste al nuevo tamaño
-        if (mapaActualData) renderizarMapa(mapaActualData);
-    }
-
-
-
 
     function toggleMenu() {menu.classList.toggle('abierto');}
     function toggleSeccion(el) {el.parentElement.classList.toggle('activa');}
@@ -234,8 +227,8 @@
             }
 
             let maps = await respuesta.json();
-            mapaActualData = maps
             maps = procesarConfiguracion(maps);
+            mapaActualData = maps
             renderizarMapa(maps);
             toggleMenu(); // Cerramos el menú al cargar con éxito
             
@@ -328,8 +321,8 @@
             div.style.backgroundImage = `url('images/${h.tipo}.png')`;
             
             // Posicionamos restando el offset para que el mapa empiece en el borde del contenedor
-            div.style.top = ((h.f * f_spacing) - offsetTop) + 'px';
-            div.style.left = ((h.c * c_spacing) - offsetLeft) + 'px';
+            div.style.top = `calc((${h.f} - ${minF}) * (var(--hex_wpx) * 1.1547 * 0.75))`;
+            div.style.left = `calc((${h.c} - ${minC}) * var(--hex_wpx))`;
 
             if (h.numeroFinal) {
                 const ficha = document.createElement('div');
@@ -359,9 +352,11 @@
     }
 
     window.onload = () => {
-        pixelesHexagonoActual = 100;
-        actualizarVisualizacionCalibracion();
-        mostrarPantallaInicio();       // Muestra el mensaje de bienvenida
+        // Sincronizamos el input con ese valor que pusiste en el CSS (:root)
+        document.getElementById('input-calibracion-px').value = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
+        
+        // Muestra el mensaje de bienvenida
+        mostrarPantallaInicio();       
     };
 </script>
 
