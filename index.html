@@ -6,493 +6,351 @@
     <style>
         :root { 
             --linea-hex: #000000;
-            --hex_wpx: 86.6px;
-            --hex_hpx: 100px;
+            --hex_wpx: 100px;
         }
         body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        .btn-flotante { 
-            position: fixed; left: 10px; z-index: 1001; cursor: pointer; 
-            background: #444; border: none; color: white; padding: 10px; 
-            border-radius: 5px; width: 45px; height: 40px; display: flex; 
-            align-items: center; justify-content: center; font-size: 20px;
+        /* BOTONES FLOTANTES AGRUPADOS A LA DERECHA */
+        .controles-superiores {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
         }
-        #toggle-menu { left: 50px; width: auto; padding: 10px 15px; }
-        #toggle-fs {right: 0px}
 
-        .seccion-colapsable { border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .cabecera-seccion { 
-            padding: 12px; background: rgba(255,255,255,0.07); cursor: pointer; 
-            display: flex; justify-content: space-between; align-items: center; font-weight: bold;
+        .btn-flotante { 
+            cursor: pointer; 
+            background: #444; 
+            border: none; 
+            color: white; 
+            padding: 10px; 
+            border-radius: 5px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px;
+            transition: background 0.2s;
         }
-        .cabecera-seccion::after { content: '▼'; font-size: 0.7em; transition: transform 0.3s; }
-        .seccion-colapsable.activa .cabecera-seccion::after { transform: rotate(180deg); }
-        .contenido-seccion { 
-            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; 
-            padding: 0 10px; opacity: 0;
-        }
-        .seccion-colapsable.activa .contenido-seccion { 
-            max-height: 1500px; /* Un valor alto para que quepa todo */
-            padding: 15px 10px; opacity: 1;
-        }
+        .btn-flotante:hover { background: #666; }
+        
+        #toggle-menu { width: auto; padding: 10px 15px; font-size: 16px; font-weight: bold; }
+
+        /* MENU LATERAL DERECHO */
         #menu-lateral { 
             position: fixed; 
-            left: -280px; 
+            right: -280px; 
             top: 0; 
             width: 250px; 
             height: 100vh; 
             background: rgba(25, 25, 25, 0.98); 
             backdrop-filter: blur(10px);
-            transition: 0.3s; 
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             z-index: 1000; 
-            padding: 15px; 
-            border-right: 2px solid #444;
+            padding: 20px; 
+            border-left: 2px solid #444;
             display: flex; 
             flex-direction: column; 
             gap: 15px; 
             overflow-y: auto; 
             box-sizing: border-box; 
         }
+        #menu-lateral.abierto { right: 0; }
 
-        #menu-lateral::-webkit-scrollbar {
-            width: 8px;
-        }
-        #menu-lateral::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 4px;
-        }
-        #lista-selectores {
-            max-height: 400px; 
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-        #menu-lateral.abierto { left: 0; }
+        /* SECCIONES COLAPSABLES */
+        .seccion-colapsable { border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
+        .cabecera-seccion { padding: 12px; background: rgba(255,255,255,0.07); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .cabecera-seccion::after { content: '▼'; font-size: 0.7em; transition: transform 0.3s; }
+        .seccion-colapsable.activa .cabecera-seccion::after { transform: rotate(180deg); }
+        .contenido-seccion { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 10px; opacity: 0; }
+        .seccion-colapsable.activa .contenido-seccion { max-height: 500px; padding: 15px 10px; opacity: 1; }
 
-        .seccion { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
-        .grid-config { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8em; }
-        .grid-config input { width: 90%; background: #111; border: 1px solid #444; color: #00ff00; padding: 3px; }
-
+        /* TABLERO Y MENSAJE INICIAL */
         .contenedor-tablero { 
             display: flex; justify-content: center; align-items: center; 
-            height: 100vh; width: 100vw; overflow: auto; background: #0a2333; 
+            height: 100vh; width: 100vw; background: #0a2333; 
+            text-align: center;
+        }
+        #tablero {position: relative; transition: width 0.3s, height 0.3s;}
+        
+        .mensaje-bienvenida {
+            font-size: 2em;
+            color: rgba(255, 255, 255, 0.6);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            line-height: 1.5;
         }
 
         .hex {
             position: absolute;
             width: var(--hex_wpx); 
-            height: var(--hex_hpx); 
+            height: calc(var(--hex_wpx) * 1.1547); 
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: flex;
             align-items: center; 
             justify-content: center;
-            cursor: pointer; 
             background-size: cover; 
             background-position: center;
-            transition: filter 0.1s;
-            z-index: 1;
+            transition: transform 0.2s;
         }
+        .hex:hover { transform: scale(1.05); z-index: 10; }
 
-        .hex:hover { filter: brightness(1.3); z-index: 100 !important; }
-
-        /* --- TUS IMÁGENES DE RECURSOS --- */
-        .vacio              { background-image: url('images/vacio.png'); background-color: #0a2333;}
-        .agua               { background-image: url('images/agua.png'); background-color: #2980b9;}
-        .peces              { background-image: url('images/peces.png'); background-color: #2980b9;}
-        .rio                { background-image: url('images/rio.png'); background-color: #2980b9;}
-        .puerto_comercial   { background-image: url('images/puerto_comercial.png'); background-color: #2980b9;}
-        .guarida_pirata     { background-image: url('images/guarida_piratas.png'); background-color: #2980b9;}
-        .bosque             { background-image: url('images/bosque.png'); background-color: #27ae60;}
-        .trigo              { background-image: url('images/trigo.png'); background-color: #f1c40f;}
-        .oveja              { background-image: url('images/oveja.png'); background-color: #a2d149;}
-        .piedra             { background-image: url('images/piedra.png'); background-color: #7f8c8d;}
-        .arcilla            { background-image: url('images/arcilla.png'); background-color: #e67e22;}
-        .desierto           { background-image: url('images/desierto.png'); background-color: #d35400;}
-        .oasis              { background-image: url('images/oasis.png'); background-color: #d35400;}
-        .navidad            { background-image: url('images/navidad.png'); background-color: #ecf0f1}
-        .castillo           { background-image: url('images/castillo.png'); background-color: #ecf0f1}
-        .aserradero         { background-image: url('images/aserradero.png'); background-color: #ecf0f1}
-        .pascua             { background-image: url('images/pascua.png'); background-color: #ecf0f1}
-        .bruma              { background-image: url('images/bruma.png'); background-color: #7f8c8d;}
-        .marmol             { background-image: url('images/marmol.png'); background-color: #7f8c8d;}
-        .vidrio             { background-image: url('images/vidrio.png'); background-color: #7f8c8d;}
-        .aleatorio          { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold;}
-
-        .numero { 
-            background: white; border-radius: 50%; width: 32px; height: 32px; 
-            display: flex; align-items: center; justify-content: center; 
-            color: black; font-weight: bold; border: 2px solid #000;
-            pointer-events: none; 
-        }
-
-        .rojo { color: red; }
-        .btn { width: 100%; padding: 8px; margin-top: 5px; cursor: pointer; font-weight: bold; border-radius: 5px; border: none; color: white; }
-        .btn-blue { background: #2980b9; }
-        .btn-green { background: #27ae60; }
-        .selector-recurso { 
-            display: flex; align-items: center; gap: 10px; padding: 6px; 
-            border-radius: 8px; cursor: pointer; transition: 0.2s; border: 1px solid transparent; font-size: 0.85em;
-        }
-        .selector-recurso.activo { border-color: #ffeb3b; background: rgba(255, 255, 255, 0.1); }
-        .mini { 
-            width: 25px; height: 25px; 
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); 
-            background-size: cover; background-position: center;
-        }
-
-        .modal {
-            display: none; position: fixed; z-index: 2000;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            align-items: center; justify-content: center;
-        }
-        .modal-contenido {
-            background: #222;
-            padding: 20px;
-            border-radius: 12px;
-            border: 2px solid #444;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            max-height: 90vh;
+        .numero-ficha {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #333;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+            font-size: 16px;
         }
-        .grid-opciones {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin: 15px 0;
-            max-height: 60vh; 
-            overflow-y: auto;
-            padding-right: 10px;
-            scrollbar-width: thin;
-            scrollbar-color: #444 #222;
-        }
-        .grid-opciones::-webkit-scrollbar {
-            width: 8px;
-        }
-        .grid-opciones::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 4px;
-        }
-        .fila-opcion {
-            display: flex; align-items: center; justify-content: space-between;
-            background: rgba(255,255,255,0.05); padding: 8px; border-radius: 5px;
-        }
-        .controles-num { display: flex; align-items: center; gap: 10px; }
-        .btn-qty { background: #444; border: none; color: white; width: 25px; height: 25px; cursor: pointer; border-radius: 3px; font-weight: bold; }
-        .qty-val { width: 30px; text-align: center; font-weight: bold; color: #00ff00; }
-        
-        #contador-info { font-weight: bold; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
-        .falta      { background: #633; color: #ffcccc; }
-        .perfecto   { background: #141; color: #ccffcc; }
-        .sobra      { background: #652; color: #ffffcc; }
+        .rojo { color: red; font-size: 18px; }
+
+        .btn { width: 100%; padding: 10px; border-radius: 5px; border: none; cursor: pointer; background: #2980b9; color: white; font-weight: bold; margin-bottom: 5px; }
     </style>
 </head>
+
+ <!-- ----------------------------------------------------------------------------------------------------- -->
+
 <body>
 
-<div id="modalAleatorio" class="modal">
-    <div class="modal-contenido">
-        <h3>✨ Configurar Recursos</h3>
-        <div id="contador-info" class="falta">
-            Restantes: <span id="res-restantes">0</span> / <span id="res-totales">0</span>
-        </div>
-        <div id="grid-opciones" class="grid-opciones"></div>
-        <button id="btn-ejecutar" class="btn btn-green" onclick="ejecutarGeneracion()" disabled>¡Generar Mapa!</button>
-        <button class="btn" style="background:#666; margin-top:10px;" onclick="cerrarModal()">Cancelar</button>
-    </div>
+<div class="controles-superiores">
+    <button id="toggle-fs"   class="btn-flotante" onclick="toggleFullScreen()" title="Pantalla Completa">⛶</button>
+    <button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
 </div>
 
-<button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
-<button id="toggle-fs"   class="btn-flotante" onclick="toggleFullScreen()">⛶</button>
-
 <div id="menu-lateral">
+    <h2 style="margin-top: 40px; border-bottom: 1px solid #444;">Catan TV</h2>
+    
     <div class="seccion-colapsable activa">
+        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🗺️ Seleccionar Mapa</div>
         <div class="contenido-seccion">
-            <small style="color: #888; display: block; margin-bottom: 5px;">Selecciona una base para generar:</small>
-            <button class="btn btn-blue" onclick="cargarPlantilla('Catan Básico (3-4)')">Catan Estándar (3-4)</button>
-            <hr style="opacity: 0.1; margin: 10px 0;">
-            <button class="btn" style="background: #555;" onclick="alert('Próximamente: Podrás importar tus propios JSON')">📂 Importar Configuración</button>
+            <button class="btn" onclick="cargarMapa('Catan básico (3-4).json')">Catan básico (3-4)</button>
         </div>
     </div>
 
-    <div class="seccion-colapsable">
-        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🎨 Generar Mapa</div>
-        <div class="contenido-seccion">
-            <button class="btn btn-green" style="margin-top:5px;" onclick="generarAleatorios()">✨ Generar Aleatorios</button>
-            <button class="btn btn-blue" style="margin-top:5px; margin-bottom:10px;" onclick="repartirNumeros()">🎲 Mezclar Números</button>
-            <div id="lista-selectores"></div>
-        </div>
-    </div>
+<div class="seccion-colapsable">
+    <div class="cabecera-seccion" onclick="toggleSeccion(this)">⚙️ Configuración</div>
+    <div class="contenido-seccion">
+        <small style="color: #888;">Elegir Pantalla Preseteada:</small>
+        <select id="selector-pantalla" class="btn" style="background: #333; margin-bottom: 10px;" onchange="ajustarTamano()">
+            <!-- Opciones generadas dinámicamente -->
+        </select>
 
-    <div class="seccion-colapsable">
-        <div class="cabecera-seccion" onclick="toggleSeccion(this)">⚙️ Configuración</div>
-        <div class="contenido-seccion">
+        <div id="ajustes-manuales" style="display: none; border-top: 1px solid #444; padding-top: 10px; margin-top: 10px;">
             <div class="grid-config">
-                <span>Ancho (cm)</span><span>Alto (cm)</span> <input type="number" id="tv-w-cm" value="121.2" oninput="aplicarDimensiones()"><input type="number" id="tv-h-cm" value="68">
-                <span>Ancho (PX)</span><span>Alto (PX)</span> <input type="number" id="tv-w-px" value="1920" oninput="aplicarDimensiones()"><input type="number" id="tv-h-px" value="1080">
+                <span>Ancho (cm)</span><span>Alto (cm)</span> 
+                <input type="number" id="tv-w-cm" value="121.2" oninput="ajustarTamano()">
+                <input type="number" id="tv-h-cm" value="68"    oninput="ajustarTamano()">
+                
+                <span>Ancho (PX)</span><span>Alto (PX)</span> 
+                <input type="number" id="tv-w-px" value="1920" oninput="ajustarTamano()">
+                <input type="number" id="tv-h-px" value="1080" oninput="ajustarTamano()">
             </div>
-            <button class="btn btn-blue" onclick="aplicarDimensiones()">Actualizar Medidas</button>
+            <p style="font-size: 0.8em; color: #888; margin-top: 5px;">* Los cambios se aplican al escribir.</p>
         </div>
     </div>
+</div>
 </div>
 
 <div class="contenedor-tablero">
     <div id="tablero"></div>
 </div>
 
+ <!-- ----------------------------------------------------------------------------------------------------- -->
+
 <script>
-    const HEX_REAL_CM = 7.7;
-    const LISTA_NUMEROS_3_4_player = [5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11];
-    const LISTA_NUMEROS_5_6_player = [2,5,4,6,3,9,8,11,11,10,6,3,8,4,8,10,11,12,10,5,4,9,5,9,12,3,2,6];
+    const HEXAGONO = {ancho_cm: 7.86, alto_cm: 9.076};
+    const PANTALLAS = {
+        portatil_Rayco: {ancho_cm: 346.0, alto_cm: 199.0, ancho_px: 1920, alto_px: 1080, nombre:"💻 Portátil Rayco (15\")"},
+        TV_Habitacion:  {ancho_cm: 121.2, alto_cm:  68.0, ancho_px: 1920, alto_px: 1080, nombre:"📺 TV Habitación (55\")"},
+        personalizado:  {ancho_cm: 121.2, alto_cm:  68.0, ancho_px: 1920, alto_px: 1080, nombre:"🛠️ Ajuste Personalizado"}
+    }
+    const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'puerto_comercial', 'oasis'];
+    const tablero = document.getElementById('tablero');
+    const menu    = document.getElementById('menu-lateral');
+    let mapaActualData = null;
 
-    const PLANTILLAS_MAPA = {
-        "Catan Básico (3-4)": {
-            // La lista de números oficial en el orden que quieres que aparezcan
-            numeros: [5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11],
-            recursos: {
-                bosque: 4, trigo: 4, oveja: 4, piedra: 3, arcilla: 3, desierto: 1
-            },
-            layout: [
-                // Ejemplo: El desierto es fijo y no tiene "orden", por lo que no recibirá número
-                {f:0, c:5, tipo:'agua'}, {f:0, c:6, tipo:'agua'}, {f:0, c:7, tipo:'agua'}, {f:0, c:8, tipo:'agua'},
-                {f:1, c:4, tipo:'agua'}, {f:1, c:5, tipo:'aleatorio', orden:  1}, {f:1, c:6, tipo:'aleatorio', orden:  2}, {f:1, c:7, tipo:'aleatorio', orden:  3},{f:1, c:8, tipo:'agua'},
-                {f:2, c:4, tipo:'agua'}, {f:2, c:5, tipo:'aleatorio', orden: 12}, {f:2, c:6, tipo:'aleatorio', orden: 13}, {f:2, c:7, tipo:'aleatorio', orden: 14}, {f:2, c:8, tipo:'aleatorio', orden:  4},{f:2, c:9, tipo:'agua'},
-                {f:3, c:3, tipo:'agua'}, {f:3, c:4, tipo:'aleatorio', orden: 11}, {f:3, c:5, tipo:'aleatorio', orden: 18}, {f:3, c:6, tipo:'aleatorio', orden: 19}, {f:3, c:7, tipo:'aleatorio', orden: 15}, {f:3, c:8, tipo:'aleatorio', orden: 5},{f:3, c:9, tipo:'agua'},
-                {f:4, c:4, tipo:'agua'}, {f:4, c:5, tipo:'aleatorio', orden: 10}, {f:4, c:6, tipo:'aleatorio', orden: 17}, {f:4, c:7, tipo:'aleatorio', orden: 16}, {f:4, c:8, tipo:'aleatorio', orden:  6},{f:4, c:9, tipo:'agua'},
-                {f:5, c:4, tipo:'agua'}, {f:5, c:5, tipo:'aleatorio', orden:  9}, {f:5, c:6, tipo:'aleatorio', orden:  8}, {f:5, c:7, tipo:'aleatorio', orden:  7}, {f:5, c:8, tipo:'agua'},
-                {f:6, c:5, tipo:'agua'}, {f:6, c:6, tipo:'agua'}, {f:6, c:7, tipo:'agua'}, {f:6, c:8, tipo:'agua'}
-            ]
+
+    function iniciarTodo() {
+        // 1. Ponemos la pantalla completa
+        toggleFullScreen();
+        // 2. Cargamos el mapa del catan más básico.
+        cargarMapa('Catan básico (3-4).json');
+    }
+    function actualizarSelectorPantallas() {
+        const selector = document.getElementById('selector-pantalla');
+        selector.innerHTML = ''; // Limpiamos
+
+        // Recorremos el objeto PANTALLAS
+        for (const key in PANTALLAS) {
+            const opcion = document.createElement('option');
+            opcion.value = key;
+            opcion.innerText = PANTALLAS[key].nombre;
+            selector.appendChild(opcion);
         }
-    };
-
-
-    const LISTA_NUMEROS = LISTA_NUMEROS_3_4_player;
-    
-    // Todos tus tipos de recursos originales
-    const RECURSOS_INFO = [
-        {id:'aleatorio',        nombre:'🎲 Aleatorio'},
-        {id:'bosque',           nombre:'Bosque'},
-        {id:'trigo',            nombre:'Trigo'},
-        {id:'oveja',            nombre:'Oveja'},
-        {id:'piedra',           nombre:'Piedra'},
-        {id:'arcilla',          nombre:'Arcilla'},
-        {id:'agua',             nombre:'Agua'},
-        {id:'desierto',         nombre:'Desierto'},
-        {id:'peces',            nombre:'Peces'},
-        {id:'puerto_comercial', nombre:'Puerto'},
-        {id:'rio',              nombre:'Río'},
-        {id:'oasis',            nombre:'Oasis'},
-        {id:'bruma',            nombre:'Bruma'},
-        {id:'marmol',           nombre:'Mármol'},
-        {id:'vidrio',           nombre:'Vidrio'},
-        {id:'aserradero',       nombre:'Aserradero'},
-        {id:'guarida_pirata',   nombre:'Piratas'},
-        {id:'navidad',          nombre:'Navidad'},
-        {id:'pascua',           nombre:'Pascua'},
-        {id:'castillo',         nombre:'Castillo'}
-    ];
-
-    let tipoSeleccionado = 'vacio';
-    let cantidades = {};
-    let totalNecesario = 0;
-
-    // Dibujar selectores en el menú lateral
-    function cargarMenuRecursos() {
-        const contenedor = document.getElementById('lista-selectores');
-        RECURSOS_INFO.forEach(res => {
-            const div = document.createElement('div');
-            div.className = 'selector-recurso';
-            if(res.id === 'aleatorio') div.classList.add('activo');
-            div.onclick = () => seleccionarTipo(res.id, div);
-            div.innerHTML = `<div class="mini ${res.id}"></div> ${res.nombre}`;
-            contenedor.appendChild(div);
-        });
-        tipoSeleccionado = 'aleatorio';
     }
 
-    function seleccionarTipo(tipo, elemento) {
-        tipoSeleccionado = tipo;
-        document.querySelectorAll('.selector-recurso').forEach(el => el.classList.remove('activo'));
-        elemento.classList.add('activo');
+    function ajustarTamano() {
+        const pantalla_seleccionada = document.getElementById('selector-pantalla').value;
+        const bloqueManual = document.getElementById('ajustes-manuales');
+        if (pantalla_seleccionada === 'personalizado') {
+            bloqueManual.style.display = 'block';
+            PANTALLAS.personalizado = {
+                ancho_cm: parseFloat(document.getElementById('tv-w-cm').value),
+                alto_cm:  parseFloat(document.getElementById('tv-h-cm').value),
+                ancho_px: parseInt(document.getElementById('tv-w-px').value),
+                alto_px:  parseInt(document.getElementById('tv-h-px').value)
+            }
+        }else {
+            bloqueManual.style.display = 'none';
+        }
+        document.getElementById('tv-w-cm').value = PANTALLAS[pantalla_seleccionada].ancho_cm;
+        document.getElementById('tv-h-cm').value = PANTALLAS[pantalla_seleccionada].alto_cm;
+        document.getElementById('tv-w-px').value = PANTALLAS[pantalla_seleccionada].ancho_px;
+        document.getElementById('tv-h-px').value = PANTALLAS[pantalla_seleccionada].alto_px;
+        document.documentElement.style.setProperty('--hex_wpx', PANTALLAS[pantalla_seleccionada].ancho_px * HEXAGONO.ancho_cm / PANTALLAS[pantalla_seleccionada].ancho_cm + 'px');
+        if (mapaActualData) renderizarMapa(mapaActualData);
+    }
+    function toggleMenu() {menu.classList.toggle('abierto');}
+    function toggleSeccion(el) {el.parentElement.classList.toggle('activa');}
+    function mostrarPantallaInicio() {
+        tablero.innerHTML = `
+            <div class="mensaje-bienvenida">
+                <h1 style="color: #f1c40f;">Catan Pro TV</h1>
+                <button class="btn" style="padding: 20px; font-size: 1.2em; background: #27ae60;" 
+                    onclick="iniciarTodo()">
+                    🚀 EMPEZAR PARTIDA
+                </button>
+                <p style="font-size: 0.5em; opacity: 0.6; margin-top: 15px;">
+                    (Se activará la pantalla completa automáticamente)
+                </p>
+            </div>`;
     }
 
-    function aplicarDimensiones() {
-        const wCm = parseFloat(document.getElementById('tv-w-cm').value);
-        const hCm = parseFloat(document.getElementById('tv-h-cm').value);
-        const wPx = parseFloat(document.getElementById('tv-w-px').value);
-        
-        const hexW = HEX_REAL_CM * wPx / wCm;
-        const hexH = hexH * 0.866;
-        
-        document.documentElement.style.setProperty('--hex_wpx', hexW + 'px');
-        document.documentElement.style.setProperty('--hex_hpx', hexH + 'px');        
+    async function cargarMapa(nombreMapa) {
+        try {
+            const respuesta = await fetch(`maps/${nombreMapa}`);
+            if (!respuesta.ok) {
+                throw new Error(`No se pudo encontrar el archivo: maps/${nombreMapa}`);
+            }
 
-        window.columnasCalculadas = wCm /  HEX_REAL_CM;
-        window.filasCalculadas    = hCm / (HEX_REAL_CM * 0.866);
-
-        crearTablero();
+            let maps = await respuesta.json();
+            mapaActualData = maps
+            maps = procesarConfiguracion(maps);
+            renderizarMapa(maps);
+            toggleMenu(); // Cerramos el menú al cargar con éxito
+            
+        }catch (e) {
+            console.error("Error cargando el JSON:", e);
+            alert(`Error: Asegúrate de que el archivo JSON existe en la carpeta maps/${nombreMapa}`);
+        }
     }
 
-    function crearTablero() {
-        const tablero = document.getElementById('tablero');
+    function procesarConfiguracion(maps) {
+        // --- 1. PREPARAR BOLSAS DE RECURSOS Y LAS ASIGNAMOS---
+        for (const key in maps.recursos) {
+            let bolsa = [];
+            const r = maps.recursos[key];
+            r.tipos.forEach((tipo, i) => {
+                for (let c = 0; c < r.cantidades[i]; c++) bolsa.push(tipo);
+            });
+
+            // Mezclamos la bolsa
+            bolsa= bolsa.sort(() => Math.random() - 0.5);
+
+            // Asignamos tipos a hexágonos que usan esta bolsa
+            maps.hexagono.filter(h => h.tipo === key).forEach((h, index) => {
+                h.tipo = bolsa[index] || null;
+            });
+        }
+
+        // --- 2. ASIGNAR NÚMEROS POR ÓRDENES ---
+        // Procesamos cada grupo de orden (orden_1, orden_2...)
+        for (const ordenKey in maps.numeros) {
+            const infoOrden = maps.numeros[ordenKey];
+            let listaNumeros = [...infoOrden.valores];
+            
+            if (infoOrden.tipo === "aleatorio") {
+                listaNumeros = listaNumeros.sort(() => Math.random() - 0.5);
+            }
+
+            // Filtramos hexágonos que pertenecen a este orden y NO son desierto/agua
+            const hexsValidos = maps.hexagono
+                .filter(h => h[ordenKey] > 0 && !terrenosSinNumero.includes(h.tipo))
+                .sort((a, b) => a[ordenKey] - b[ordenKey]);
+
+            // Asignamos el número de la lista según la posición
+            hexsValidos.forEach((h, index) => {
+                h.numeroFinal = listaNumeros[index] || null;
+            });
+        }
+
+        return maps;
+    }
+
+    function renderizarMapa(maps) {
         tablero.innerHTML = '';
         
-        const w = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
-        const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hex_hpx'));
+        // 1. Obtener medidas actuales
+        const w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
+        const f_spacing = w * 1.1547 * 0.75; 
+        const c_spacing = w;
+
+        // 2. Calcular límites para centrado automático
+        let minF = Infinity, maxF = -Infinity;
+        let minC = Infinity, maxC = -Infinity;
+
+        maps.hexagono.forEach(h => {
+            if (h.f < minF) minF = h.f;
+            if (h.f > maxF) maxF = h.f;
+            if (h.c < minC) minC = h.c;
+            if (h.c > maxC) maxC = h.c;
+        });
+
+        // 3. Ajustar el tamaño del contenedor #tablero
+        const filas = (maxF - minF);
+        const columnas = (maxC - minC);
         
-        const filas = window.filasCalculadas || 10; 
-        const cols  = window.columnasCalculadas || 14;
+        // Calculamos ancho y alto total (+1 para el último hexágono)
+        const totalW = (columnas * c_spacing) + w;
+        const totalH = (filas * f_spacing) + (w * 1.15);
 
-        // Calculamos el desfase inicial para centrar TODO el bloque de hexágonos
-        const totalW = cols * w;
-        const totalH = filas * (h * 0.75);
-        const offsetX = (window.innerWidth - totalW) / 2;
-        const offsetY = (window.innerHeight - totalH) / 2;
-
-        for (let f = 0; f < filas; f++) {
-            for (let c = 0; c < cols; c++) {
-                const hex = document.createElement('div');
-                hex.className = 'hex vacio';
-                
-                // Posicionamiento con desfase de filas impares y centrado
-                const posX = c * w + (f % 2 === 1 ? w / 2 : 0) + offsetX;
-                const posY = f * (h * 0.75) + offsetY;
-                
-                hex.style.left = posX + 'px';
-                hex.style.top = posY + 'px';
-
-                // Guardamos coordenadas en el elemento para facilitar las plantillas
-                hex.dataset.f = f;
-                hex.dataset.c = c;
-
-                hex.onclick = function() {
-                    this.className = 'hex ' + tipoSeleccionado;
-                    this.innerHTML = (tipoSeleccionado === 'aleatorio') ? '<strong>?</strong>' : '';
-                };
-                tablero.appendChild(hex);
-            }
-        }
-    }
-
-    function generarAleatorios() {
-        const aleatorios = document.querySelectorAll('.hex.aleatorio');
-        if (aleatorios.length === 0) return alert("Primero coloca hexágonos '🎲 Aleatorio'.");
-
-        totalNecesario = aleatorios.length;
-        document.getElementById('res-totales').innerText = totalNecesario;
-        const grid = document.getElementById('grid-opciones');
-        grid.innerHTML = '';
-        cantidades = {};
-
-        // Excluimos 'aleatorio' y 'vacio' de la lista de selección para el modal
-        RECURSOS_INFO.filter(r => r.id !== 'aleatorio').forEach(res => {
-            cantidades[res.id] = 0;
-            const fila = document.createElement('div');
-            fila.className = 'fila-opcion';
-            fila.innerHTML = `
-                <span>${res.nombre}</span>
-                <div class="controles-num">
-                    <button class="btn-qty" onclick="cambiarCant('${res.id}', -1)">-</button>
-                    <span class="qty-val" id="qty-${res.id}">0</span>
-                    <button class="btn-qty" onclick="cambiarCant('${res.id}', 1)">+</button>
-                </div>`;
-            grid.appendChild(fila);
-        });
-        actualizarContador();
-        document.getElementById('modalAleatorio').style.display = 'flex';
-    }
-
-    function cambiarCant(tipo, cambio) {
-        if (cantidades[tipo] + cambio >= 0) {
-            cantidades[tipo] += cambio;
-            document.getElementById(`qty-${tipo}`).innerText = cantidades[tipo];
-            actualizarContador();
-        }
-    }
-
-    function actualizarContador() {
-        const totalSeleccionado = Object.values(cantidades).reduce((a, b) => a + b, 0);
-        const restantes = totalNecesario - totalSeleccionado;
-        const info = document.getElementById('contador-info');
-        const spanRest = document.getElementById('res-restantes');
+        tablero.style.width = totalW + 'px';
+        tablero.style.height = totalH + 'px';
         
-        if (spanRest) spanRest.innerText = restantes;
-        document.getElementById('btn-ejecutar').disabled = (restantes !== 0);
+        // Centrado: desplazamos el tablero para que la coordenada mínima sea el 0,0
+        const offsetTop = minF * f_spacing;
+        const offsetLeft = minC * c_spacing;
 
-        if (restantes === 0) {
-            info.className = 'perfecto';
-            info.innerHTML = `✓ ¡Listo! Restantes: <span id="res-restantes">0</span>`;
-        } else if (restantes > 0) {
-            info.className = 'falta';
-            info.innerHTML = `Faltan ${restantes} hexágonos: <span id="res-restantes">${restantes}</span>`;
-        } else {
-            info.className = 'sobra';
-            info.innerHTML = `Sobran ${Math.abs(restantes)} hexágonos: <span id="res-restantes">${restantes}</span>`;
-        }
-    }
-
-    function ejecutarGeneracion() {
-        let saco = [];
-        for (const [tipo, cant] of Object.entries(cantidades)) {
-            for (let i = 0; i < cant; i++) saco.push(tipo);
-        }
-        saco.sort(() => Math.random() - 0.5);
-
-        document.querySelectorAll('.hex.aleatorio').forEach((hex, i) => {
-            hex.className = 'hex ' + saco[i];
-            hex.innerHTML = '';
-        });
-        repartirNumeros();
-        cerrarModal();
-    }
-
-    function repartirNumeros() {
-        // 1. Obtener la plantilla para saber qué números usar
-        const plantillaActual = Object.values(PLANTILLAS_MAPA).find(p => p.numeros); 
-        if (!plantillaActual) return;
-
-        let nums = [...plantillaActual.numeros];
-        let nIdx = 0;
-
-        // Terrenos que NO pueden tener número
-        const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'bruma', 'puerto_comercial', 'oasis', 'vacio'];
-
-        // 2. Obtener y ordenar los hexágonos que tienen un 'orden' asignado
-        const hexágonosConOrden = Array.from(document.querySelectorAll('.hex'))
-            .filter(h => h.dataset.orden !== undefined)
-            .sort((a, b) => parseInt(a.dataset.orden) - parseInt(b.dataset.orden));
-
-        // 3. Limpiar todos los números previos de CUALQUIER hexágono
-        document.querySelectorAll('.hex').forEach(h => {
-            const numDiv = h.querySelector('.numero');
-            if (numDiv) numDiv.remove();
-            // Si aún es tipo aleatorio (con el ?), no lo tocamos hasta que se genere
-        });
-
-        // 4. Repartir siguiendo el orden estricto, pero saltando terrenos prohibidos
-        hexágonosConOrden.forEach(hex => {
-            const tipoActual = Array.from(hex.classList)[1];
+        // 4. Dibujar hexágonos
+        maps.hexagono.forEach(h => {
+            const div = document.createElement('div');
+            div.className = `hex ${h.tipo}`;
+            div.style.backgroundImage = `url('images/${h.tipo}.png')`;
             
-            // Si el terreno actual NO está en la lista negra y quedan números
-            if (!terrenosSinNumero.includes(tipoActual) && nIdx < nums.length) {
-                const n = nums[nIdx++];
-                hex.innerHTML = `<div class="numero ${n===6||n===8?'rojo':''}">${n}</div>`;
-            } else {
-                // Si es desierto/agua, nos aseguramos de que esté vacío (sin número)
-                const numDiv = hex.querySelector('.numero');
-                if (numDiv) numDiv.remove();
+            // Posicionamos restando el offset para que el mapa empiece en el borde del contenedor
+            div.style.top = ((h.f * f_spacing) - offsetTop) + 'px';
+            div.style.left = ((h.c * c_spacing) - offsetLeft) + 'px';
+
+            if (h.numeroFinal) {
+                const ficha = document.createElement('div');
+                ficha.className = 'numero-ficha' + (h.numeroFinal === 6 || h.numeroFinal === 8 ? ' rojo' : '');
+                ficha.innerText = h.numeroFinal;
+                div.appendChild(ficha);
             }
+
+            tablero.appendChild(div);
         });
     }
 
-    function cerrarModal() { document.getElementById('modalAleatorio').style.display = 'none'; }
-    function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
-    function toggleSeccion(elemento) {
-        // Busca el contenedor padre (seccion-colapsable) y le pone/quita la clase 'activa'
-        const padre = elemento.parentElement;
-        padre.classList.toggle('activa');
-    }
     function toggleFullScreen() {
         const btn = document.getElementById('toggle-fs');
         if (!document.fullscreenElement) {
@@ -510,41 +368,15 @@
     }
 
     window.onload = () => {
-        cargarMenuRecursos();
-        aplicarDimensiones();
-    };
+        actualizarSelectorPantallas(); // Genera el menú dinámicamente
+        mostrarPantallaInicio();       // Muestra el mensaje de bienvenida
 
-
-    function cargarPlantilla(nombre) {
-        const p = PLANTILLAS_MAPA[nombre];
-        if(!p) return;
-
-        crearTablero(); 
-        let conteoAleatorios = 0;
-
-        p.layout.forEach(item => {
-            const hex = document.querySelector(`.hex[data-f="${item.f}"][data-c="${item.c}"]`);
-            if(hex) {
-                hex.className = 'hex ' + item.tipo;
-                // Guardamos el orden en el dataset del hexágono
-                if(item.orden) hex.dataset.orden = item.orden;
-                
-                if(item.tipo === 'aleatorio') {
-                    hex.innerHTML = '<strong>?</strong>';
-                    conteoAleatorios++;
-                }
-            }
-        });
-
-        cantidades = {...p.recursos};
-        totalNecesario = conteoAleatorios;
+        // Define la pantalla personalizada por defecto.
+        document.getElementById('selector-pantalla').value = 'personalizado';
+        ajustarTamano(); 
         
-        if(totalNecesario > 0) {
-            ejecutarGeneracion();
-        } else {
-            repartirNumeros();
-        }
-    }
+    };
 </script>
+
 </body>
 </html>

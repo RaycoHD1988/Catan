@@ -18,7 +18,7 @@
             align-items: center; justify-content: center; font-size: 20px;
         }
         #toggle-menu { left: 50px; width: auto; padding: 10px 15px; }
-        #toggle-fs { right: 10px; width: 45px; padding: 10px; }
+        #toggle-fs {right: 0px}
 
         .seccion-colapsable { border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .cabecera-seccion { 
@@ -32,7 +32,7 @@
             padding: 0 10px; opacity: 0;
         }
         .seccion-colapsable.activa .contenido-seccion { 
-            max-height: 500px;
+            max-height: 1500px; /* Un valor alto para que quepa todo */
             padding: 15px 10px; opacity: 1;
         }
         #menu-lateral { 
@@ -54,6 +54,20 @@
             box-sizing: border-box; 
         }
 
+        #menu-lateral::-webkit-scrollbar {
+            width: 8px;
+        }
+        #menu-lateral::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+        #lista-selectores {
+            max-height: 400px; 
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        #menu-lateral.abierto { left: 0; }
+
         .seccion { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
         .grid-config { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8em; }
         .grid-config input { width: 90%; background: #111; border: 1px solid #444; color: #00ff00; padding: 3px; }
@@ -62,7 +76,7 @@
             display: flex; justify-content: center; align-items: center; 
             height: 100vh; width: 100vw; overflow: auto; background: #0a2333; 
         }
-        #tablero { position: relative; }
+
         .hex {
             position: absolute;
             width: var(--hex_wpx); 
@@ -98,14 +112,10 @@
         .castillo           { background-image: url('images/castillo.png'); background-color: #ecf0f1}
         .aserradero         { background-image: url('images/aserradero.png'); background-color: #ecf0f1}
         .pascua             { background-image: url('images/pascua.png'); background-color: #ecf0f1}
+        .bruma              { background-image: url('images/bruma.png'); background-color: #7f8c8d;}
         .marmol             { background-image: url('images/marmol.png'); background-color: #7f8c8d;}
         .vidrio             { background-image: url('images/vidrio.png'); background-color: #7f8c8d;}
-        .aleatorio_1        { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold;}
-        .aleatorio_2        { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold;}
-        .aleatorio_3        { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold;}
-        .bruma_1            { background-image: url('images/bruma.png'); background-color: #7f8c8d;}
-        .bruma_2            { background-image: url('images/bruma.png'); background-color: #7f8c8d;}
-        .bruma_3            { background-image: url('images/bruma.png'); background-color: #7f8c8d;}
+        .aleatorio          { background-image: none; background-color: #ecf0f1; color: black; font-weight: bold;}
 
         .numero { 
             background: white; border-radius: 50%; width: 32px; height: 32px; 
@@ -181,45 +191,48 @@
 </head>
 <body>
 
-
-<div id="menu-lateral-cerrado">    
-    <div class="contenido-seccion">
-        <button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
-        <button id="toggle-fs"   class="btn-flotante" onclick="toggleFullScreen()">⛶</button>
+<div id="modalAleatorio" class="modal">
+    <div class="modal-contenido">
+        <h3>✨ Configurar Recursos</h3>
+        <div id="contador-info" class="falta">
+            Restantes: <span id="res-restantes">0</span> / <span id="res-totales">0</span>
+        </div>
+        <div id="grid-opciones" class="grid-opciones"></div>
+        <button id="btn-ejecutar" class="btn btn-green" onclick="ejecutarGeneracion()" disabled>¡Generar Mapa!</button>
+        <button class="btn" style="background:#666; margin-top:10px;" onclick="cerrarModal()">Cancelar</button>
     </div>
 </div>
 
-<div id="menu-lateral-abierto">
+<button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
+<button id="toggle-fs"   class="btn-flotante" onclick="toggleFullScreen()">⛶</button>
+
+<div id="menu-lateral">
     <div class="seccion-colapsable activa">
-        <div class="cabecera-seccion" onclick="toggleSeccion(this)">Elegir Mapa</div>
         <div class="contenido-seccion">
-            <select id="selector-tablero" class="btn" style="background: #333; margin-bottom: 10px;" onchange="seleccionarTableroPreset()">
-                <option value="Catan Básico (3-4)">Catan Estándar (3-4)</option>
-                <option value="personalizado">📂 Importar tablero</option>
-            </select>
+            <small style="color: #888; display: block; margin-bottom: 5px;">Selecciona una base para generar:</small>
+            <button class="btn btn-blue" onclick="cargarPlantilla('Catan Básico (3-4)')">Catan Estándar (3-4)</button>
+            <hr style="opacity: 0.1; margin: 10px 0;">
+            <button class="btn" style="background: #555;" onclick="alert('Próximamente: Podrás importar tus propios JSON')">📂 Importar Configuración</button>
+        </div>
+    </div>
+
+    <div class="seccion-colapsable">
+        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🎨 Generar Mapa</div>
+        <div class="contenido-seccion">
+            <button class="btn btn-green" style="margin-top:5px;" onclick="generarAleatorios()">✨ Generar Aleatorios</button>
+            <button class="btn btn-blue" style="margin-top:5px; margin-bottom:10px;" onclick="repartirNumeros()">🎲 Mezclar Números</button>
+            <div id="lista-selectores"></div>
         </div>
     </div>
 
     <div class="seccion-colapsable">
         <div class="cabecera-seccion" onclick="toggleSeccion(this)">⚙️ Configuración</div>
         <div class="contenido-seccion">
-            <small style="color: #888;">Elegir Pantalla Preseteada:</small>
-            <select id="selector-pantalla" class="btn" style="background: #333; margin-bottom: 10px;" onchange="seleccionarPantallaPreset()">
-                <option value="portatil_Rayco">💻 Portátil Rayco (15")</option>
-                <option value="TV_Habitacion">📺 TV Habitación (55")</option>
-                <option value="personalizado">🛠️ Ajuste Personalizado</option>
-            </select>
-
             <div class="grid-config">
-                <span>Ancho (cm)</span><span>Alto (cm)</span> 
-                <input type="number" id="tv-w-cm" value="121.2" oninput="marcarPersonalizado()">
-                <input type="number" id="tv-h-cm" value="68"    oninput="marcarPersonalizado()">
-                
-                <span>Ancho (PX)</span><span>Alto (PX)</span> 
-                <input type="number" id="tv-w-px" value="1920" oninput="marcarPersonalizado()">
-                <input type="number" id="tv-h-px" value="1080" oninput="marcarPersonalizado()">
+                <span>Ancho (cm)</span><span>Alto (cm)</span> <input type="number" id="tv-w-cm" value="121.2" oninput="aplicarDimensiones()"><input type="number" id="tv-h-cm" value="68">
+                <span>Ancho (PX)</span><span>Alto (PX)</span> <input type="number" id="tv-w-px" value="1920" oninput="aplicarDimensiones()"><input type="number" id="tv-h-px" value="1080">
             </div>
-            <button class="btn btn-blue" onclick="aplicarDimensiones()">Actualizar Tablero</button>
+            <button class="btn btn-blue" onclick="aplicarDimensiones()">Actualizar Medidas</button>
         </div>
     </div>
 </div>
@@ -228,20 +241,10 @@
     <div id="tablero"></div>
 </div>
 
-
-
-
 <script>
-    const PANTALLAS = {
-        portatil_Rayco: { ancho_cm: 346, alto_cm: 199, ancho_px: 1920, alto_px: 1080 },
-        TV_Habitacion: { ancho_cm: 121.2, alto_cm: 68.0, ancho_px: 1920, alto_px: 1080 }
-    }
-    let TV = { ...PANTALLAS.portatil_Rayco };
-    const HEXAGONO = {ancho_cm: 7.86, alto_cm: 9.076, ancho_px: 7.86 * TV.ancho_px / TV.ancho_cm, alto_px: 9.076 * TV.alto_px / TV.alto_cm};
-    
-    TV.columnas = Math.floor(TV.ancho_cm / HEXAGONO.ancho_cm);
-    TV.filas = Math.floor(TV.alto_cm / (HEXAGONO.alto_cm * 0.75));
-    
+    const HEX_REAL_CM = 7.7;
+    const LISTA_NUMEROS_3_4_player = [5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11];
+    const LISTA_NUMEROS_5_6_player = [2,5,4,6,3,9,8,11,11,10,6,3,8,4,8,10,11,12,10,5,4,9,5,9,12,3,2,6];
 
     const PLANTILLAS_MAPA = {
         "Catan Básico (3-4)": {
@@ -264,7 +267,7 @@
     };
 
 
-    const LISTA_NUMEROS = [2,5,4,6,3,9,8,11,11,10,6,3,8,4,8,10,11,12,10,5,4,9,5,9,12,3,2,6];
+    const LISTA_NUMEROS = LISTA_NUMEROS_3_4_player;
     
     // Todos tus tipos de recursos originales
     const RECURSOS_INFO = [
@@ -314,30 +317,19 @@
         elemento.classList.add('activo');
     }
 
-    function seleccionarPantallaPreset() {
-        const preset = document.getElementById('selector-pantalla').value;
-        if (preset !== 'personalizado') {
-            const data = PANTALLAS[preset];
-            document.getElementById('tv-w-cm').value = data.ancho_cm;
-            document.getElementById('tv-h-cm').value = data.alto_cm;
-            document.getElementById('tv-w-px').value = data.ancho_px;
-            document.getElementById('tv-h-px').value = data.alto_px;
-            aplicarDimensiones();
-        }
-    }
     function aplicarDimensiones() {
-        TV.ancho_cm = parseFloat(document.getElementById('tv-w-cm').value);
-        TV.alto_cm = parseFloat(document.getElementById('tv-h-cm').value);
-        TV.ancho_px = parseFloat(document.getElementById('tv-w-px').value);
-        TV.alto_px = parseFloat(document.getElementById('tv-h-px').value);
+        const wCm = parseFloat(document.getElementById('tv-w-cm').value);
+        const hCm = parseFloat(document.getElementById('tv-h-cm').value);
+        const wPx = parseFloat(document.getElementById('tv-w-px').value);
+        
+        const hexW = HEX_REAL_CM * wPx / wCm;
+        const hexH = hexH * 0.866;
+        
+        document.documentElement.style.setProperty('--hex_wpx', hexW + 'px');
+        document.documentElement.style.setProperty('--hex_hpx', hexH + 'px');        
 
-        HEXAGONO.ancho_px = HEXAGONO.ancho_cm * TV.ancho_px / TV.ancho_cm;
-        HEXAGONO.alto_px  = HEXAGONO.alto_cm  * TV.alto_px / TV.alto_cm;
-        document.documentElement.style.setProperty('--hex_wpx', HEXAGONO.ancho_px + 'px');
-        document.documentElement.style.setProperty('--hex_hpx', HEXAGONO.alto_px + 'px');
-
-        TV.columnas = Math.floor(TV.ancho_cm / HEXAGONO.ancho_cm);
-        TV.filas = Math.floor(TV.alto_cm / (HEXAGONO.alto_cm * 0.75));
+        window.columnasCalculadas = wCm /  HEX_REAL_CM;
+        window.filasCalculadas    = hCm / (HEX_REAL_CM * 0.866);
 
         crearTablero();
     }
@@ -346,44 +338,37 @@
         const tablero = document.getElementById('tablero');
         tablero.innerHTML = '';
         
-        const w = HEXAGONO.ancho_px;
-        const h = HEXAGONO.alto_px;
+        const w = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
+        const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hex_hpx'));
         
-        const filas = TV.filas; 
-        const cols  = TV.columnas;
+        const filas = window.filasCalculadas || 10; 
+        const cols  = window.columnasCalculadas || 14;
 
-        const totalW = (cols * w) + (filas > 1 ? w / 2 : 0);
-        const totalH = ((filas - 1) * (h * 0.75)) + h;
-
-        tablero.style.width  = totalW + 'px';
-        tablero.style.height = totalH + 'px';
-
-        const offsetX = Math.max(0, (TV.ancho_px - totalW) / 2);
-        const offsetY = Math.max(0, (TV.alto_px - totalH) / 2);
+        // Calculamos el desfase inicial para centrar TODO el bloque de hexágonos
+        const totalW = cols * w;
+        const totalH = filas * (h * 0.75);
+        const offsetX = (window.innerWidth - totalW) / 2;
+        const offsetY = (window.innerHeight - totalH) / 2;
 
         for (let f = 0; f < filas; f++) {
             for (let c = 0; c < cols; c++) {
                 const hex = document.createElement('div');
                 hex.className = 'hex vacio';
                 
-                // Posicionamiento:
-                // f % 2 === 1 desplaza las filas 1, 3, 5... media pieza a la derecha
+                // Posicionamiento con desfase de filas impares y centrado
                 const posX = c * w + (f % 2 === 1 ? w / 2 : 0) + offsetX;
                 const posY = f * (h * 0.75) + offsetY;
                 
                 hex.style.left = posX + 'px';
                 hex.style.top = posY + 'px';
 
+                // Guardamos coordenadas en el elemento para facilitar las plantillas
                 hex.dataset.f = f;
                 hex.dataset.c = c;
 
                 hex.onclick = function() {
-                    this.innerHTML = ''; 
-                    delete this.dataset.orden;
                     this.className = 'hex ' + tipoSeleccionado;
-                    if (tipoSeleccionado === 'aleatorio') {
-                        this.innerHTML = '<strong>?</strong>';
-                    }
+                    this.innerHTML = (tipoSeleccionado === 'aleatorio') ? '<strong>?</strong>' : '';
                 };
                 tablero.appendChild(hex);
             }
@@ -463,6 +448,7 @@
     }
 
     function repartirNumeros() {
+        // 1. Obtener la plantilla para saber qué números usar
         const plantillaActual = Object.values(PLANTILLAS_MAPA).find(p => p.numeros); 
         if (!plantillaActual) return;
 
@@ -477,18 +463,23 @@
             .filter(h => h.dataset.orden !== undefined)
             .sort((a, b) => parseInt(a.dataset.orden) - parseInt(b.dataset.orden));
 
+        // 3. Limpiar todos los números previos de CUALQUIER hexágono
         document.querySelectorAll('.hex').forEach(h => {
             const numDiv = h.querySelector('.numero');
             if (numDiv) numDiv.remove();
+            // Si aún es tipo aleatorio (con el ?), no lo tocamos hasta que se genere
         });
 
+        // 4. Repartir siguiendo el orden estricto, pero saltando terrenos prohibidos
         hexágonosConOrden.forEach(hex => {
             const tipoActual = Array.from(hex.classList)[1];
             
+            // Si el terreno actual NO está en la lista negra y quedan números
             if (!terrenosSinNumero.includes(tipoActual) && nIdx < nums.length) {
                 const n = nums[nIdx++];
                 hex.innerHTML = `<div class="numero ${n===6||n===8?'rojo':''}">${n}</div>`;
             } else {
+                // Si es desierto/agua, nos aseguramos de que esté vacío (sin número)
                 const numDiv = hex.querySelector('.numero');
                 if (numDiv) numDiv.remove();
             }
@@ -498,6 +489,7 @@
     function cerrarModal() { document.getElementById('modalAleatorio').style.display = 'none'; }
     function toggleMenu() { document.getElementById('menu-lateral').classList.toggle('abierto'); }
     function toggleSeccion(elemento) {
+        // Busca el contenedor padre (seccion-colapsable) y le pone/quita la clase 'activa'
         const padre = elemento.parentElement;
         padre.classList.toggle('activa');
     }
@@ -505,14 +497,14 @@
         const btn = document.getElementById('toggle-fs');
         if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().then(() => {
-                    btn.innerText = "❐"; 
+                    btn.innerText = "❐"; // Icono de "ventanas superpuestas" al entrar
                 }).catch(err => {
                     console.error(`Error al intentar entrar en pantalla completa: ${err.message}`);
                 });
         } else {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
-                btn.innerText = "⛶"; 
+                btn.innerText = "⛶"; // Icono de "expandir"
             }
         }
     }
