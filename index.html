@@ -6,7 +6,7 @@
     <style>
         :root { 
             --linea-hex: #000000;
-            --hex_wpx: 100px;
+            --hex_wpx: 165px;
         }
         body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
@@ -318,7 +318,11 @@
         maps.hexagono.forEach(h => {
             const div = document.createElement('div');
             div.className = `hex ${h.tipo}`;
-            div.style.backgroundImage = `url('images/${h.tipo}.png')`;
+            if(h.tipo === 'agua'){
+                div.style.backgroundImage = `url('images/${h.tipo}.gif')`;
+            } else {
+                div.style.backgroundImage = `url('images/${h.tipo}.png')`;
+            }
             
             // Posicionamos restando el offset para que el mapa empiece en el borde del contenedor
             div.style.top = `calc((${h.f} - ${minF}) * (var(--hex_wpx) * 1.1547 * 0.75))`;
