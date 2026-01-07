@@ -114,6 +114,32 @@
         .rojo { color: red; font-size: 18px; }
 
         .btn { width: 100%; padding: 10px; border-radius: 5px; border: none; cursor: pointer; background: #2980b9; color: white; font-weight: bold; margin-bottom: 5px; }
+
+        /* Rejilla de edición pequeña */
+        .modo-edicion .hex {
+            width: 30px !important;
+            height: calc(30px * 1.1547) !important;
+            outline: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Paleta de selección */
+        .paleta-editor { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 5px; 
+            margin-top: 10px; 
+        }
+        .pincel-opcion { 
+            width: 45px; height: 45px; 
+            cursor: pointer; 
+            border: 2px solid transparent;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background-size: cover;
+        }
+        .pincel-opcion.activo { border: 2px solid #f1c40f; transform: scale(1.1); }
+
+        /* Cursor especial al pintar */
+        .pintando { cursor: crosshair !important; }
     </style>
 </head>
 
@@ -133,6 +159,8 @@
         <div class="cabecera-seccion" onclick="toggleSeccion(this)">🗺️ Seleccionar Mapa</div>
         <div class="contenido-seccion">
             <button class="btn" onclick="cargarMapa('Catan básico (3-4).json')">Catan básico (3-4)</button>
+            <button class="btn" onclick="cargarMapa('Catan básico (5-6).json')">Catan básico (5-6)</button>
+            <button class="btn" onclick="cargarMapa('Ataque de los bárbaros (3-4).json')">Ataque de los bárbaros (3-4)</button>
         </div>
     </div>
 
@@ -159,6 +187,16 @@
             </p>
         </div>
     </div>
+    <div class="seccion-colapsable">
+        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🛠️ Modo Creador</div>
+        <div class="contenido-seccion">
+            <button class="btn" style="background: #d35400;" onclick="activarModoCreador()">Activar Lienzo 20x20</button>
+            <p style="font-size: 0.7em; color: #888;">Selecciona una pieza:</p>
+            <div id="selector-piezas" class="paleta-editor">
+                </div>
+            <button class="btn" style="background: #27ae60; margin-top:15px;" onclick="descargarJSONCreado()">💾 Descargar JSON</button>
+        </div>
+    </div>
 </div>
 
 <div class="contenedor-tablero">
@@ -172,6 +210,79 @@
     const tablero = document.getElementById('tablero');
     const menu    = document.getElementById('menu-lateral');
     let mapaActualData = null;
+
+    let piezaSeleccionada = 'vacio';
+    let datosMapaCreador = [];
+
+    function activarModoCreador() {
+        // 1. Cambiamos el tamaño visual del tablero a 30px mediante una clase CSS
+        document.body.classList.add('modo-edicion');
+        document.documentElement.style.setProperty('--hex_wpx', '30px');
+        
+        // 2. Cargamos las opciones de piezas en el panel lateral
+        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla', 'desierto', 'agua', 'vacio'];
+        const contenedor = document.getElementById('selector-piezas');
+        contenedor.innerHTML = '';
+        
+        tipos.forEach(tipo => {
+            const div = document.createElement('div');
+            div.className = 'pincel-opcion';
+            div.style.backgroundImage = `url('images/${tipo === 'agua' ? 'agua.gif' : tipo + '.png'}')`;
+            div.onclick = () => {
+                piezaSeleccionada = tipo;
+                document.querySelectorAll('.pincel-opcion').forEach(el => el.classList.remove('activo'));
+                div.classList.add('activo');
+                document.getElementById('tablero').classList.add('pintando');
+            };
+            contenedor.appendChild(div);
+        });
+
+        // 3. Generamos la rejilla de 20x20
+        datosMapaCreador = [];
+        for (let f = 0; f < 20; f++) {
+            for (let c = 0; c < 20; c++) {
+                const offset = (f % 2 !== 0) ? 0.5 : 0;
+                datosMapaCreador.push({ f: f, c: c + offset, tipo: 'vacio' });
+            }
+        }
+        
+        // Usamos tu propia función de renderizado para mostrar la rejilla
+        renderizarMapa({ hexagono: datosMapaCreador });
+
+        // 4. Inyectamos la lógica de "pintar" en los hexágonos renderizados
+        actualizarEventosPintado();
+    }
+
+    function actualizarEventosPintado() {
+        const hexsEnPantalla = document.querySelectorAll('.hex');
+        hexsEnPantalla.forEach((div, index) => {
+            div.onclick = () => {
+                // Actualizamos el modelo de datos
+                datosMapaCreador[index].tipo = piezaSeleccionada;
+                // Actualizamos la vista inmediatamente
+                div.className = `hex ${piezaSeleccionada}`;
+                div.style.backgroundImage = `url('images/${piezaSeleccionada === 'agua' ? 'agua.gif' : piezaSeleccionada + '.png'}')`;
+            };
+        });
+    }
+
+    function descargarJSONCreado() {
+        // Filtramos para no exportar los "vacio" y que el JSON sea limpio
+        const resultado = {
+            nombre: "Mapa Personalizado Rayco",
+            hexagono: datosMapaCreador.filter(h => h.tipo !== 'vacio')
+        };
+        
+        const blob = new Blob([JSON.stringify(resultado, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'nuevo_mapa_catan.json';
+        a.click();
+    }
+
+
+
 
 
     function iniciarTodo() {
@@ -239,6 +350,12 @@
     }
 
     function procesarConfiguracion(maps) {
+        maps.hexagono.forEach(h => {
+            if (h.numero && h.numero > 0) {
+                h.numeroFinal = h.numero;
+            }
+        });
+
         // --- 1. PREPARAR BOLSAS DE RECURSOS Y LAS ASIGNAMOS---
         for (const key in maps.recursos) {
             let bolsa = [];
@@ -258,23 +375,26 @@
 
         // --- 2. ASIGNAR NÚMEROS POR ÓRDENES ---
         // Procesamos cada grupo de orden (orden_1, orden_2...)
-        for (const ordenKey in maps.numeros) {
-            const infoOrden = maps.numeros[ordenKey];
-            let listaNumeros = [...infoOrden.valores];
-            
-            if (infoOrden.tipo === "aleatorio") {
-                listaNumeros = listaNumeros.sort(() => Math.random() - 0.5);
+
+        if (maps.numeros){ // Si no hay números, salimos
+            for (const ordenKey in maps.numeros) {
+                const infoOrden = maps.numeros[ordenKey];
+                let listaNumeros = [...infoOrden.valores];
+                
+                if (infoOrden.tipo === "aleatorio") {
+                    listaNumeros = listaNumeros.sort(() => Math.random() - 0.5);
+                }
+
+                // Filtramos hexágonos que pertenecen a este orden y NO son hexagonos sin número.
+                const hexsValidos = maps.hexagono
+                    .filter(h => h[ordenKey] > 0 && !terrenosSinNumero.includes(h.tipo))
+                    .sort((a, b) => a[ordenKey] - b[ordenKey]);
+
+                // Asignamos el número de la lista según la posición
+                hexsValidos.forEach((h, index) => {
+                    h.numeroFinal = listaNumeros[index] || null;
+                });
             }
-
-            // Filtramos hexágonos que pertenecen a este orden y NO son desierto/agua
-            const hexsValidos = maps.hexagono
-                .filter(h => h[ordenKey] > 0 && !terrenosSinNumero.includes(h.tipo))
-                .sort((a, b) => a[ordenKey] - b[ordenKey]);
-
-            // Asignamos el número de la lista según la posición
-            hexsValidos.forEach((h, index) => {
-                h.numeroFinal = listaNumeros[index] || null;
-            });
         }
 
         return maps;

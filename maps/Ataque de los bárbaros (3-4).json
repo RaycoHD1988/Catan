@@ -1,0 +1,52 @@
+{
+  "nombre": "Catan básico (3-4)",
+  "recursos": {
+    "aleatorio_1": {
+      "tipos": ["bosque", "trigo", "oveja", "piedra", "arcilla"],
+      "cantidades": [2, 2, 3, 1, 2]
+    },
+    "aleatorio_2": {
+      "tipos": ["bosque", "trigo", "oveja", "piedra", "arcilla"],
+      "cantidades": [1, 2, 1, 2, 1]
+    }
+  },
+  "hexagono": [
+    { "f": 0, "c": 1.5, "numero":  0,"tipo": "agua"},
+    { "f": 0, "c": 2.5, "numero":  0,"tipo": "agua"},
+    { "f": 0, "c": 3.5, "numero":  0, "tipo": "agua"},
+    { "f": 0, "c": 4.5, "numero":  0,"tipo": "agua"},
+    { "f": 1, "c": 1  , "numero":  0, "tipo": "agua"},
+    { "f": 1, "c": 2  , "numero":  3, "tipo": "aleatorio_1"},
+    { "f": 1, "c": 3  , "numero":  8, "tipo": "aleatorio_1"},
+    { "f": 1, "c": 4  , "numero":  0, "tipo": "desierto"},
+    { "f": 1, "c": 5  , "numero":  0, "tipo": "agua"},
+    { "f": 2, "c": 0.5, "numero":  0, "tipo": "agua"},
+    { "f": 2, "c": 1.5, "numero":  9, "tipo": "aleatorio_1"},
+    { "f": 2, "c": 2.5, "numero":  4, "tipo": "aleatorio_2"},
+    { "f": 2, "c": 3.5, "numero":  5, "tipo": "aleatorio_2"},
+    { "f": 2, "c": 4.5, "numero": 10, "tipo": "aleatorio_1"},
+    { "f": 2, "c": 5.5, "numero":  0, "tipo": "agua"},
+    { "f": 3, "c": 0  , "numero":  0, "tipo": "agua"},
+    { "f": 3, "c": 1  , "numero": 12, "tipo": "aleatorio_1"},
+    { "f": 3, "c": 2  , "numero":  6, "tipo": "aleatorio_2"},
+    { "f": 3, "c": 3  , "numero": 10, "tipo": "aleatorio_2"},
+    { "f": 3, "c": 4  , "numero":  8, "tipo": "aleatorio_2"},
+    { "f": 3, "c": 5  , "numero": 11, "tipo": "aleatorio_1"},
+    { "f": 3, "c": 6  , "numero":  0, "tipo": "agua"},
+    { "f": 4, "c": 0.5, "numero":  0, "tipo": "agua"},
+    { "f": 4, "c": 1.5, "numero":  4, "tipo": "aleatorio_1"},
+    { "f": 4, "c": 2.5, "numero":  9, "tipo": "aleatorio_2"},
+    { "f": 4, "c": 3.5, "numero":  3, "tipo": "aleatorio_2"},
+    { "f": 4, "c": 4.5, "numero":  5, "tipo": "aleatorio_1"},
+    { "f": 4, "c": 5.5, "numero":  0, "tipo": "agua"},
+    { "f": 5, "c": 1  , "numero":  0, "tipo": "agua"},
+    { "f": 5, "c": 2  , "numero":  0, "tipo": "castillo"},
+    { "f": 5, "c": 3  , "numero":  6, "tipo": "aleatorio_1"},
+    { "f": 5, "c": 4  , "numero":  2, "tipo": "aleatorio_1"},
+    { "f": 5, "c": 5  , "numero":  0, "tipo": "agua"},
+    { "f": 6, "c": 1.5, "numero":  0, "tipo": "agua"},
+    { "f": 6, "c": 2.5, "numero":  0, "tipo": "agua"},
+    { "f": 6, "c": 3.5, "numero":  0, "tipo": "agua"},
+    { "f": 6, "c": 4.5, "numero":  0, "tipo": "agua"}
+  ]
+}
