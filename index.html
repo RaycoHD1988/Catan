@@ -552,6 +552,9 @@
 
     function procesarConfiguracion(maps) {
         maps.hexagono.forEach(h => {
+            delete h.numeroFinal; 
+        });
+        maps.hexagono.forEach(h => {
             if (h.numero && h.numero > 0) {
                 h.numeroFinal = h.numero;
             }
@@ -572,7 +575,7 @@
             maps.hexagono.filter(h => Array.isArray(h.tipo) && h.tipo.includes(key)).forEach((h, index) => {
                 if (bolsa[index]) {
                     // Reemplazamos "aleatorio_1" por el recurso real (ej: "bosque")
-                    h.tipo = h.tipo.map(t => t === key ? bolsa[index] : t);
+                    h.tipoReal = h.tipo.map(t => t === key ? bolsa[index] : t);
                 }
             });
         }
@@ -591,7 +594,11 @@
 
                 // Filtramos hexágonos que pertenecen a este orden y NO son hexagonos sin número.
                 const hexsValidos = maps.hexagono
-                    .filter(h => h[ordenKey] > 0 && !terrenosSinNumero.includes(h.tipo))
+                    .filter(h => {
+                        const tipoActual = h.tipoReal || h.tipo;
+                        const nombreTipo = Array.isArray(tipoActual) ? tipoActual[0] : tipoActual;
+                        return h[ordenKey] > 0 && !terrenosSinNumero.includes(nombreTipo);
+                    })
                     .sort((a, b) => a[ordenKey] - b[ordenKey]);
 
                 // Asignamos el número de la lista según la posición
@@ -623,8 +630,8 @@
 
         maps.hexagono.forEach(h => {
             const div = document.createElement('div');
-            // Si tipo es array, usamos el primero para la clase CSS principal
-            const tipoPrincipal = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
+            const tipoParaRender = h.tipoReal || h.tipo;
+            const tipoPrincipal = Array.isArray(tipoParaRender) ? tipoParaRender[0] : tipoParaRender;
             div.className = `hex ${tipoPrincipal}`;
             
             div.style.top = `calc((${h.f} - ${minF}) * (var(--hex_wpx) * 1.1547 * 0.75))`;
@@ -633,7 +640,7 @@
                     div.style.transform = `rotate(${60*h.giros}deg)`;
                 }
             // Lógica de capas (Capas múltiples si es array)
-            const capas = Array.isArray(h.tipo) ? h.tipo : [h.tipo];
+            const capas = Array.isArray(tipoParaRender) ? tipoParaRender : [tipoParaRender];
             
             capas.forEach((capaNombre, index) => {
                 const capa = document.createElement('div');
