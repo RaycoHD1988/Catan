@@ -35,8 +35,71 @@
             transition: background 0.2s;
         }
         .btn-flotante:hover { background: #666; }
-        
         #toggle-menu { width: auto; padding: 10px 15px; font-size: 16px; font-weight: bold; }
+
+        /* Dados 3D */
+        #panel-dados-external {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 2000; 
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        #resultado-suma { 
+            font-size: 3.5em; 
+            color: #f1c40f; 
+            font-weight: 800;
+            text-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+            margin: 0;
+            line-height: 1;
+        }
+        .dice-wrapper { display: flex; gap: 15px; }
+        .scene { width: 50px; height: 50px; perspective: 300px; }
+        .cube {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; 
+            transition: transform 1s cubic-bezier(0.2, 0.8, 0.3, 1);
+            transform: translateZ(-25px);
+        }
+        .cube__face {
+            position: absolute; width: 50px; height: 50px;
+            background: #ffffff; border: 1px solid #bbb;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: bold; color: #111; border-radius: 8px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+        }
+        /* Orientación de las caras */
+        .face-1 { transform: rotateY(0deg) translateZ(25px); }
+        .face-2 { transform: rotateY(180deg) translateZ(25px); }
+        .face-3 { transform: rotateY(90deg) translateZ(25px); }
+        .face-4 { transform: rotateY(-90deg) translateZ(25px); }
+        .face-5 { transform: rotateX(90deg) translateZ(25px); }
+        .face-6 { transform: rotateX(-90deg) translateZ(25px); }
+        .btn-lanzar {
+            width: 100%;
+            padding: 12px;
+            background: #d35400;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .btn-lanzar:hover { background: #e67e22; transform: translateY(-2px); }
+        .btn-lanzar:active { transform: scale(0.95); }
+
+
 
         /* MENU LATERAL DERECHO */
         #menu-lateral { 
@@ -59,6 +122,7 @@
         }
         #menu-lateral.abierto { right: 0; }
 
+
         /* SECCIONES COLAPSABLES */
         .seccion-colapsable { border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
         .cabecera-seccion { padding: 12px; background: rgba(255,255,255,0.07); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
@@ -67,6 +131,7 @@
         .contenido-seccion { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 10px; opacity: 0; }
         .seccion-colapsable.activa .contenido-seccion { max-height: 500px; padding: 15px 10px; opacity: 1; }
 
+
         /* TABLERO Y MENSAJE INICIAL */
         .contenedor-tablero { 
             display: flex; justify-content: center; align-items: center; 
@@ -74,7 +139,6 @@
             text-align: center;
         }
         #tablero {position: relative; transition: width 0.3s, height 0.3s;}
-        
         .mensaje-bienvenida {
             font-size: 2em;
             color: rgba(255, 255, 255, 0.6);
@@ -83,7 +147,6 @@
             border-radius: 20px;
             line-height: 1.5;
         }
-
         .hex {
             position: absolute;
             width: var(--hex_wpx); 
@@ -96,8 +159,18 @@
             background-position: center;
             transition: transform 0.2s;
         }
+        .capa-hex {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            /* Hereda el clip-path del padre para que todas las capas sean hexagonales */
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
         .hex:hover { transform: scale(1.05); z-index: 10; }
-
         .numero-ficha {
             background: rgba(255, 255, 255, 0.9);
             border: 2px solid #333;
@@ -110,9 +183,24 @@
             color: #000;
             font-weight: bold;
             font-size: 16px;
+            z-index: 10;
+            position: relative;
+        }
+        /* Efecto de iluminación para los hexágonos activos */
+        .hex.iluminado {
+            transform: scale(1.1); /* Se hace un poco más grande */
+            z-index: 500;
+            filter: brightness(1.1) drop-shadow(0 0 15px #f1c40f);
+            transition: all 0.5s ease;
+        }
+        /* Resaltamos también la ficha numérica */
+        .hex.iluminado .numero-ficha {
+            background: #f1c40f !important;
+            border-color: white;
+            box-shadow: 0 0 10px white;
+            transform: scale(1.2);
         }
         .rojo { color: red; font-size: 18px; }
-
         .btn { width: 100%; padding: 10px; border-radius: 5px; border: none; cursor: pointer; background: #2980b9; color: white; font-weight: bold; margin-bottom: 5px; }
 
         /* Rejilla de edición pequeña */
@@ -152,6 +240,9 @@
     <button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
 </div>
 
+<div id="panel-dados-external" style="display: none;"></div>
+
+
 <div id="menu-lateral">
     <h2 style="margin-top: 40px; border-bottom: 1px solid #444;">Catan TV</h2>
     
@@ -163,9 +254,6 @@
             <button class="btn" onclick="cargarMapa('Ataque de los bárbaros (3-4).json')">Ataque de los bárbaros (3-4)</button>
         </div>
     </div>
-
-
-
 
     <div class="seccion-colapsable">
         <div class="cabecera-seccion" onclick="toggleSeccion(this)">📏 Tamaño Hexagono</div>
@@ -282,9 +370,121 @@
     }
 
 
+    // LÓGICA DE DADOS 3D
+    let rotacionBase = 0;
+    function inicializarDadosSegunMapa(mapa) {
+        const contenedor = document.getElementById('panel-dados-external');
+        if (!mapa.config_dados) {
+            contenedor.style.display = 'none';
+            return;
+        }
+        contenedor.style.display = 'flex';
+        contenedor.innerHTML = '<div id="resultado-suma">--</div>'; // Limpiar
+        // Recorremos cada botón definido en el JSON
+        Object.keys(mapa.config_dados).forEach((idBoton) => {
+            const btnConfig = mapa.config_dados[idBoton];
+            const wrapperId = `wrapper-${idBoton}`;
+            let btnHtml = `
+                <div class="dice-group" style="margin-bottom: 15px; text-align:center;">
+                    <div class="dice-wrapper" id="${wrapperId}" style="margin-bottom:10px; display:flex; gap:15px; justify-content:center;">`;
+            btnConfig.dados.forEach((dado, idxDado) => {
+                const idUnico = `dado-${idBoton}-${idxDado}`;
+                btnHtml += `
+                    <div class="scene">
+                        <div id="${idUnico}" class="cube">
+                            ${dado.caras_contenido.map((cont, i) => `
+                                <div class="cube__face face-${i+1}" style="background-color: ${dado.caras_fondo[i]}">
+                                    ${formatearContenidoCara(cont)}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>`;
+            });
+            btnHtml += `
+                    </div>
+                    <button class="btn-lanzar" onclick="lanzarGrupo('${idBoton}')">${btnConfig.nombre}</button>
+                </div>`;
+            contenedor.insertAdjacentHTML('beforeend', btnHtml);
+        });
+    }
+    function formatearContenidoCara(tipo) {
+        // Si es un número (del 1 al 6), lo devolvemos tal cual
+        if (!isNaN(tipo)) return tipo;
+        // Si es un color, dibujamos un círculo (punto)
+        const coloresMap = {
+            "verde": "#27ae60",
+            "azul": "#2980b9",
+            "amarillo": "#f1c40f",
+            "rojo": "#c0392b",
+            "marron": "#784212",
+            "violeta": "#8e44ad"
+        };
+        if (coloresMap[tipo]) {
+            return `<div style="width:25px; height:25px; border-radius:50%; background:${coloresMap[tipo]}; border:2px solid rgba(0,0,0,0.2)"></div>`;
+        }
+        // Si es pirata u otros iconos
+        if (tipo === "pirata") return "⛵";
+        return tipo;
+    }
+    function aplicarRotacion(id, valor, rotacionBase) {
+        const cubo = document.getElementById(id);
+        // Definimos las rotaciones extra para cada cara (X, Y, Z)
+        const rotaciones = {
+            1: { x: 0,   y: 0 },   // Frontal
+            2: { x: 0,   y: 180 }, // Trasera
+            3: { x: 0,   y: -90 }, // Derecha
+            4: { x: 0,   y: 90 },  // Izquierda
+            5: { x: -90, y: 0 },   // Superior
+            6: { x: 90,  y: 0 }    // Inferior
+        };
+
+        const r = rotaciones[valor];
+        // Sumamos la rotación base (las vueltas completas) para que el giro sea fluido
+        cubo.style.transform = `translateZ(-25px) rotateX(${r.x + rotacionBase}deg) rotateY(${r.y + rotacionBase}deg)`;
+    }
+    function lanzarGrupo(idBoton) {
+        const btnConfig = mapaActualData.config_dados[idBoton];
+        rotacionBase += 720;
+        let sumaNumerica = 0;
+        let esTiradaNumerica = false;
+
+        // 1. Limpiar iluminación previa inmediatamente al lanzar
+        document.querySelectorAll('.hex').forEach(h => h.classList.remove('iluminado'));
+
+        btnConfig.dados.forEach((dado, idx) => {
+            const valorCara = Math.floor(Math.random() * 6) + 1;
+            const idUnico = `dado-${idBoton}-${idx}`;
+            aplicarRotacion(idUnico, valorCara, rotacionBase);
+            
+            const contenido = dado.caras_contenido[valorCara - 1];
+            if (!isNaN(contenido)) {
+                sumaNumerica += parseInt(contenido);
+                esTiradaNumerica = true;
+            }
+        });
+        if (esTiradaNumerica) {
+            // Esperamos a que la animación de los dados (1s) termine
+            setTimeout(() => {
+                const display = document.getElementById('resultado-suma');
+                display.innerText = sumaNumerica;
+                display.style.color = (sumaNumerica === 7) ? '#ff4d4d' : '#f1c40f';
+
+                // 2. BUSCAR E ILUMINAR: Ahora que tenemos la suma final
+                const hexs = document.querySelectorAll('.hex');
+                hexs.forEach(div => {
+                    const ficha = div.querySelector('.numero-ficha');
+                    // Comparación estricta del número
+                    if (ficha && parseInt(ficha.innerText) === sumaNumerica) {
+                        div.classList.add('iluminado');
+                    }
+                });
+            }, 1000); 
+        }
+    }
 
 
 
+    // Inicio de la aplicación.
     function iniciarTodo() {
         // 1. Ponemos la pantalla completa despues de que el usuario haya interactuado.
         toggleFullScreen();
@@ -341,6 +541,7 @@
             maps = procesarConfiguracion(maps);
             mapaActualData = maps
             renderizarMapa(maps);
+            inicializarDadosSegunMapa(maps);
             toggleMenu(); // Cerramos el menú al cargar con éxito
             
         }catch (e) {
@@ -365,11 +566,14 @@
             });
 
             // Mezclamos la bolsa
-            bolsa= bolsa.sort(() => Math.random() - 0.5);
+            bolsa = bolsa.sort(() => Math.random() - 0.5);
 
             // Asignamos tipos a hexágonos que usan esta bolsa
-            maps.hexagono.filter(h => h.tipo === key).forEach((h, index) => {
-                h.tipo = bolsa[index] || null;
+            maps.hexagono.filter(h => Array.isArray(h.tipo) && h.tipo.includes(key)).forEach((h, index) => {
+                if (bolsa[index]) {
+                    // Reemplazamos "aleatorio_1" por el recurso real (ej: "bosque")
+                    h.tipo = h.tipo.map(t => t === key ? bolsa[index] : t);
+                }
             });
         }
 
@@ -402,55 +606,56 @@
 
     function renderizarMapa(maps) {
         tablero.innerHTML = '';
-        
-        // 1. Obtener medidas actuales
         const w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
         const f_spacing = w * 1.1547 * 0.75; 
         const c_spacing = w;
 
-        // 2. Calcular límites para centrado automático
-        let minF = Infinity, maxF = -Infinity;
-        let minC = Infinity, maxC = -Infinity;
-
+        let minF = Infinity, maxF = -Infinity, minC = Infinity, maxC = -Infinity;
         maps.hexagono.forEach(h => {
-            if (h.f < minF) minF = h.f;
-            if (h.f > maxF) maxF = h.f;
-            if (h.c < minC) minC = h.c;
-            if (h.c > maxC) maxC = h.c;
+            if (h.f < minF) minF = h.f; if (h.f > maxF) maxF = h.f;
+            if (h.c < minC) minC = h.c; if (h.c > maxC) maxC = h.c;
         });
 
-        // 3. Ajustar el tamaño del contenedor #tablero
-        const filas = (maxF - minF);
-        const columnas = (maxC - minC);
-        
-        // Calculamos ancho y alto total (+1 para el último hexágono)
-        const totalW = (columnas * c_spacing) + w;
-        const totalH = (filas * f_spacing) + (w * 1.15);
-
+        const totalW = ((maxC - minC) * c_spacing) + w;
+        const totalH = ((maxF - minF) * f_spacing) + (w * 1.15);
         tablero.style.width = totalW + 'px';
         tablero.style.height = totalH + 'px';
-        
-        // Centrado: desplazamos el tablero para que la coordenada mínima sea el 0,0
-        const offsetTop = minF * f_spacing;
-        const offsetLeft = minC * c_spacing;
 
-        // 4. Dibujar hexágonos
         maps.hexagono.forEach(h => {
             const div = document.createElement('div');
-            div.className = `hex ${h.tipo}`;
-            if(h.tipo === 'agua'){
-                div.style.backgroundImage = `url('images/${h.tipo}.gif')`;
-            } else {
-                div.style.backgroundImage = `url('images/${h.tipo}.png')`;
-            }
+            // Si tipo es array, usamos el primero para la clase CSS principal
+            const tipoPrincipal = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
+            div.className = `hex ${tipoPrincipal}`;
             
-            // Posicionamos restando el offset para que el mapa empiece en el borde del contenedor
             div.style.top = `calc((${h.f} - ${minF}) * (var(--hex_wpx) * 1.1547 * 0.75))`;
             div.style.left = `calc((${h.c} - ${minC}) * var(--hex_wpx))`;
+            if (h.giros) {
+                    div.style.transform = `rotate(${60*h.giros}deg)`;
+                }
+            // Lógica de capas (Capas múltiples si es array)
+            const capas = Array.isArray(h.tipo) ? h.tipo : [h.tipo];
+            
+            capas.forEach((capaNombre, index) => {
+                const capa = document.createElement('div');
+                capa.className = 'capa-hex';
+                
+                // Determinar imagen y extensión
+                let nombreArchivo = capaNombre;
+                // Si no tiene punto (no tiene extensión), le ponemos .png por defecto
+                if (!nombreArchivo.includes('.')) {
+                    nombreArchivo += (capaNombre === 'agua') ? '.gif' : '.png';
+                }
+                
+                capa.style.backgroundImage = `url('images/${nombreArchivo}')`;
+                capa.style.zIndex = index; // La última en el array se ve arriba
+                div.appendChild(capa);
+            });
 
+            // Ficha numérica (siempre encima de todo)
             if (h.numeroFinal) {
                 const ficha = document.createElement('div');
                 ficha.className = 'numero-ficha' + (h.numeroFinal === 6 || h.numeroFinal === 8 ? ' rojo' : '');
+                ficha.style.zIndex = 10;
                 ficha.innerText = h.numeroFinal;
                 div.appendChild(ficha);
             }
