@@ -1,0 +1,84 @@
+{
+  "nombre": "Catan Ampliación (5-6)",
+  "config_dados": {
+    "boton_1": {
+      "nombre": "Lanzar Dados",
+      "dados": [
+        {
+          "caras_fondo": ["white", "white", "white", "white", "white", "white"],
+          "caras_contenido": ["1", "2", "3", "4", "5", "6"]
+        },
+        {
+          "caras_fondo": ["white","white","white","white","white","white"],
+          "caras_contenido": ["1", "2", "3", "4", "5", "6"]
+        }
+      ]
+    }
+  },
+  "numeros": {
+    "orden_1": {
+      "tipo": "fijo",
+      "valores": [2, 5, 4, 6, 3, 9, 8, 11, 11, 10, 6, 3, 8, 4, 8, 10, 11, 12, 10, 5, 4, 9, 5, 9, 12, 3, 2, 6]
+    }
+  },
+  "recursos": {
+    "aleatorio_1": {
+      "tipos": ["bosque", "trigo", "oveja", "piedra", "arcilla", "desierto"],
+      "cantidades": [6, 6, 6, 5, 5, 2]
+    }
+  },
+  "hexagono": [
+    { "f": 0, "c":   2, "tipo": ["agua"] }, 
+    { "f": 0, "c":   3, "tipo": ["agua"] }, 
+    { "f": 0, "c":   4, "tipo": ["agua"] }, 
+    { "f": 0, "c":   5, "tipo": ["agua"] },
+    { "f": 1, "c": 1.5, "tipo": ["agua"] }, 
+    { "f": 1, "c": 2.5, "orden_1": 3, "tipo": ["aleatorio_1"] }, 
+    { "f": 1, "c": 3.5, "orden_1": 2, "tipo": ["aleatorio_1"] }, 
+    { "f": 1, "c": 4.5, "orden_1": 1, "tipo": ["aleatorio_1"] }, 
+    { "f": 1, "c": 5.5, "tipo": ["agua"] },
+    { "f": 2, "c":   1, "tipo": ["agua"] }, 
+    { "f": 2, "c":   2, "orden_1": 4, "tipo": ["aleatorio_1"] }, 
+    { "f": 2, "c":   3, "orden_1":18, "tipo": ["aleatorio_1"] }, 
+    { "f": 2, "c":   4, "orden_1":17, "tipo": ["aleatorio_1"] }, 
+    { "f": 2, "c":   5, "orden_1":16, "tipo": ["aleatorio_1"] }, 
+    { "f": 2, "c":   6, "tipo": ["agua"] },
+    { "f": 3, "c": 0.5, "tipo": ["agua"] }, 
+    { "f": 3, "c": 1.5, "orden_1": 5, "tipo": ["aleatorio_1"] }, 
+    { "f": 3, "c": 2.5, "orden_1":19, "tipo": ["aleatorio_1"] }, 
+    { "f": 3, "c": 3.5, "orden_1":27, "tipo": ["aleatorio_1"] }, 
+    { "f": 3, "c": 4.5, "orden_1":26, "tipo": ["aleatorio_1"] }, 
+    { "f": 3, "c": 5.5, "orden_1":15, "tipo": ["aleatorio_1"] }, 
+    { "f": 3, "c": 6.5, "tipo": ["agua"] },
+    { "f": 4, "c":   0, "tipo": ["agua"] }, 
+    { "f": 4, "c":   1, "orden_1": 6, "tipo": ["aleatorio_1"] }, 
+    { "f": 4, "c":   2, "orden_1":20, "tipo": ["aleatorio_1"] }, 
+    { "f": 4, "c":   3, "orden_1":28, "tipo": ["aleatorio_1"] }, 
+    { "f": 4, "c":   4, "orden_1":30, "tipo": ["aleatorio_1"] }, 
+    { "f": 4, "c":   5, "orden_1":25, "tipo": ["aleatorio_1"] }, 
+    { "f": 4, "c":   6, "orden_1":14, "tipo": ["aleatorio_1"] }, 
+    { "f": 4, "c":   7, "tipo": ["agua"] },
+    { "f": 5, "c": 0.5, "tipo": ["agua"] }, 
+    { "f": 5, "c": 1.5, "orden_1": 7, "tipo": ["aleatorio_1"] }, 
+    { "f": 5, "c": 2.5, "orden_1":21, "tipo": ["aleatorio_1"] }, 
+    { "f": 5, "c": 3.5, "orden_1":29, "tipo": ["aleatorio_1"] }, 
+    { "f": 5, "c": 4.5, "orden_1":24, "tipo": ["aleatorio_1"] }, 
+    { "f": 5, "c": 5.5, "orden_1":13, "tipo": ["aleatorio_1"] }, 
+    { "f": 5, "c": 6.5, "tipo": ["agua"] },
+    { "f": 6, "c":   1, "tipo": ["agua"] }, 
+    { "f": 6, "c":   2, "orden_1": 8, "tipo": ["aleatorio_1"] }, 
+    { "f": 6, "c":   3, "orden_1":22, "tipo": ["aleatorio_1"] }, 
+    { "f": 6, "c":   4, "orden_1":23, "tipo": ["aleatorio_1"] }, 
+    { "f": 6, "c":   5, "orden_1":12, "tipo": ["aleatorio_1"] }, 
+    { "f": 6, "c":   6, "tipo": ["agua"] },
+    { "f": 7, "c": 1.5, "tipo": ["agua"] }, 
+    { "f": 7, "c": 2.5, "orden_1": 9, "tipo": ["aleatorio_1"] }, 
+    { "f": 7, "c": 3.5, "orden_1":10, "tipo": ["aleatorio_1"] }, 
+    { "f": 7, "c": 4.5, "orden_1":11, "tipo": ["aleatorio_1"] }, 
+    { "f": 7, "c": 5.5, "tipo": ["agua"] },
+    { "f": 8, "c":   2, "tipo": ["agua"] }, 
+    { "f": 8, "c":   3, "tipo": ["agua"] }, 
+    { "f": 8, "c":   4, "tipo": ["agua"] }, 
+    { "f": 8, "c":   5, "tipo": ["agua"] }
+  ]
+}

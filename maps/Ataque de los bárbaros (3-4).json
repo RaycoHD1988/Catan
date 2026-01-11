@@ -15,7 +15,7 @@
       ]
     },
     "boton_evento": {
-      "nombre": "¿Sobrevive el caballero?",
+      "nombre": "¿Que caballero fallece?",
       "dados": [
       {
         "caras_fondo": ["white", "white", "white", "white", "white", "white"],
@@ -43,7 +43,7 @@
     { "f": 1, "c": 2  , "numero":  3, "tipo": ["aleatorio_1"]},
     { "f": 1, "c": 3  , "numero":  8, "tipo": ["aleatorio_1"]},
     { "f": 1, "c": 4  , "numero":  0, "tipo": ["desierto"]},
-    { "f": 1, "c": 5  , "numero":  0, "tipo": ["agua","puerto_2_1_madera_2.png"], "giros":5},
+    { "f": 1, "c": 5  , "numero":  0, "tipo": ["agua"]},
     { "f": 2, "c": 0.5, "numero":  0, "tipo": ["agua"]},
     { "f": 2, "c": 1.5, "numero":  9, "tipo": ["aleatorio_1"]},
     { "f": 2, "c": 2.5, "numero":  4, "tipo": ["aleatorio_2"]},

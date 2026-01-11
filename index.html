@@ -169,6 +169,7 @@
             background-position: center;
             /* Hereda el clip-path del padre para que todas las capas sean hexagonales */
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            pointer-events: none;
         }
         .hex:hover { transform: scale(1.05); z-index: 10; }
         .numero-ficha {
@@ -259,29 +260,29 @@
         <div class="cabecera-seccion" onclick="toggleSeccion(this)">📏 Tamaño Hexagono</div>
         <div class="contenido-seccion">
             <p style="font-size: 0.8em; color: #888; margin-bottom: 10px;">
-                Ajusta el ancho del hexágono hasta que mida exactamente 7.86 cm en tu pantalla.
             </p>
-        <div style="display: flex; align-items: center; justify-content: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
-            <button class="btn" style="width: 40px; margin:0; background: #e74c3c;" onclick="cambiarPixeles(-1)">◀</button>
-            
-            <input type="number" id="input-calibracion-px" 
-            style="width: 70px; text-align: center; font-size: 1.1em; font-weight: bold; background: transparent; color: #f1c40f; border: 1px solid #444; padding: 5px; -moz-appearance: textfield;"
-            oninput="setPixelesDirecto(this.value)">
-            
-            <button class="btn" style="width: 40px; margin:0; background: #27ae60;" onclick="cambiarPixeles(1)">▶</button>
-        </div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
+                <button class="btn" style="width: 40px; margin:0; background: #e74c3c;" onclick="cambiarPixeles(-1)">◀</button>
+                <input type="number" id="input-calibracion-px" 
+                style="width: 70px; text-align: center; font-size: 1.1em; font-weight: bold; background: transparent; color: #f1c40f; border: 1px solid #444; padding: 5px; -moz-appearance: textfield;"
+                oninput="setPixelesDirecto(this.value)">
+                <button class="btn" style="width: 40px; margin:0; background: #27ae60;" onclick="cambiarPixeles(1)">▶</button>
+            </div>
             <p style="font-size: 0.7em; color: #888; margin-top: 10px; text-align: center;">
                 Unidad: Píxeles por hexágono. Aprox. 32" = 165px, 55" = 99px.
             </p>
         </div>
     </div>
+
     <div class="seccion-colapsable">
-        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🛠️ Modo Creador</div>
+        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🎨 Modo Creador</div>
         <div class="contenido-seccion">
             <button class="btn" style="background: #d35400;" onclick="activarModoCreador()">Activar Lienzo 20x20</button>
-            <p style="font-size: 0.7em; color: #888;">Selecciona una pieza:</p>
-            <div id="selector-piezas" class="paleta-editor">
-                </div>
+            <p style="font-size: 0.7em; color: #888; margin-top: 10px;">Selecciona una pieza:</p>
+            <div id="selector-piezas" class="paleta-editor"></div>
+            
+            <button id="btn-orden" class="btn" style="background: #8e44ad; margin-top:10px;" onclick="activarPincelOrden()">🔢 Marcar Orden 1</button>
+            
             <button class="btn" style="background: #27ae60; margin-top:15px;" onclick="descargarJSONCreado()">💾 Descargar JSON</button>
         </div>
     </div>
@@ -301,14 +302,18 @@
 
     let piezaSeleccionada = 'vacio';
     let datosMapaCreador = [];
+    let modoOrdenActivo = false;
+    let contadorOrden = 1;
 
     function activarModoCreador() {
+        mapaActualData = { hexagono: [] };
+        contadorOrden = 1;
         // 1. Cambiamos el tamaño visual del tablero a 30px mediante una clase CSS
         document.body.classList.add('modo-edicion');
         document.documentElement.style.setProperty('--hex_wpx', '30px');
         
         // 2. Cargamos las opciones de piezas en el panel lateral
-        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla', 'desierto', 'agua', 'vacio'];
+        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla', 'desierto', 'agua', 'vacio', 'aleatorio_1', 'aleatorio_2', 'aleatorio_3', 'puerto_comercial'];
         const contenedor = document.getElementById('selector-piezas');
         contenedor.innerHTML = '';
         
@@ -341,25 +346,71 @@
         actualizarEventosPintado();
     }
 
+    function activarPincelOrden() {
+        modoOrdenActivo = !modoOrdenActivo;
+        const btn = document.getElementById('btn-orden');
+        
+        if (modoOrdenActivo) {
+            btn.style.background = "#f1c40f";
+            btn.style.color = "#000";
+            document.getElementById('tablero').classList.add('pintando');
+        } else {
+            btn.style.background = "#8e44ad";
+            btn.style.color = "#fff";
+            btn.innerText = `🔢 Marcar Orden ${contadorOrden}`;
+        }
+    }
     function actualizarEventosPintado() {
         const hexsEnPantalla = document.querySelectorAll('.hex');
         hexsEnPantalla.forEach((div, index) => {
-            div.onclick = () => {
-                // Actualizamos el modelo de datos
-                datosMapaCreador[index].tipo = piezaSeleccionada;
-                // Actualizamos la vista inmediatamente
-                div.className = `hex ${piezaSeleccionada}`;
-                div.style.backgroundImage = `url('images/${piezaSeleccionada === 'agua' ? 'agua.gif' : piezaSeleccionada + '.png'}')`;
+            div.onclick = (e) => {
+                if (modoOrdenActivo) {
+                    // LÓGICA DE ASIGNAR ORDEN
+                    datosMapaCreador[index].orden_1 = contadorOrden;
+                    
+                    // Mostrar visualmente el número en el editor
+                    let ficha = div.querySelector('.numero-ficha');
+                    if (!ficha) {
+                        ficha = document.createElement('div');
+                        ficha.className = 'numero-ficha';
+                        div.appendChild(ficha);
+                    }
+                    ficha.innerText = contadorOrden;
+                    
+                    // Incrementar para el siguiente
+                    contadorOrden++;
+                    document.getElementById('btn-orden').innerText = `🔢 Marcar Orden ${contadorOrden}`;
+                    
+                } else {
+                    // LÓGICA DE PINTAR TERRENO (Tu código anterior)
+                    datosMapaCreador[index].tipo = piezaSeleccionada;
+                    div.querySelectorAll('.capa-hex').forEach(capa => capa.remove());
+                    const nuevaCapa = document.createElement('div');
+                    nuevaCapa.className = 'capa-hex';
+                    let nombreArchivo = piezaSeleccionada;
+                    if (!nombreArchivo.includes('.')) {
+                        nombreArchivo += (piezaSeleccionada === 'agua') ? '.gif' : '.png';
+                    }
+                    nuevaCapa.style.backgroundImage = `url('images/${nombreArchivo}')`;
+                    div.appendChild(nuevaCapa);
+                    div.className = `hex ${piezaSeleccionada}`;
+                }
             };
         });
     }
 
     function descargarJSONCreado() {
-        // Filtramos para no exportar los "vacio" y que el JSON sea limpio
         const resultado = {
             nombre: "Mapa Personalizado Rayco",
-            hexagono: datosMapaCreador.filter(h => h.tipo !== 'vacio')
+            hexagono: datosMapaCreador.filter(h => h.tipo !== 'vacio'),
+            recursos: {},
+            numeros: { "orden_1": { "tipo": "fijo", "valores": [] } } 
         };
+    
+    // Generar los valores de los números basados en lo que pintaste
+    resultado.hexagono.forEach(h => {
+        if(h.orden_1) resultado.numeros.orden_1.valores.push(null); // Marcador de posición
+    });
         
         const blob = new Blob([JSON.stringify(resultado, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
