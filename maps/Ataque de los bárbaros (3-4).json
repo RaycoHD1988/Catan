@@ -26,11 +26,11 @@
   },
   "recursos": {
     "aleatorio_1": {
-      "tipos": ["bosque", "trigo", "oveja", "piedra", "arcilla"],
+      "tipos": ["bosque", "trigo", "oveja", "piedra", "barro"],
       "cantidades": [2, 2, 3, 1, 2]
     },
     "aleatorio_2": {
-      "tipos": ["bosque", "trigo", "oveja", "piedra", "arcilla"],
+      "tipos": ["bosque", "trigo", "oveja", "piedra", "barro"],
       "cantidades": [1, 2, 1, 2, 1]
     }
   },

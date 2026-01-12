@@ -257,6 +257,17 @@
     </div>
 
     <div class="seccion-colapsable">
+        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🎨 Modo Creador</div>
+        <div class="contenido-seccion">
+            <button class="btn" style="background: #d35400;" onclick="activarModoCreador()">Activar Lienzo 20x20</button>
+            <p style="font-size: 0.7em; color: #888; margin-top: 10px;">Selecciona una pieza:</p>
+            <div id="selector-piezas" class="paleta-editor"></div>
+            <button id="btn-orden" class="btn" style="background: #8e44ad; margin-top:10px;" onclick="activarPincelOrden()">🔢 Marcar Orden 1</button>
+            <button class="btn" style="background: #27ae60; margin-top:15px;" onclick="descargarJSONCreado()">💾 Descargar JSON</button>
+        </div>
+    </div>
+
+    <div class="seccion-colapsable">
         <div class="cabecera-seccion" onclick="toggleSeccion(this)">📏 Tamaño Hexagono</div>
         <div class="contenido-seccion">
             <p style="font-size: 0.8em; color: #888; margin-bottom: 10px;">
@@ -271,19 +282,6 @@
             <p style="font-size: 0.7em; color: #888; margin-top: 10px; text-align: center;">
                 Unidad: Píxeles por hexágono. Aprox. 32" = 165px, 55" = 99px.
             </p>
-        </div>
-    </div>
-
-    <div class="seccion-colapsable">
-        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🎨 Modo Creador</div>
-        <div class="contenido-seccion">
-            <button class="btn" style="background: #d35400;" onclick="activarModoCreador()">Activar Lienzo 20x20</button>
-            <p style="font-size: 0.7em; color: #888; margin-top: 10px;">Selecciona una pieza:</p>
-            <div id="selector-piezas" class="paleta-editor"></div>
-            
-            <button id="btn-orden" class="btn" style="background: #8e44ad; margin-top:10px;" onclick="activarPincelOrden()">🔢 Marcar Orden 1</button>
-            
-            <button class="btn" style="background: #27ae60; margin-top:15px;" onclick="descargarJSONCreado()">💾 Descargar JSON</button>
         </div>
     </div>
 </div>
@@ -308,19 +306,22 @@
     function activarModoCreador() {
         mapaActualData = { hexagono: [] };
         contadorOrden = 1;
+        modoOrdenActivo = false;
+        document.getElementById('btn-orden').style.background = "#8e44ad";
         // 1. Cambiamos el tamaño visual del tablero a 30px mediante una clase CSS
         document.body.classList.add('modo-edicion');
         document.documentElement.style.setProperty('--hex_wpx', '30px');
         
         // 2. Cargamos las opciones de piezas en el panel lateral
-        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'arcilla', 'desierto', 'agua', 'vacio', 'aleatorio_1', 'aleatorio_2', 'aleatorio_3', 'puerto_comercial'];
+        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'barro', 'desierto', 'agua', 'vacio', 'aleatorio_1', 'aleatorio_2', 'aleatorio_3', 'puerto_comercial'];
         const contenedor = document.getElementById('selector-piezas');
         contenedor.innerHTML = '';
         
         tipos.forEach(tipo => {
             const div = document.createElement('div');
             div.className = 'pincel-opcion';
-            div.style.backgroundImage = `url('images/${tipo === 'agua' ? 'agua.gif' : tipo + '.png'}')`;
+            // div.style.backgroundImage = `url('images/${tipo === 'agua' ? 'agua.gif' : tipo + '.png'}')`;
+            div.style.backgroundImage = `url('images/${tipo + '.png'}')`;
             div.onclick = () => {
                 piezaSeleccionada = tipo;
                 document.querySelectorAll('.pincel-opcion').forEach(el => el.classList.remove('activo'));
@@ -389,7 +390,8 @@
                     nuevaCapa.className = 'capa-hex';
                     let nombreArchivo = piezaSeleccionada;
                     if (!nombreArchivo.includes('.')) {
-                        nombreArchivo += (piezaSeleccionada === 'agua') ? '.gif' : '.png';
+                        // nombreArchivo += (piezaSeleccionada === 'agua') ? '.gif' : '.png';
+                        nombreArchivo += '.png';
                     }
                     nuevaCapa.style.backgroundImage = `url('images/${nombreArchivo}')`;
                     div.appendChild(nuevaCapa);
@@ -583,6 +585,15 @@
     }
     async function cargarMapa(nombreMapa) {
         try {
+            // --- AQUÍ LA SOLUCIÓN ---
+            // 1. Quitamos la clase de edición del body
+            document.body.classList.remove('modo-edicion');
+            // 2. Quitamos el cursor de pintar si estaba activo
+            document.getElementById('tablero').classList.remove('pintando');
+            // 3. Restauramos el tamaño de los hexágonos al valor del input de calibración
+            let pxGuardados = document.getElementById('input-calibracion-px').value;
+            document.documentElement.style.setProperty('--hex_wpx', pxGuardados + 'px');
+            // -------------------------
             const respuesta = await fetch(`maps/${nombreMapa}`);
             if (!respuesta.ok) {
                 throw new Error(`No se pudo encontrar el archivo: maps/${nombreMapa}`);
@@ -658,7 +669,6 @@
                 });
             }
         }
-
         return maps;
     }
 
@@ -673,7 +683,6 @@
             if (h.f < minF) minF = h.f; if (h.f > maxF) maxF = h.f;
             if (h.c < minC) minC = h.c; if (h.c > maxC) maxC = h.c;
         });
-
         const totalW = ((maxC - minC) * c_spacing) + w;
         const totalH = ((maxF - minF) * f_spacing) + (w * 1.15);
         tablero.style.width = totalW + 'px';
@@ -684,31 +693,30 @@
             const tipoParaRender = h.tipoReal || h.tipo;
             const tipoPrincipal = Array.isArray(tipoParaRender) ? tipoParaRender[0] : tipoParaRender;
             div.className = `hex ${tipoPrincipal}`;
-            
             div.style.top = `calc((${h.f} - ${minF}) * (var(--hex_wpx) * 1.1547 * 0.75))`;
             div.style.left = `calc((${h.c} - ${minC}) * var(--hex_wpx))`;
-            if (h.giros) {
-                    div.style.transform = `rotate(${60*h.giros}deg)`;
-                }
-            // Lógica de capas (Capas múltiples si es array)
-            const capas = Array.isArray(tipoParaRender) ? tipoParaRender : [tipoParaRender];
+            const listaCapas = Array.isArray(tipoParaRender) ? tipoParaRender : [tipoParaRender];
+            const listaGiros = Array.isArray(h.giros) ? h.giros : [h.giros || 0];
             
-            capas.forEach((capaNombre, index) => {
+            listaCapas.forEach((capaNombre, index) => {
                 const capa = document.createElement('div');
                 capa.className = 'capa-hex';
                 
-                // Determinar imagen y extensión
                 let nombreArchivo = capaNombre;
-                // Si no tiene punto (no tiene extensión), le ponemos .png por defecto
                 if (!nombreArchivo.includes('.')) {
-                    nombreArchivo += (capaNombre === 'agua') ? '.gif' : '.png';
+                    nombreArchivo += '.png';
                 }
                 
                 capa.style.backgroundImage = `url('images/${nombreArchivo}')`;
-                capa.style.zIndex = index; // La última en el array se ve arriba
+                capa.style.zIndex = index; 
+                
+                // Aplicamos el giro si existe para esta capa
+                const gradosGiro = (listaGiros[index] || 0) * 60;
+                if (gradosGiro !== 0) {
+                    capa.style.transform = `rotate(${gradosGiro}deg)`;
+                }
                 div.appendChild(capa);
             });
-
             // Ficha numérica (siempre encima de todo)
             if (h.numeroFinal) {
                 const ficha = document.createElement('div');
@@ -726,23 +734,20 @@
         const btn = document.getElementById('toggle-fs');
         if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().then(() => {
-                    btn.innerText = "❐"; // Icono de "ventanas superpuestas" al entrar
+                    btn.innerText = "❐"; 
                 }).catch(err => {
                     console.error(`Error al intentar entrar en pantalla completa: ${err.message}`);
                 });
         } else {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
-                btn.innerText = "⛶"; // Icono de "expandir"
+                btn.innerText = "⛶";
             }
         }
     }
 
     window.onload = () => {
-        // Sincronizamos el input con ese valor que pusiste en el CSS (:root)
         document.getElementById('input-calibracion-px').value = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
-        
-        // Muestra el mensaje de bienvenida
         mostrarPantallaInicio();       
     };
 </script>
