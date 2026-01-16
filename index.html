@@ -252,6 +252,7 @@
         <div class="contenido-seccion">
             <button class="btn" onclick="cargarMapa('Catan básico (3-4).json')">Catan básico (3-4)</button>
             <button class="btn" onclick="cargarMapa('Catan básico (5-6).json')">Catan básico (5-6)</button>
+            <button class="btn" onclick="cargarMapa('Rumbo a nuevas orillas (3-4).json')">Rumbo a nuevas orillas (3-4)</button>
             <button class="btn" onclick="cargarMapa('Ataque de los bárbaros (3-4).json')">Ataque de los bárbaros (3-4)</button>
         </div>
     </div>
@@ -293,7 +294,7 @@
  <!-- ----------------------------------------------------------------------------------------------------- -->
 
 <script>
-    const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'puerto_comercial', 'oasis'];
+    const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'puerto_comercial', 'oasis','puerto_2_1_madera','puerto_2_1_barro','puerto_2_1_oveja','puerto_2_1_trigo','puerto_2_1_piedra','puerto_3_1','borde recto','borde esquina'];
     const tablero = document.getElementById('tablero');
     const menu    = document.getElementById('menu-lateral');
     let mapaActualData = null;
@@ -313,7 +314,13 @@
         document.documentElement.style.setProperty('--hex_wpx', '30px');
         
         // 2. Cargamos las opciones de piezas en el panel lateral
-        const tipos = ['bosque', 'trigo', 'oveja', 'piedra', 'barro', 'desierto', 'agua', 'vacio', 'aleatorio_1', 'aleatorio_2', 'aleatorio_3', 'puerto_comercial'];
+        const tipos = [
+            'aleatorio_1', 'aleatorio_2', 'aleatorio_3', 
+            'vacio','borde recto', 'borde esquina',
+            'bosque','trigo','oveja', 
+            'piedra','barro','rio',
+            'desierto','oasis','peces',
+            'agua','puerto_comercial','castillo'];
         const contenedor = document.getElementById('selector-piezas');
         contenedor.innerHTML = '';
         
