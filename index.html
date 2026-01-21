@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Catan Pro TV - Rayco Edition</title>
     <style>
-        :root { 
+        :root {
             --linea-hex: #000000;
             --hex_wpx: 99px;
         }
-        body { background-color: #0d0d0d; color: white; margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        /* BOTONES FLOTANTES AGRUPADOS A LA DERECHA */
+
+        body {
+            background-color: #0d0d0d;
+            color: white;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
         .controles-superiores {
             position: fixed;
             top: 10px;
@@ -20,70 +27,119 @@
             z-index: 1001;
         }
 
-        .btn-flotante { 
-            cursor: pointer; 
-            background: #444; 
-            border: none; 
-            color: white; 
-            padding: 10px; 
-            border-radius: 5px; 
-            height: 40px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+        .btn-flotante {
+            cursor: pointer;
+            background: #444;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 20px;
             transition: background 0.2s;
         }
-        .btn-flotante:hover { background: #666; }
-        #toggle-menu { width: auto; padding: 10px 15px; font-size: 16px; font-weight: bold; }
+
+        .btn-flotante:hover {
+            background: #666;
+        }
+
+        #toggle-menu {
+            width: auto;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
 
         /* Dados 3D */
         #panel-dados-external {
             position: fixed;
             bottom: 30px;
             left: 30px;
-            z-index: 2000; 
+            z-index: 2000;
             background: rgba(20, 20, 20, 0.85);
             backdrop-filter: blur(8px);
             padding: 20px;
             border-radius: 20px;
             border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
         }
-        #resultado-suma { 
-            font-size: 3.5em; 
-            color: #f1c40f; 
+
+        #resultado-suma {
+            font-size: 3.5em;
+            color: #f1c40f;
             font-weight: 800;
             text-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
             margin: 0;
             line-height: 1;
         }
-        .dice-wrapper { display: flex; gap: 15px; }
-        .scene { width: 50px; height: 50px; perspective: 300px; }
+
+        .dice-wrapper {
+            display: flex;
+            gap: 15px;
+        }
+
+        .scene {
+            width: 50px;
+            height: 50px;
+            perspective: 300px;
+        }
+
         .cube {
-            width: 100%; height: 100%; position: relative;
-            transform-style: preserve-3d; 
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
             transition: transform 1s cubic-bezier(0.2, 0.8, 0.3, 1);
             transform: translateZ(-25px);
         }
+
         .cube__face {
-            position: absolute; width: 50px; height: 50px;
-            background: #ffffff; border: 1px solid #bbb;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: bold; color: #111; border-radius: 8px;
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #ffffff;
+            border: 1px solid #bbb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #111;
+            border-radius: 8px;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
         }
-        /* Orientación de las caras */
-        .face-1 { transform: rotateY(0deg) translateZ(25px); }
-        .face-2 { transform: rotateY(180deg) translateZ(25px); }
-        .face-3 { transform: rotateY(90deg) translateZ(25px); }
-        .face-4 { transform: rotateY(-90deg) translateZ(25px); }
-        .face-5 { transform: rotateX(90deg) translateZ(25px); }
-        .face-6 { transform: rotateX(-90deg) translateZ(25px); }
+
+        .face-1 {
+            transform: rotateY(0deg) translateZ(25px);
+        }
+
+        .face-2 {
+            transform: rotateY(180deg) translateZ(25px);
+        }
+
+        .face-3 {
+            transform: rotateY(90deg) translateZ(25px);
+        }
+
+        .face-4 {
+            transform: rotateY(-90deg) translateZ(25px);
+        }
+
+        .face-5 {
+            transform: rotateX(90deg) translateZ(25px);
+        }
+
+        .face-6 {
+            transform: rotateX(-90deg) translateZ(25px);
+        }
+
         .btn-lanzar {
             width: 100%;
             padding: 12px;
@@ -96,43 +152,84 @@
             transition: 0.2s;
             font-family: inherit;
         }
-        .btn-lanzar:hover { background: #e67e22; transform: translateY(-2px); }
-        .btn-lanzar:active { transform: scale(0.95); }
+
+        .btn-lanzar:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .btn-lanzar:active {
+            transform: scale(0.95);
+        }
 
 
 
         /* MENU LATERAL DERECHO */
-        #menu-lateral { 
-            position: fixed; 
-            right: -280px; 
-            top: 0; 
-            width: 250px; 
-            height: 100vh; 
-            background: rgba(25, 25, 25, 0.98); 
+        #menu-lateral {
+            position: fixed;
+            right: -280px;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: rgba(25, 25, 25, 0.98);
             backdrop-filter: blur(10px);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            z-index: 1000; 
-            padding: 20px; 
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            padding: 20px;
             border-left: 2px solid #444;
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            overflow-y: auto; 
-            box-sizing: border-box; 
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            box-sizing: border-box;
         }
-        #menu-lateral.abierto { right: 0; }
 
+        #menu-lateral.abierto {
+            right: 0;
+        }
 
-        /* SECCIONES COLAPSABLES */
-        .seccion-colapsable { border-radius: 8px; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; }
-        .cabecera-seccion { padding: 12px; background: rgba(255,255,255,0.07); cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-        .cabecera-seccion::after { content: '▼'; font-size: 0.7em; transition: transform 0.3s; }
-        .seccion-colapsable.activa .cabecera-seccion::after { transform: rotate(180deg); }
-        .contenido-seccion { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; padding: 0 10px; opacity: 0; }
-        .seccion-colapsable.activa .contenido-seccion { max-height: 1000px; padding: 15px 10px; opacity: 1; }
+        .seccion-colapsable {
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+        }
 
-        
-        /* Botón de cerrar en el panel de piezas */
+        .cabecera-seccion {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.07);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .cabecera-seccion::after {
+            content: '▼';
+            font-size: 0.7em;
+            transition: transform 0.3s;
+        }
+
+        .seccion-colapsable.activa .cabecera-seccion::after {
+            transform: rotate(180deg);
+        }
+
+        .contenido-seccion {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            padding: 0 10px;
+            opacity: 0;
+        }
+
+        .seccion-colapsable.activa .contenido-seccion {
+            max-height: 1000px;
+            padding: 15px 10px;
+            opacity: 1;
+        }
+
         .btn-cerrar-piezas {
             position: absolute;
             top: 10px;
@@ -147,30 +244,63 @@
         }
 
         .btn-cerrar-piezas:hover {
-            color: #e74c3c; /* Color rojo al pasar el ratón */
-        }
-        /* Panel lateral para piezas */
-        #menu-piezas-creador {
-            position: fixed;
-            right: 250px; /* Se pega al borde izquierdo del menú principal */
-            top: 0;
-            width: 200px;
-            height: 100vh;
-            background: rgba(20, 20, 20, 0.95);
-            backdrop-filter: blur(10px);
-            border-left: 1px solid #444;
-            z-index: 999;
-            padding: 60px 15px 20px 15px;
-            display: none; /* Se activa solo en modo creador */
-            overflow-y: auto;
-            box-sizing: border-box;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            color: #e74c3c;
         }
 
-        /* Ajuste para que se vea bien en el grid */
+        #menu-piezas-creador {
+            position: fixed;
+            left: 20px;
+            top: 80px;
+            bottom: 20px;
+            width: 350px;
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid #444;
+            border-radius: 15px;
+            z-index: 10000;
+            display: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 10px;
+            opacity: 1;
+            transform: none;
+            cursor: grab;
+        }
+
+
+        #menu-creador {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: rgba(40, 20, 40, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #menu-creador.abierto {
+            display: flex;
+        }
+
+        #contenedor-mapa-piezas {
+            position: relative;
+            width: 100%;
+            min-width: 100%;
+            min-height: 2000px; 
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+
         .paleta-editor-lateral {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 columnas para que quepan mejor */
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             justify-items: center;
         }
@@ -189,13 +319,23 @@
             align-items: center;
             width: 100%;
         }
+
         /* TABLERO Y MENSAJE INICIAL */
-        .contenedor-tablero { 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; width: 100vw; background: #0a2333; 
+        .contenedor-tablero {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background: #0a2333;
             text-align: center;
         }
-        #tablero {position: relative; transition: width 0.3s, height 0.3s;}
+
+        #tablero {
+            position: relative;
+            transition: width 0.3s, height 0.3s;
+        }
+
         .mensaje-bienvenida {
             font-size: 2em;
             color: rgba(255, 255, 255, 0.6);
@@ -204,18 +344,22 @@
             border-radius: 20px;
             line-height: 1.5;
         }
+
         .hex {
             position: absolute;
-            width: var(--hex_wpx); 
-            height: calc(var(--hex_wpx) * 1.1547); 
+            width: var(--hex_wpx);
+            height: calc(var(--hex_wpx) * 1.1547);
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: flex;
-            align-items: center; 
+            align-items: center;
             justify-content: center;
-            background-size: cover; 
+            background-size: cover;
             background-position: center;
             transition: transform 0.2s;
         }
+
+        .capa-visual-fondo,
+        .capa-visual-detalle,
         .capa-hex {
             position: absolute;
             top: 0;
@@ -224,11 +368,44 @@
             height: 100%;
             background-size: cover;
             background-position: center;
-            /* Hereda el clip-path del padre para que todas las capas sean hexagonales */
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             pointer-events: none;
         }
-        .hex:hover { transform: scale(1.05); z-index: 10; }
+
+        .capa-visual-fondo {
+            z-index: 1;
+        }
+
+        .capa-visual-detalle {
+            z-index: 2;
+        }
+
+        .capa-interaccion {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            z-index: 100;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .bruma {
+            background: rgba(200, 200, 200, 0.8);
+            filter: blur(5px);
+        }
+
+        .capa-interaccion:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .hex:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
         .numero-ficha {
             background: rgba(255, 255, 255, 0.9);
             border: 2px solid #333;
@@ -244,20 +421,21 @@
             z-index: 10;
             position: relative;
         }
-        /* Efecto de iluminación para los hexágonos activos */
+
         .hex.iluminado {
-            transform: scale(1.1); /* Se hace un poco más grande */
+            transform: scale(1.1);
             z-index: 500;
             filter: brightness(1.1) drop-shadow(0 0 15px #f1c40f);
             transition: all 0.5s ease;
         }
-        /* Resaltamos también la ficha numérica */
+
         .hex.iluminado .numero-ficha {
             background: #f1c40f !important;
             border-color: white;
             box-shadow: 0 0 10px white;
             transform: scale(1.2);
         }
+
         #submenu-giros {
             position: fixed;
             top: 50%;
@@ -267,12 +445,14 @@
             border: 2px solid #f1c40f;
             padding: 20px;
             border-radius: 15px;
-            display: none; /* Oculto por defecto */
+            display: none;
+            /* Oculto por defecto */
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             z-index: 2000;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
         }
+
         .opcion-giro {
             width: 80px;
             height: calc(80px * 1.1547);
@@ -280,517 +460,946 @@
             position: relative;
             transition: transform 0.2s;
         }
+
         .opcion-giro.hex {
-            position: relative
-            top: 0
-            left: 0
+            position: relative;
+            top: 0;
+            left: 0;
         }
+
         .opcion-giro:hover {
             transform: scale(1.1);
             filter: brightness(1.2);
         }
+
         .overlay-giro {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             display: none;
             z-index: 1999;
         }
-        .rojo { color: red; font-size: 18px; }
-        .btn { width: 100%; padding: 10px; border-radius: 5px; border: none; cursor: pointer; background: #2980b9; color: white; font-weight: bold; margin-bottom: 5px; }
 
-        /* Rejilla de edición pequeña */
+        .rojo {
+            color: red;
+            font-size: 18px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background: #2980b9;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
         .modo-edicion .hex {
             width: 30px !important;
             height: calc(30px * 1.1547) !important;
-            outline: 1px solid rgba(255,255,255,0.1);
+            outline: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Paleta de selección */
-        .paleta-editor { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 5px; 
-            margin-top: 10px; 
+        .paleta-editor {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 10px;
         }
-        .pincel-opcion { 
-            width: 45px; height: 45px; 
-            cursor: pointer; 
+
+        .pincel-opcion {
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
             border: 2px solid transparent;
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             background-size: cover;
         }
-        .pincel-opcion.activo { border: 2px solid #f1c40f; transform: scale(1.1); }
 
-        /* Cursor especial al pintar */
-        .pintando { cursor: crosshair !important; }
+        .pincel-opcion.activo {
+            border: 2px solid #f1c40f;
+            transform: scale(1.1);
+        }
+
+        .pintando {
+            cursor: crosshair !important;
+        }
     </style>
 </head>
 
- <!-- ----------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------- -->
 
 <body>
 
-<div class="controles-superiores">
-    <button id="toggle-fs"   class="btn-flotante" onclick="toggleFullScreen()" title="Pantalla Completa">⛶</button>
-    <button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
-</div>
+    <div class="controles-superiores">
+        <button id="toggle-fs" class="btn-flotante" onclick="toggleFullScreen()" title="Pantalla Completa">⛶</button>
+        <button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
+    </div>
 
-<div id="panel-dados-external" style="display: none;"></div>
+    <div id="panel-dados-external" style="display: none;"></div>
 
-<div id="menu-piezas-creador">
-    <button class="btn-cerrar-piezas" onclick="cerrarPanelPiezas()">✕</button>
-    <h3 style="color: #f1c40f; text-align: center; border-bottom: 1px solid #444; padding-bottom: 10px;">Piezas</h3>
-    <div id="selector-piezas-lateral" class="paleta-editor-lateral"></div>
-</div>
+    <!-- Menú Piezas (Ahora visual) -->
+    <div id="menu-piezas-creador">
+        <div
+            style="position: absolute; top: 10px; left: 10px; z-index: 10; color: #f1c40f; font-weight: bold; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px;">
+            Paleta de Piezas
+        </div>
+        <div id="contenedor-mapa-piezas"></div>
+    </div>
 
-<div id="menu-lateral">
-    <h2 style="margin-top: 40px; border-bottom: 1px solid #444;">Catan TV</h2>
-    
-    <div class="seccion-colapsable activa">
-        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🗺️ Seleccionar Mapa</div>
-        <div class="contenido-seccion">
-            <button class="btn" onclick="cargarMapa('Catan básico (3-4).json')">Catan básico (3-4)</button>
-            <button class="btn" onclick="cargarMapa('Catan básico (5-6).json')">Catan básico (5-6)</button>
-            <button class="btn" onclick="cargarMapa('Rumbo a nuevas orillas (3-4).json')">Rumbo a nuevas orillas (3-4)</button>
-            <button class="btn" onclick="cargarMapa('Ataque de los bárbaros (3-4).json')">Ataque de los bárbaros (3-4)</button>
+    <!-- Menú Creador (Derecha) -->
+    <div id="menu-creador">
+        <h2 style="color: #e67e22; border-bottom: 1px solid #eba166; padding-bottom: 10px;">🛠️ Editor</h2>
+
+        <div class="input-group" style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 0.8em; margin-bottom: 5px; color: #ccc;">Nombre del Mapa</label>
+            <input type="text" id="input-nombre-mapa" value="Mapa Nuevo"
+                style="width: 100%; padding: 10px; background: transparent; border: 1px solid #666; color: white; border-radius: 5px;">
+        </div>
+
+        <button class="btn" style="background: #8e44ad;" onclick="activarPincelOrden()"><span id="lbl-btn-orden">🔢
+                Marcar Orden 1</span></button>
+        <button id="btn-siguiente-orden" class="btn" style="background: #2c3e50; display: none;"
+            onclick="finalizarOrdenActual()">✅ Siguiente Orden</button>
+
+        <hr style="border-color: #444; width: 100%;">
+
+        <button class="btn" style="background: #27ae60;" onclick="jugarMapaActual()">🎮 Jugar este Mapa</button>
+
+        <div id="contenedor-gestor-ordenes" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
+        </div>
+
+        <div style="margin-top: auto;">
+            <hr style="border-color: #444; width: 100%;">
+            <label style="display: block; font-size: 0.8em; margin-bottom: 5px; color: #ccc;">Importar /
+                Exportar</label>
+            <button class="btn" style="background: #34495e;" onclick="document.getElementById('file-upload').click()">📂
+                Cargar JSON</button>
+            <input type="file" id="file-upload" accept=".json" style="display: none;"
+                onchange="cargarMapaDesdeArchivo(this)">
+            <button class="btn" style="background: #2980b9;" onclick="descargarJSONCreado()">💾 Descargar JSON</button>
         </div>
     </div>
 
-    <div class="seccion-colapsable">
-        <div class="cabecera-seccion" onclick="toggleSeccion(this)">🎨 Modo Creador</div>
-        <div class="contenido-seccion">
-            <button class="btn" style="background: #d35400;" onclick="activarModoCreador()">Activar Lienzo 20x20</button>
-            <p style="font-size: 0.7em; color: #888; margin-top: 10px;">Selecciona una pieza:</p>
-            <div id="selector-piezas" class="paleta-editor"></div>
-            <button id="btn-orden" class="btn" style="background: #8e44ad; margin-top:10px;" onclick="activarPincelOrden()">🔢 Marcar Orden 1</button>
-            <button id="btn-siguiente-orden" class="btn" style="background: #2c3e50; display: none;" onclick="finalizarOrdenActual()">✅ Finalizar Orden y pasar al siguiente</button>
-            <button class="btn" style="background: #27ae60; margin-top:15px;" onclick="descargarJSONCreado()">💾 Descargar JSON</button>
-        </div>
-    </div>
+    <div id="menu-lateral">
+        <h2 style="margin-top: 40px; border-bottom: 1px solid #444;">Catan TV</h2>
 
-    <div class="seccion-colapsable">
-        <div class="cabecera-seccion" onclick="toggleSeccion(this)">📏 Tamaño Hexagono</div>
-        <div class="contenido-seccion">
-            <p style="font-size: 0.8em; color: #888; margin-bottom: 10px;">
-            </p>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
-                <button class="btn" style="width: 40px; margin:0; background: #e74c3c;" onclick="cambiarPixeles(-1)">◀</button>
-                <input type="number" id="input-calibracion-px" 
-                style="width: 70px; text-align: center; font-size: 1.1em; font-weight: bold; background: transparent; color: #f1c40f; border: 1px solid #444; padding: 5px; -moz-appearance: textfield;"
-                oninput="setPixelesDirecto(this.value)">
-                <button class="btn" style="width: 40px; margin:0; background: #27ae60;" onclick="cambiarPixeles(1)">▶</button>
+        <div class="seccion-colapsable activa">
+            <div class="cabecera-seccion" onclick="toggleSeccion(this)">🗺️ Seleccionar Mapa</div>
+            <div class="contenido-seccion">
+                <button class="btn" style="background: #d35400; font-weight: bold; border-left: 5px solid #e67e22;"
+                    onclick="activarModoCreador()">🎨 Modo Creador</button>
+                <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                <button class="btn" onclick="cargarMapa('Catan básico (3-4).json')">Catan básico (3-4)</button>
+                <button class="btn" onclick="cargarMapa('Catan básico (5-6).json')">Catan básico (5-6)</button>
+                <button class="btn" onclick="cargarMapa('Rumbo a nuevas orillas (3-4).json')">Rumbo a nuevas orillas
+                    (3-4)</button>
+                <button class="btn" onclick="cargarMapa('Ataque de los bárbaros (3-4).json')">Ataque de los bárbaros
+                    (3-4)</button>
             </div>
-            <p style="font-size: 0.7em; color: #888; margin-top: 10px; text-align: center;">
-                Unidad: Píxeles por hexágono. Aprox. 32" = 165px, 55" = 99px.
-            </p>
+        </div>
+
+        <div class="seccion-colapsable">
+            <div class="cabecera-seccion" onclick="toggleSeccion(this)">📏 Tamaño Hexagono</div>
+            <div class="contenido-seccion">
+                <p style="font-size: 0.8em; color: #888; margin-bottom: 10px;">
+                </p>
+                <div
+                    style="display: flex; align-items: center; justify-content: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
+                    <button class="btn" style="width: 40px; margin:0; background: #e74c3c;"
+                        onclick="cambiarPixeles(-1)">◀</button>
+                    <input type="number" id="input-calibracion-px"
+                        style="width: 70px; text-align: center; font-size: 1.1em; font-weight: bold; background: transparent; color: #f1c40f; border: 1px solid #444; padding: 5px; -moz-appearance: textfield;"
+                        oninput="setPixelesDirecto(this.value)">
+                    <button class="btn" style="width: 40px; margin:0; background: #27ae60;"
+                        onclick="cambiarPixeles(1)">▶</button>
+                </div>
+                <p style="font-size: 0.7em; color: #888; margin-top: 10px; text-align: center;">
+                    Unidad: Píxeles por hexágono. Aprox. 32" = 165px, 55" = 99px.
+                </p>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="contenedor-tablero">
-    <div id="tablero"></div>
-</div>
-<div id="overlay-editor" class="overlay-giro" onclick="cerrarSubmenu()"></div>
-<div id="submenu-giros"></div>
+    <div class="contenedor-tablero">
+        <div id="tablero"></div>
+    </div>
+    <div id="overlay-editor" class="overlay-giro" onclick="cerrarSubmenu()"></div>
+    <div id="submenu-giros"></div>
 
- <!-- ----------------------------------------------------------------------------------------------------- -->
+    <!-- ----------------------------------------------------------------------------------------------------- -->
 
-<script>
-    const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'puerto_comercial', 'oasis','puerto_2_1_madera','puerto_2_1_barro','puerto_2_1_oveja','puerto_2_1_trigo','puerto_2_1_piedra','puerto_3_1','borde recto','borde esquina'];
-    const tablero = document.getElementById('tablero');
-    const menu    = document.getElementById('menu-lateral');
-    let mapaActualData = null;
+    <script>
+        const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'puerto_comercial', 'oasis', 'puerto_2_1_madera', 'puerto_2_1_barro', 'puerto_2_1_oveja', 'puerto_2_1_trigo', 'puerto_2_1_piedra', 'puerto_3_1', 'borde recto', 'borde esquina'];
+        const tablero = document.getElementById('tablero');
+        const menu = document.getElementById('menu-lateral');
 
-    let piezaSeleccionada = 'vacio';
-    let datosMapaCreador = [];
-    let modoOrdenActivo = false;
-    let contadorOrden = 1;
-    let giroActual = 0;
-    let nivelOrdenActual = 1; // Para controlar si es orden_1, orden_2, etc.
+        // NUEVA ESTRUCTURA DE VARIABLES
+        let mapa_original = null; // El JSON crudo sin modificar
+        let mapa_visual = null; // El estado actual procesado (fichas fijadas, etc)
+        let configNumerosOrdenes = {}; // Almacena los arrays de números para cada orden
+        let configRecursosAleatorios = {}; // Almacena qué recursos salen de cada bolsa de aleatorios
 
-    function activarModoCreador() {
-        mapaActualData = { hexagono: [] };
-        contadorOrden = 1;
-        modoOrdenActivo = false;
-        document.getElementById('btn-orden').style.background = "#8e44ad";
-        document.body.classList.add('modo-edicion');
-        document.documentElement.style.setProperty('--hex_wpx', '30px');
-        // 2. Mostrar el panel lateral de piezas
-        const panelPiezas = document.getElementById('menu-piezas-creador');
-        panelPiezas.style.display = 'block';
+        async function activarModoCreador() {
+            // 1. UI Updates
+            document.body.classList.add('modo-edicion');
+            document.getElementById('menu-lateral').classList.remove('abierto');
+            document.getElementById('menu-creador').classList.add('abierto');
+            document.getElementById('menu-piezas-creador').style.display = 'block';
 
+            // 2. Init Grid 20x20 (Temporary variable, will become mapa_original)
+            let nuevaRejilla = [];
+            for (let f = 0; f < 20; f++) {
+                for (let c = 0; c < 20; c++) {
+                    const offset = (f % 2 !== 0) ? 0.5 : 0;
+                    nuevaRejilla.push({ f: f, c: c + offset, tipo: 'vacio' });
+                }
+            }
 
-        // 3. Cargamos las opciones de piezas en el panel lateral
-        const tipos = [
-            'aleatorio_1', 'aleatorio_2', 'aleatorio_3', 
-            'vacio','borde recto', 'borde esquina',
-            'bosque','trigo','oveja', 
-            'piedra','barro','rio',
-            'desierto','oasis','peces',
-            'agua','puerto_comercial','castillo'];
-            const contenedor = document.getElementById('selector-piezas-lateral');
-            contenedor.innerHTML = '';
-        
-        tipos.forEach(tipo => {
-            const div = document.createElement('div');
-            div.className = 'pincel-opcion';
-            // div.style.backgroundImage = `url('images/${tipo === 'agua' ? 'agua.gif' : tipo + '.png'}')`;
-            div.style.backgroundImage = `url('images/${tipo + '.png'}')`;
-            div.onclick = () => {
-                abrirSubmenu(tipo);
-                document.querySelectorAll('.pincel-opcion').forEach(el => el.classList.remove('activo'));
-                div.classList.add('activo');
+            // 3. Load EXISTING data into grid (Center it)
+            if (mapa_original && mapa_original.hexagono) {
+                // If we are re-entering or loading a map, we overlay it on the fresh grid
+                let minF = Infinity, maxF = -Infinity, minC = Infinity, maxC = -Infinity;
+                mapa_original.hexagono.forEach(h => {
+                    if (h.f < minF) minF = h.f; if (h.f > maxF) maxF = h.f;
+                    if (h.c < minC) minC = h.c; if (h.c > maxC) maxC = h.c;
+                });
+
+                const widthOriginal = maxC - minC;
+                const heightOriginal = maxF - minF;
+
+                const offsetF = Math.floor((20 - heightOriginal) / 2) - minF;
+                const offsetC = Math.floor((20 - widthOriginal) / 2) - minC;
+
+                mapa_original.hexagono.forEach(h => {
+                    const nuevoF = h.f + offsetF;
+                    const nuevoC = h.c + offsetC;
+                    // Find target in the new grid
+                    const target = nuevaRejilla.find(d => d.f === nuevoF && Math.abs(d.c - nuevoC) < 0.1);
+                    if (target) {
+                        target.tipo = h.tipo;
+                        target.giros = h.giros;
+                        Object.keys(h).forEach(k => {
+                            if (k !== 'f' && k !== 'c') target[k] = h[k];
+                        });
+                    }
+                });
+                // Preserve other props
+                if (mapa_original.nombre) document.getElementById('input-nombre-mapa').value = mapa_original.nombre;
+                if (mapa_original.numeros) {
+                    Object.keys(mapa_original.numeros).forEach(k => {
+                        configNumerosOrdenes[k] = mapa_original.numeros[k].valores || [];
+                    });
+                }
+            }
+
+            // 4. UNIFY: mapa_original NOW BECOMES THE GRID
+            // We create a new object to ensure it's clean, inheriting config from previous if needed
+            mapa_original = {
+                nombre: document.getElementById('input-nombre-mapa').value,
+                hexagono: nuevaRejilla,
+                recursos: (mapa_original && mapa_original.recursos) ? mapa_original.recursos : {},
+                numeros: (mapa_original && mapa_original.numeros) ? mapa_original.numeros : {}
             };
-            contenedor.appendChild(div);
-        });
 
-        // 3. Generamos la rejilla de 20x20
-        datosMapaCreador = [];
-        for (let f = 0; f < 20; f++) {
-            for (let c = 0; c < 20; c++) {
-                const offset = (f % 2 !== 0) ? 0.5 : 0;
-                datosMapaCreador.push({ f: f, c: c + offset, tipo: 'vacio' });
+            // 5. Render Editor
+            document.documentElement.style.setProperty('--hex_wpx', '35px');
+            document.getElementById('input-calibracion-px').value = 35;
+
+            mapa_visual = mapa_original; // Visual points to the editable grid
+            renderizarMapa(mapa_visual, tablero);
+            actualizarEventosPintado(); // Updates clicks on mapa_visual
+            actualizarUIOrdenes();
+            actualizarUIRecursosAleatorios();
+
+            // 6. Render Palette using generic loader
+            document.getElementById('menu-piezas-creador').style.display = 'block';
+            await cargarYRenderizarPaleta();
+        }
+
+        // Adapted to just reuse cargarMapa
+        async function cargarYRenderizarPaleta() {
+            const contenedor = document.getElementById('contenedor-mapa-piezas');
+            try {
+                const response = await fetch('Piezas.json');
+                const datos = await response.json();
+                
+                // Limpiamos el contenedor
+                contenedor.innerHTML = '';
+                
+                // Forzamos un tamaño de hexágono pequeño para la paleta
+                // Si no quieres que afecte al tablero, lo aplicamos solo al estilo del contenedor
+                contenedor.style.setProperty('--hex_wpx', '40px'); 
+
+                // Renderizamos usando tu función existente pero dirigida al contenedor de la paleta
+                renderizarMapa(datos, contenedor);
+                
+                console.log("Paleta cargada con " + datos.hexagono.length + " piezas");
+            } catch (e) {
+                console.error("Error al cargar la paleta:", e);
             }
         }
-        
-        // Usamos tu propia función de renderizado para mostrar la rejilla
-        renderizarMapa({ hexagono: datosMapaCreador });
 
-        // 4. Inyectamos la lógica de "pintar" en los hexágonos renderizados
-        actualizarEventosPintado();
-    }
-    function abrirSubmenu(tipo) {
-        const submenu = document.getElementById('submenu-giros');
-        const overlay = document.getElementById('overlay-editor');
-        submenu.innerHTML = ''; // Limpiar
-        
-        // Crear 6 opciones (0, 60, 120, 180, 240, 300 grados)
-        for (let i = 0; i < 6; i++) {
-            const contenedorGiro = document.createElement('div');
-            contenedorGiro.className = 'opcion-giro hex';
-            contenedorGiro.style.position = 'relative';
-            
-            // Crear la capa visual rotada
-            const capa = document.createElement('div');
-            capa.className = 'capa-hex';
-            capa.style.backgroundImage = `url('images/${tipo}.png')`;
-            capa.style.transform = `rotate(${i * 60}deg)`;
-            
-            contenedorGiro.appendChild(capa);
-            
-            contenedorGiro.onclick = () => {
-                piezaSeleccionada = tipo;
-                giroActual = i; // Guardamos el giro elegido
-                cerrarSubmenu();
-                document.getElementById('tablero').classList.add('pintando');
-            };
-            
-            submenu.appendChild(contenedorGiro);
-        }
-        
-        submenu.style.display = 'grid';
-        overlay.style.display = 'block';
-    }
+        // IMPLEMENTACIÓN DE CARGA DE ARCHIVOS
+        function cargarMapaDesdeArchivo(input) {
+            const file = input.files[0];
+            if (!file) return;
 
-    function cerrarSubmenu() {
-        document.getElementById('submenu-giros').style.display = 'none';
-        document.getElementById('overlay-editor').style.display = 'none';
-    }
-    function cerrarPanelPiezas() {
-        const panel = document.getElementById('menu-piezas-creador');
-        panel.style.display = 'none';
-    }
-
-    function activarPincelOrden() {
-        modoOrdenActivo = !modoOrdenActivo;
-        const btn = document.getElementById('btn-orden');
-        const btnSiguiente = document.getElementById('btn-siguiente-orden');
-        
-        if (modoOrdenActivo) {
-            btn.style.background = "#f1c40f";
-            btn.style.color = "#000";
-            btnSiguiente.style.display = "block"; // Mostrar el botón de finalizar
-            document.getElementById('tablero').classList.add('pintando');
-        } else {
-            btn.style.background = "#8e44ad";
-            btn.style.color = "#fff";
-            btn.innerText = `🔢 Marcar Orden ${nivelOrdenActual} (Nº ${contadorOrden})`;
-        }
-    }
-
-    function finalizarOrdenActual() {
-        // 1. Preguntar confirmación para no perder el progreso del orden actual
-        if (!confirm(`¿Finalizar el Orden ${nivelOrdenActual}? Ya no podrás añadir más números a este grupo.`)) return;
-
-        // 2. Incrementar el nivel de orden y resetear el contador de piezas
-        nivelOrdenActual++;
-        contadorOrden = 1;
-
-        // 3. Actualizar la interfaz
-        modoOrdenActivo = false;
-        document.getElementById('tablero').classList.remove('pintando');
-        
-        const btn = document.getElementById('btn-orden');
-        btn.style.background = "#8e44ad";
-        btn.style.color = "#fff";
-        btn.innerText = `🔢 Marcar Orden ${nivelOrdenActual}`;
-        
-        document.getElementById('btn-siguiente-orden').style.display = "none";
-        
-        alert(`Ahora puedes empezar a marcar el Orden ${nivelOrdenActual}`);
-    }
-
-    function actualizarEventosPintado() {
-        const hexsEnPantalla = document.querySelectorAll('.hex');
-        hexsEnPantalla.forEach((div, index) => {
-            div.onclick = (e) => {
-                if (modoOrdenActivo) {
-                    // ASIGNAR ORDEN DINÁMICO (orden_1, orden_2, etc.)
-                    const propiedadOrden = `orden_${nivelOrdenActual}`;
-                    datosMapaCreador[index][propiedadOrden] = contadorOrden;
-                    
-                    // Mostrar visualmente el número y el nivel en el editor
-                    let ficha = div.querySelector('.numero-ficha');
-                    if (!ficha) {
-                        ficha = document.createElement('div');
-                        ficha.className = 'numero-ficha';
-                        div.appendChild(ficha);
-                    }
-                    // Mostramos "O1-1", "O1-2"... para diferenciar en el editor
-                    ficha.innerText = contadorOrden;
-                    ficha.title = `Grupo: ${propiedadOrden}`;
-                    
-                    contadorOrden++;
-                    document.getElementById('btn-orden').innerText = `🔢 Marcando O${nivelOrdenActual} (Nº ${contadorOrden})`;
-                    
-                } else {
-                    // ... (Mantén tu lógica de pintar terreno igual)
-                    datosMapaCreador[index].tipo = piezaSeleccionada;
-                    datosMapaCreador[index].giros = [giroActual];
-                    div.querySelectorAll('.capa-hex').forEach(capa => capa.remove());
-                    const nuevaCapa = document.createElement('div');
-                    nuevaCapa.className = 'capa-hex';
-                    nuevaCapa.style.backgroundImage = `url('images/${piezaSeleccionada}.png')`;
-                    nuevaCapa.style.transform = `rotate(${giroActual * 60}deg)`;
-                    div.appendChild(nuevaCapa);
-                    div.className = `hex ${piezaSeleccionada}`;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    mapa_original = json;
+                    // Reiniciar editor con este mapa
+                    activarModoCreador();
+                    alert("Mapa cargado correctamente en el editor.");
+                } catch (err) {
+                    console.error("Error al leer el archivo:", err);
+                    alert("Error al leer el archivo JSON.");
                 }
             };
-        });
-    }
-    // LÓGICA DE DADOS 3D
-    let rotacionBase = 0;
-    function inicializarDadosSegunMapa(mapa) {
-        const contenedor = document.getElementById('panel-dados-external');
-        if (!mapa.config_dados) {
-            contenedor.style.display = 'none';
-            return;
+            reader.readAsText(file);
+            // Reset input para permitir recargar el mismo archivo
+            input.value = '';
         }
-        contenedor.style.display = 'flex';
-        contenedor.innerHTML = '<div id="resultado-suma">--</div>'; // Limpiar
-        // Recorremos cada botón definido en el JSON
-        Object.keys(mapa.config_dados).forEach((idBoton) => {
-            const btnConfig = mapa.config_dados[idBoton];
-            const wrapperId = `wrapper-${idBoton}`;
-            let btnHtml = `
+
+        function actualizarUIOrdenes() {
+            const container = document.getElementById('contenedor-gestor-ordenes');
+            container.innerHTML = '<h3 style="font-size:1em; color:#ccc;">Fichas por Orden</h3>';
+
+            // Detectar qué órdenes existen en el mapa actual
+            const ordenesEnUso = new Set();
+            if (mapa_visual && mapa_visual.hexagono) {
+                mapa_visual.hexagono.forEach(h => {
+                    Object.keys(h).forEach(k => {
+                        if (k.startsWith('orden_')) ordenesEnUso.add(k);
+                    });
+                });
+            }
+
+            // Añadir también las que tengamos en memoria aunque no estén pintadas aún (por si acaso)
+            // Object.keys(configNumerosOrdenes).forEach(k => ordenesEnUso.add(k));
+
+            if (ordenesEnUso.size === 0 && !modoOrdenActivo) {
+                container.innerHTML += '<p style="font-size:0.8em; color:#666;">No hay órdenes marcados.</p>';
+                return;
+            }
+
+            ordenesEnUso.forEach(ordenKey => {
+                const div = document.createElement('div');
+                div.style.marginBottom = '10px';
+
+                const label = document.createElement('label');
+                label.innerText = `${ordenKey.replace('orden_', 'Orden ')}:`;
+                label.style.display = 'block';
+                label.style.fontSize = '0.8em';
+                label.style.color = '#f1c40f';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Ej: 5,2,6,8...';
+                input.style.width = '100%';
+                input.style.background = 'rgba(0,0,0,0.3)';
+                input.style.border = '1px solid #555';
+                input.style.color = 'white';
+                input.style.padding = '5px';
+                input.style.fontSize = '0.9em';
+
+                // Pre-rellenar
+                if (configNumerosOrdenes[ordenKey]) {
+                    input.value = configNumerosOrdenes[ordenKey].join(',');
+                }
+
+
+                input.onchange = (e) => {
+                    // Guardar valores
+                    const val = e.target.value.trim();
+                    if (val) {
+                        configNumerosOrdenes[ordenKey] = val.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                    } else {
+                        configNumerosOrdenes[ordenKey] = [];
+                    }
+                };
+
+                div.appendChild(label);
+                div.appendChild(input);
+                container.appendChild(div);
+            });
+        }
+
+        // Variable global para almacenar config de recursos
+        // Estructura: { "aleatorio_1": { "bosque": 10, "trigo": 5 }, ... } 
+        // Simplificado para UI: guardaremos texto y luego parseamos.
+
+        function actualizarUIRecursosAleatorios() {
+            const container = document.getElementById('contenedor-gestor-aleatorios');
+            container.innerHTML = '<h3 style="font-size:1em; color:#ccc;">Config. Aleatorios</h3>';
+
+            // 1. Detectar qué tipos de 'aleatorio_X' hay en el mapa pintado
+            const aleatoriosEnUso = new Set();
+            mapa_visual.hexagono.forEach(h => {
+                if (h.tipo !== 'vacio' && typeof h.tipo === 'string' && h.tipo.startsWith('aleatorio_')) {
+                    aleatoriosEnUso.add(h.tipo);
+                }
+            });
+
+            if (aleatoriosEnUso.size === 0) {
+                container.innerHTML += '<p style="font-size:0.8em; color:#666;">No hay hexágonos aleatorios.</p>';
+                return;
+            }
+
+            aleatoriosEnUso.forEach(nombreBolsa => {
+                // Recuperar config previa si existe (del mapa cargado o de la sesión)
+                let configActual = { tipos: ["bosque"], cantidades: [0] };
+
+                // Si ya tenemos en memoria local
+                if (configRecursosAleatorios[nombreBolsa]) {
+                    configActual = configRecursosAleatorios[nombreBolsa];
+                }
+                // Si no, mirar en mapa_original (si cargamos uno)
+                else if (mapa_original && mapa_original.recursos && mapa_original.recursos[nombreBolsa]) {
+                    configActual = mapa_original.recursos[nombreBolsa];
+                    configRecursosAleatorios[nombreBolsa] = configActual; // Sync global
+                }
+
+                const div = document.createElement('div');
+                div.style.marginBottom = '10px';
+                div.style.borderLeft = '2px solid #3498db';
+                div.style.paddingLeft = '5px';
+
+                const label = document.createElement('div');
+                label.innerText = nombreBolsa;
+                label.style.fontWeight = 'bold';
+                label.style.fontSize = '0.9em';
+                label.style.color = '#3498db';
+                div.appendChild(label);
+
+                // Input para Tipos (completar)
+                const inputTipos = document.createElement('input');
+                inputTipos.placeholder = 'Tipos (ej: bosque,trigo)';
+                inputTipos.value = configActual.tipos.join(',');
+                inputTipos.style.width = '100%';
+                inputTipos.style.marginBottom = '3px';
+                inputTipos.style.background = 'rgba(0,0,0,0.3)';
+                inputTipos.style.border = '1px solid #555';
+                inputTipos.style.color = 'white';
+
+                // Input para Cantidades
+                const inputCantidades = document.createElement('input');
+                inputCantidades.placeholder = 'Cantidades (ej: 4,5)';
+                inputCantidades.value = configActual.cantidades.join(',');
+                inputCantidades.style.width = '100%';
+                inputCantidades.style.background = 'rgba(0,0,0,0.3)';
+                inputCantidades.style.border = '1px solid #555';
+                inputCantidades.style.color = 'white';
+
+                // Guardar cambios
+                const guardar = () => {
+                    const tipos = inputTipos.value.split(',').map(s => s.trim()).filter(s => s);
+                    const cants = inputCantidades.value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+                    configRecursosAleatorios[nombreBolsa] = { tipos, cantidades: cants };
+                };
+                inputTipos.onchange = guardar;
+                inputCantidades.onchange = guardar;
+
+                div.appendChild(inputTipos);
+                div.appendChild(inputCantidades);
+                container.appendChild(div);
+            });
+        }
+        // Función para cargar y mostrar las piezas en el menú lateral
+        // Reemplaza tu función actual por esta
+        async function cargarYRenderizarPaleta() {
+            const contenedor = document.getElementById('contenedor-mapa-piezas');
+            if (!contenedor) return;
+
+            try {
+                const response = await fetch('Piezas.json');
+                const datos = await response.json();
+                
+                contenedor.innerHTML = ''; // Limpiar
+                
+                // IMPORTANTE: Definimos el tamaño de la pieza para la paleta aquí
+                const tamanoPieza = 50; 
+                contenedor.style.setProperty('--hex_wpx', tamanoPieza + 'px');
+
+                datos.hexagono.forEach(h => {
+                    const div = document.createElement('div');
+                    div.className = 'hex';
+                    
+                    // Calculamos la posición basada en el tamaño local
+                    const w = tamanoPieza;
+                    const h_px = w * 1.1547;
+                    
+                    // Ajustamos las coordenadas del JSON para que queden compactas en el menú
+                    div.style.left = (h.c * w * 0.9) + 'px'; 
+                    div.style.top = (h.f * h_px * 0.75) + 'px';
+                    
+                    // Imagen de fondo (asegúrate de que la ruta img/ sea correcta)
+                    div.style.backgroundImage = `url('img/${h.tipo}.png')`;
+                    
+                    if (h.giros && h.giros[0]) {
+                        div.style.transform = `rotate(${h.giros[0] * 60}deg)`;
+                    }
+
+                    contenedor.appendChild(div);
+                });
+                
+                console.log("Paleta cargada correctamente");
+            } catch (error) {
+                console.error("Error cargando Piezas.json:", error);
+            }
+        }
+
+        // Asegúrate de que tu función renderizarMapa acepte un contenedor y tamaño opcional
+        function renderizarMapa(datos, contenedorDestino, tamanoHex = null) {
+            if (!datos || !datos.hexagono) return;
+
+            // Si pasamos un tamaño, actualizamos la variable CSS solo para este contexto
+            if (tamanoHex) {
+                contenedorDestino.style.setProperty('--hex_wpx', tamanoHex + 'px');
+            }
+
+            datos.hexagono.forEach(h => {
+                const div = document.createElement('div');
+                div.className = 'hex';
+                
+                // Cálculo de posición basado en filas (f) y columnas (c)
+                const w = tamanoHex || parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
+                const h_px = w * 1.1547;
+                
+                div.style.left = (h.c * w) + 'px';
+                div.style.top = (h.f * h_px * 0.75) + 'px';
+                
+                // Aplicar imagen de fondo según el tipo (madera, trigo, etc.)
+                div.style.backgroundImage = `url('img/${h.tipo}.png')`; 
+                
+                // Si tiene rotación
+                if (h.giros && h.giros[0]) {
+                    div.style.transform = `rotate(${h.giros[0] * 60}deg)`;
+                }
+
+                contenedorDestino.appendChild(div);
+            });
+        }
+
+        function jugarMapaActual() {
+            // CONVERTIR EDITABLE A JUGABLE
+            // 1. Filtrar vacíos
+            const hexsReales = mapa_visual.hexagono.filter(h => h.tipo !== 'vacio');
+
+            // 2. Construir objeto mapa
+            // Construir objeto de números final
+            const numerosFinales = {};
+            Object.keys(configNumerosOrdenes).forEach(k => {
+                numerosFinales[k] = {
+                    tipo: "fijo",
+                    valores: configNumerosOrdenes[k]
+                };
+            });
+
+
+
+            // GESTION DE RECURSOS FINAL
+            // Usamos configRecursosAleatorios como fuente de verdad
+            const recursosFinales = {};
+
+            // Recorrer hexs para ver qué se necesita
+            hexsReales.forEach(h => {
+                const tipo = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
+                if (tipo.startsWith('aleatorio_')) {
+                    if (configRecursosAleatorios[tipo]) {
+                        recursosFinales[tipo] = configRecursosAleatorios[tipo];
+                    } else if (mapa_original && mapa_original.recursos && mapa_original.recursos[tipo]) {
+                        recursosFinales[tipo] = JSON.parse(JSON.stringify(mapa_original.recursos[tipo]));
+                    } else {
+                        // Default dummy
+                        recursosFinales[tipo] = { tipos: ["bosque"], cantidades: [1] };
+                    }
+                }
+            });
+
+
+            const nuevoMapa = {
+                nombre: document.getElementById('input-nombre-mapa').value,
+                hexagono: hexsReales,
+                recursos: recursosFinales,
+                numeros: numerosFinales
+            };
+
+            // Preservar lógica de recursos aleatorios y números si existen en los hexs
+            // (La lógica de `descargarJSONCreado` ya hace esto bien, podríamos reutilizarla o extraerla)
+            // Por simplicidad, usaremos la estructura actual de los hexs que ya tienen 'orden_x', etc.
+
+            // 3. Modificamos mapa_original global
+            mapa_original = nuevoMapa;
+
+            // 4. Salir de modo creador
+            document.body.classList.remove('modo-edicion');
+            document.getElementById('menu-creador').classList.remove('abierto');
+            document.getElementById('menu-piezas-creador').style.display = 'none';
+            document.getElementById('tablero').classList.remove('pintando');
+
+            // 5. Procesar y Jugar
+            mapa_visual = procesarConfiguracion(structuredClone(mapa_original));
+            renderizarMapa(mapa_visual, tablero);
+            inicializarDadosSegunMapa(mapa_visual);
+
+            // Ajustar zoom para juego (más grande)
+            document.documentElement.style.setProperty('--hex_wpx', '99px');
+            document.getElementById('input-calibracion-px').value = 99;
+            // Re-render con nuevo zoom
+            renderizarMapa(mapa_visual, tablero);
+        }
+
+        // Reemplazo de abrirSubmenu para aceptar anchor optional
+        function abrirSubmenu(tipo, anchorElement) {
+            const submenu = document.getElementById('submenu-giros');
+            const overlay = document.getElementById('overlay-editor');
+            submenu.innerHTML = '';
+
+            for (let i = 0; i < 6; i++) {
+                const contenedorGiro = document.createElement('div');
+                contenedorGiro.className = 'opcion-giro hex';
+                contenedorGiro.style.position = 'relative';
+
+                const capa = document.createElement('div');
+                capa.className = 'capa-hex';
+                capa.style.backgroundImage = `url('images/${tipo}.png')`;
+                capa.style.transform = `rotate(${i * 60}deg)`;
+
+                contenedorGiro.appendChild(capa);
+
+                contenedorGiro.onclick = () => {
+                    piezaSeleccionada = tipo;
+                    giroActual = i;
+                    cerrarSubmenu();
+                    document.getElementById('tablero').classList.add('pintando');
+                };
+                submenu.appendChild(contenedorGiro);
+            }
+            submenu.style.display = 'grid';
+            overlay.style.display = 'block';
+        }
+
+        function activarPincelOrden() {
+            modoOrdenActivo = !modoOrdenActivo;
+            const btn = document.getElementById('btn-orden');
+            const btnSiguiente = document.getElementById('btn-siguiente-orden');
+
+            if (modoOrdenActivo) {
+                btn.style.background = "#f1c40f";
+                btn.style.color = "#000";
+                btnSiguiente.style.display = "block"; // Mostrar el botón de finalizar
+                document.getElementById('tablero').classList.add('pintando');
+            } else {
+                btn.style.background = "#8e44ad";
+                btn.style.color = "#fff";
+                btn.innerText = `🔢 Marcar Orden ${nivelOrdenActual} (Nº ${contadorOrden})`;
+            }
+        }
+
+        function finalizarOrdenActual() {
+            // 1. Preguntar confirmación para no perder el progreso del orden actual
+            if (!confirm(`¿Finalizar el Orden ${nivelOrdenActual}? Ya no podrás añadir más números a este grupo.`)) return;
+
+            // 2. Incrementar el nivel de orden y resetear el contador de piezas
+            nivelOrdenActual++;
+            contadorOrden = 1;
+
+            // 3. Actualizar la interfaz
+            modoOrdenActivo = false;
+            document.getElementById('tablero').classList.remove('pintando');
+
+            const btn = document.getElementById('btn-orden');
+            btn.style.background = "#8e44ad";
+            btn.style.color = "#fff";
+            btn.innerText = `🔢 Marcar Orden ${nivelOrdenActual}`;
+
+            document.getElementById('btn-siguiente-orden').style.display = "none";
+
+            alert(`Ahora puedes empezar a marcar el Orden ${nivelOrdenActual}`);
+            actualizarUIOrdenes();
+        }
+
+        function actualizarEventosPintado() {
+            const hexsEnPantalla = document.querySelectorAll('.hex');
+            hexsEnPantalla.forEach((div, index) => {
+                div.onclick = (e) => {
+                    if (modoOrdenActivo) {
+                        // ASIGNAR ORDEN DINÁMICO (orden_1, orden_2, etc.)
+                        const propiedadOrden = `orden_${nivelOrdenActual}`;
+                        mapa_visual.hexagono[index][propiedadOrden] = contadorOrden;
+
+                        // Mostrar visualmente el número y el nivel en el editor
+                        let ficha = div.querySelector('.numero-ficha');
+                        if (!ficha) {
+                            ficha = document.createElement('div');
+                            ficha.className = 'numero-ficha';
+                            div.appendChild(ficha);
+                        }
+                        // Mostramos "O1-1", "O1-2"... para diferenciar en el editor
+                        ficha.innerText = contadorOrden;
+                        ficha.title = `Grupo: ${propiedadOrden}`;
+
+                        contadorOrden++;
+                        const lbl = document.getElementById('lbl-btn-orden') || document.getElementById('btn-orden');
+                        if (lbl) lbl.innerText = `🔢 Marcando O${nivelOrdenActual} (Nº ${contadorOrden})`;
+
+                    } else {
+                        // ... (Mantén tu lógica de pintar terreno igual)
+                        mapa_visual.hexagono[index].tipo = piezaSeleccionada;
+                        mapa_visual.hexagono[index].giros = [giroActual];
+
+                        renderizarMapa(mapa_visual, tablero);
+                        actualizarEventosPintado();
+                        // Refrescar paneles por si pusimos un nuevo aleatorio
+                        actualizarUIRecursosAleatorios();
+                        actualizarUIOrdenes();
+                    }
+                };
+            });
+        }
+        // LÓGICA DE DADOS 3D
+        let rotacionBase = 0;
+        function inicializarDadosSegunMapa(mapa) {
+            const contenedor = document.getElementById('panel-dados-external');
+            if (!mapa.config_dados) {
+                contenedor.style.display = 'none';
+                return;
+            }
+            contenedor.style.display = 'flex';
+            contenedor.innerHTML = '<div id="resultado-suma">--</div>'; // Limpiar
+            // Recorremos cada botón definido en el JSON
+            Object.keys(mapa.config_dados).forEach((idBoton) => {
+                const btnConfig = mapa.config_dados[idBoton];
+                const wrapperId = `wrapper-${idBoton}`;
+                let btnHtml = `
                 <div class="dice-group" style="margin-bottom: 15px; text-align:center;">
                     <div class="dice-wrapper" id="${wrapperId}" style="margin-bottom:10px; display:flex; gap:15px; justify-content:center;">`;
-            btnConfig.dados.forEach((dado, idxDado) => {
-                const idUnico = `dado-${idBoton}-${idxDado}`;
-                btnHtml += `
+                btnConfig.dados.forEach((dado, idxDado) => {
+                    const idUnico = `dado-${idBoton}-${idxDado}`;
+                    btnHtml += `
                     <div class="scene">
                         <div id="${idUnico}" class="cube">
                             ${dado.caras_contenido.map((cont, i) => `
-                                <div class="cube__face face-${i+1}" style="background-color: ${dado.caras_fondo[i]}">
+                                <div class="cube__face face-${i + 1}" style="background-color: ${dado.caras_fondo[i]}">
                                     ${formatearContenidoCara(cont)}
                                 </div>
                             `).join('')}
                         </div>
                     </div>`;
-            });
-            btnHtml += `
+                });
+                btnHtml += `
                     </div>
                     <button class="btn-lanzar" onclick="lanzarGrupo('${idBoton}')">${btnConfig.nombre}</button>
                 </div>`;
-            contenedor.insertAdjacentHTML('beforeend', btnHtml);
-        });
-    }
-    function formatearContenidoCara(tipo) {
-        // Si es un número (del 1 al 6), lo devolvemos tal cual
-        if (!isNaN(tipo)) return tipo;
-        // Si es un color, dibujamos un círculo (punto)
-        const coloresMap = {
-            "verde": "#27ae60",
-            "azul": "#2980b9",
-            "amarillo": "#f1c40f",
-            "rojo": "#c0392b",
-            "marron": "#784212",
-            "violeta": "#8e44ad"
-        };
-        if (coloresMap[tipo]) {
-            return `<div style="width:25px; height:25px; border-radius:50%; background:${coloresMap[tipo]}; border:2px solid rgba(0,0,0,0.2)"></div>`;
+                contenedor.insertAdjacentHTML('beforeend', btnHtml);
+            });
         }
-        // Si es pirata u otros iconos
-        if (tipo === "pirata") return "⛵";
-        return tipo;
-    }
-    function aplicarRotacion(id, valor, rotacionBase) {
-        const cubo = document.getElementById(id);
-        // Definimos las rotaciones extra para cada cara (X, Y, Z)
-        const rotaciones = {
-            1: { x: 0,   y: 0 },   // Frontal
-            2: { x: 0,   y: 180 }, // Trasera
-            3: { x: 0,   y: -90 }, // Derecha
-            4: { x: 0,   y: 90 },  // Izquierda
-            5: { x: -90, y: 0 },   // Superior
-            6: { x: 90,  y: 0 }    // Inferior
-        };
-
-        const r = rotaciones[valor];
-        // Sumamos la rotación base (las vueltas completas) para que el giro sea fluido
-        cubo.style.transform = `translateZ(-25px) rotateX(${r.x + rotacionBase}deg) rotateY(${r.y + rotacionBase}deg)`;
-    }
-    function lanzarGrupo(idBoton) {
-        const btnConfig = mapaActualData.config_dados[idBoton];
-        rotacionBase += 720;
-        let sumaNumerica = 0;
-        let esTiradaNumerica = false;
-
-        // 1. Limpiar iluminación previa inmediatamente al lanzar
-        document.querySelectorAll('.hex').forEach(h => h.classList.remove('iluminado'));
-
-        btnConfig.dados.forEach((dado, idx) => {
-            const valorCara = Math.floor(Math.random() * 6) + 1;
-            const idUnico = `dado-${idBoton}-${idx}`;
-            aplicarRotacion(idUnico, valorCara, rotacionBase);
-            
-            const contenido = dado.caras_contenido[valorCara - 1];
-            if (!isNaN(contenido)) {
-                sumaNumerica += parseInt(contenido);
-                esTiradaNumerica = true;
+        function formatearContenidoCara(tipo) {
+            // Si es un número (del 1 al 6), lo devolvemos tal cual
+            if (!isNaN(tipo)) return tipo;
+            // Si es un color, dibujamos un círculo (punto)
+            const coloresMap = {
+                "verde": "#27ae60",
+                "azul": "#2980b9",
+                "amarillo": "#f1c40f",
+                "rojo": "#c0392b",
+                "marron": "#784212",
+                "violeta": "#8e44ad"
+            };
+            if (coloresMap[tipo]) {
+                return `<div style="width:25px; height:25px; border-radius:50%; background:${coloresMap[tipo]}; border:2px solid rgba(0,0,0,0.2)"></div>`;
             }
-        });
-        if (esTiradaNumerica) {
-            // Esperamos a que la animación de los dados (1s) termine
-            setTimeout(() => {
-                const display = document.getElementById('resultado-suma');
-                display.innerText = sumaNumerica;
-                display.style.color = (sumaNumerica === 7) ? '#ff4d4d' : '#f1c40f';
-
-                // 2. BUSCAR E ILUMINAR: Ahora que tenemos la suma final
-                const hexs = document.querySelectorAll('.hex');
-                hexs.forEach(div => {
-                    const ficha = div.querySelector('.numero-ficha');
-                    // Comparación estricta del número
-                    if (ficha && parseInt(ficha.innerText) === sumaNumerica) {
-                        div.classList.add('iluminado');
-                    }
-                });
-            }, 1000); 
+            // Si es pirata u otros iconos
+            if (tipo === "pirata") return "⛵";
+            return tipo;
         }
-    }
-
-    function descargarJSONCreado() {
-        // 1. Filtrar solo los hexágonos que no están vacíos
-        const hexagonosActivos = datosMapaCreador.filter(h => h.tipo !== 'vacio');
-
-        const recursosDinamicos = {};
-        const numerosDinamicos = {};
-
-        // 2. Mapear los hexágonos y detectar dinámicamente cuántos órdenes existen
-        const hexagonosParaExportar = hexagonosActivos.map(h => {
-            const hexExport = {
-                f: h.f,
-                c: h.c,
-                tipo: h.tipo,
-                giros: h.giros || [0]
+        function aplicarRotacion(id, valor, rotacionBase) {
+            const cubo = document.getElementById(id);
+            // Definimos las rotaciones extra para cada cara (X, Y)
+            const rotaciones = {
+                1: { x: 0, y: 0 },   // Frontal
+                2: { x: 0, y: 180 }, // Trasera
+                3: { x: 0, y: -90 }, // Derecha
+                4: { x: 0, y: 90 },  // Izquierda
+                5: { x: -90, y: 0 },   // Superior
+                6: { x: 90, y: 0 }    // Inferior
             };
 
-            // Gestionar Recursos Aleatorios (bolsas)
-            if (h.tipo.startsWith('aleatorio_')) {
-                const bolsaNombre = h.tipo;
-                if (!recursosDinamicos[bolsaNombre]) {
-                    recursosDinamicos[bolsaNombre] = { tipos: ["bosque"], cantidades: [0] };
-                }
-                recursosDinamicos[bolsaNombre].cantidades[0]++;
-            }
+            const r = rotaciones[valor];
+            // Sumamos la rotación base (las vueltas completas) para que el giro sea fluido
+            cubo.style.transform = `translateZ(-25px) rotateX(${r.x + rotacionBase}deg) rotateY(${r.y + rotacionBase}deg)`;
+        }
+        function lanzarGrupo(idBoton) {
+            const btnConfig = mapa_visual.config_dados[idBoton];
+            rotacionBase += 720;
+            let sumaNumerica = 0;
+            let esTiradaNumerica = false;
 
-            // Gestionar TODOS los órdenes (orden_1, orden_2, orden_3...)
-            Object.keys(h).forEach(prop => {
-                if (prop.startsWith('orden_')) {
-                    hexExport[prop] = h[prop];
-                    // Si el orden no existe en el objeto global de números, lo creamos
-                    if (!numerosDinamicos[prop]) {
-                        numerosDinamicos[prop] = { "tipo": "fijo", "valores": [] };
-                    }
+            // 1. Limpiar iluminación previa inmediatamente al lanzar
+            document.querySelectorAll('.hex').forEach(h => h.classList.remove('iluminado'));
+
+            btnConfig.dados.forEach((dado, idx) => {
+                const valorCara = Math.floor(Math.random() * 6) + 1;
+                const idUnico = `dado-${idBoton}-${idx}`;
+                aplicarRotacion(idUnico, valorCara, rotacionBase);
+
+                const contenido = dado.caras_contenido[valorCara - 1];
+                if (!isNaN(contenido)) {
+                    sumaNumerica += parseInt(contenido);
+                    esTiradaNumerica = true;
                 }
             });
+            if (esTiradaNumerica) {
+                // Esperamos a que la animación de los dados (1s) termine
+                setTimeout(() => {
+                    const display = document.getElementById('resultado-suma');
+                    display.innerText = sumaNumerica;
+                    display.style.color = (sumaNumerica === 7) ? '#ff4d4d' : '#f1c40f';
 
-            return hexExport;
-        });
-
-        // 3. Rellenar los arrays de valores con null para que el cargador sepa cuántas fichas esperar
-        // (Tu cargador actual de Catan Pro TV necesita que el número de valores coincida con el número de hexágonos del orden)
-        Object.keys(numerosDinamicos).forEach(ordenKey => {
-            const cantidadFichas = hexagonosParaExportar.filter(h => h[ordenKey]).length;
-            numerosDinamicos[ordenKey].valores = new Array(cantidadFichas).fill(null);
-        });
-
-        const resultado = {
-            nombre: "Mapa Personalizado Rayco",
-            hexagono: hexagonosParaExportar,
-            recursos: recursosDinamicos,
-            numeros: numerosDinamicos
-        };
-
-        // 4. Ejecutar descarga
-        const blob = new Blob([JSON.stringify(resultado, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'nuevo_mapa_catan.json';
-        a.click();
-    }
-
-    // Inicio de la aplicación.
-    function iniciarTodo() {
-        // 1. Ponemos la pantalla completa despues de que el usuario haya interactuado.
-        toggleFullScreen();
-        // 2. Cargamos el mapa del catan más básico.
-        cargarMapa('Catan básico (3-4).json');
-    }
-
-    function cambiarPixeles(delta) {
-        let valorActual = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
-        let nuevoValor = valorActual + delta;
-        
-        if (nuevoValor < 10) nuevoValor = 10; // Límite mínimo
-        setPixelesDirecto(nuevoValor);
-    }
-
-    function setPixelesDirecto(valor) {
-        let num = parseInt(valor);
-        if (!isNaN(num) && num > 0) {
-            // 1. Aplicamos el cambio directamente al CSS
-            document.documentElement.style.setProperty('--hex_wpx', num + 'px');
-            
-            // 2. Sincronizamos el input visualmente
-            const input = document.getElementById('input-calibracion-px');
-            if (input) input.value = num;
-
-            // 3. Re-renderizamos el mapa
-            if (mapaActualData) renderizarMapa(mapaActualData);
+                    // 2. BUSCAR E ILUMINAR: Ahora que tenemos la suma final
+                    const hexs = document.querySelectorAll('.hex');
+                    hexs.forEach(div => {
+                        const ficha = div.querySelector('.numero-ficha');
+                        // Comparación estricta del número
+                        if (ficha && parseInt(ficha.innerText) === sumaNumerica) {
+                            div.classList.add('iluminado');
+                        }
+                    });
+                }, 1000);
+            }
         }
-    }
 
-    function toggleMenu() {menu.classList.toggle('abierto');}
-    function toggleSeccion(el) {el.parentElement.classList.toggle('activa');}
-    function mostrarPantallaInicio() {
-        tablero.innerHTML = `
+        function descargarJSONCreado() {
+            try {
+                // 1. Filtrar solo los hexágonos que no están vacíos
+                if (!mapa_visual || !mapa_visual.hexagono) {
+                    throw new Error("No hay datos de mapa para exportar.");
+                }
+
+                const hexagonosActivos = mapa_visual.hexagono.filter(h => h.tipo !== 'vacio');
+
+                if (hexagonosActivos.length === 0) {
+                    alert("El mapa está vacío. Dibuja algo antes de descargar.");
+                    return;
+                }
+
+                const recursosDinamicos = {};
+                const numerosDinamicos = {};
+
+                // 2. Mapear los hexágonos y detectar dinámicamente cuántos órdenes existen
+                const hexagonosParaExportar = hexagonosActivos.map(h => {
+                    const hexExport = {
+                        f: h.f,
+                        c: h.c,
+                        tipo: h.tipo,
+                        giros: h.giros || [0]
+                    };
+
+                    // Gestionar Recursos Aleatorios (bolsas)
+                    if (typeof h.tipo === 'string' && h.tipo.startsWith('aleatorio_')) {
+                        const bolsaNombre = h.tipo;
+                        if (!recursosDinamicos[bolsaNombre]) {
+                            if (configRecursosAleatorios[bolsaNombre]) {
+                                recursosDinamicos[bolsaNombre] = configRecursosAleatorios[bolsaNombre];
+                            } else if (mapa_original && mapa_original.recursos && mapa_original.recursos[bolsaNombre]) {
+                                recursosDinamicos[bolsaNombre] = mapa_original.recursos[bolsaNombre];
+                            } else {
+                                // Default
+                                recursosDinamicos[bolsaNombre] = { tipos: ["bosque"], cantidades: [1] };
+                            }
+                        }
+                    }
+
+                    // Gestionar TODOS los órdenes
+                    Object.keys(h).forEach(prop => {
+                        if (prop.startsWith('orden_')) {
+                            hexExport[prop] = h[prop];
+                            if (!numerosDinamicos[prop]) {
+                                numerosDinamicos[prop] = { "tipo": "fijo", "valores": [] };
+                            }
+                        }
+                    });
+
+                    return hexExport;
+                });
+
+                // 3. Rellenar los arrays de valores
+                Object.keys(numerosDinamicos).forEach(ordenKey => {
+                    const cantidadFichas = hexagonosParaExportar.filter(h => h[ordenKey]).length;
+                    if (configNumerosOrdenes[ordenKey] && configNumerosOrdenes[ordenKey].length > 0) {
+                        numerosDinamicos[ordenKey].valores = configNumerosOrdenes[ordenKey];
+                    } else {
+                        numerosDinamicos[ordenKey].valores = new Array(cantidadFichas).fill(null);
+                    }
+                });
+
+                const nombreMapa = document.getElementById('input-nombre-mapa').value || "Mapa Personalizado";
+
+                const resultado = {
+                    nombre: nombreMapa,
+                    hexagono: hexagonosParaExportar,
+                    recursos: recursosDinamicos,
+                    numeros: numerosDinamicos
+                };
+
+                // 4. Ejecutar descarga
+                const blob = new Blob([JSON.stringify(resultado, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${nombreMapa.replace(/\s+/g, '_')}.json`;
+                a.click();
+
+            } catch (e) {
+                console.error("Error al descargar JSON:", e);
+                alert("Error al descargar el mapa: " + e.message);
+            }
+        }
+
+        // Inicio de la aplicación.
+        function iniciarTodo() {
+            // 1. Ponemos la pantalla completa despues de que el usuario haya interactuado.
+            toggleFullScreen();
+            // 2. Cargamos el mapa del catan más básico.
+            cargarMapa('Catan básico (3-4).json');
+        }
+
+        function cambiarPixeles(delta) {
+            let valorActual = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
+            let nuevoValor = valorActual + delta;
+
+            if (nuevoValor < 10) nuevoValor = 10; // Límite mínimo
+            setPixelesDirecto(nuevoValor);
+        }
+
+        function setPixelesDirecto(valor) {
+            let num = parseInt(valor);
+            if (!isNaN(num) && num > 0) {
+                // 1. Aplicamos el cambio directamente al CSS
+                document.documentElement.style.setProperty('--hex_wpx', num + 'px');
+
+                // 2. Sincronizamos el input visualmente
+                const input = document.getElementById('input-calibracion-px');
+                if (input) input.value = num;
+
+                // 3. Re-renderizamos el mapa
+                if (mapa_visual) renderizarMapa(mapa_visual, tablero);
+            }
+        }
+
+        function toggleMenu() { menu.classList.toggle('abierto'); }
+        function toggleSeccion(el) { el.parentElement.classList.toggle('activa'); }
+        function mostrarPantallaInicio() {
+            tablero.innerHTML = `
             <div class="mensaje-bienvenida">
                 <h1 style="color: #f1c40f;">Catan Pro TV</h1>
                 <button class="btn" style="padding: 20px; font-size: 1.2em; background: #27ae60;" 
@@ -798,178 +1407,294 @@
                     🚀 EMPEZAR PARTIDA
                 </button>
                 <p style="font-size: 0.5em; opacity: 0.6; margin-top: 15px;">
-                    (Se activará la pantalla completa automáticamente)
-                </p>
             </div>`;
-    }
-    async function cargarMapa(nombreMapa) {
-        try {
-            // --- AQUÍ LA SOLUCIÓN ---
-            // 1. Quitamos la clase de edición del body
-            document.body.classList.remove('modo-edicion');
-            // 2. Quitamos el cursor de pintar si estaba activo
-            document.getElementById('tablero').classList.remove('pintando');
-            // 3. Restauramos el tamaño de los hexágonos al valor del input de calibración
-            let pxGuardados = document.getElementById('input-calibracion-px').value;
-            document.documentElement.style.setProperty('--hex_wpx', pxGuardados + 'px');
-            // -------------------------
-            const respuesta = await fetch(`maps/${nombreMapa}`);
-            if (!respuesta.ok) {
-                throw new Error(`No se pudo encontrar el archivo: maps/${nombreMapa}`);
-            }
-
-            let maps = await respuesta.json();
-            maps = procesarConfiguracion(maps);
-            mapaActualData = maps
-            renderizarMapa(maps);
-            inicializarDadosSegunMapa(maps);
-            toggleMenu(); // Cerramos el menú al cargar con éxito
-            
-        }catch (e) {
-            console.error("Error cargando el JSON:", e);
-            alert(`Error: Asegúrate de que el archivo JSON existe en la carpeta maps/${nombreMapa}`);
         }
-    }
-
-    function procesarConfiguracion(maps) {
-        maps.hexagono.forEach(h => {
-            delete h.numeroFinal; 
-        });
-        maps.hexagono.forEach(h => {
-            if (h.numero && h.numero > 0) {
-                h.numeroFinal = h.numero;
-            }
-        });
-
-        // --- 1. PREPARAR BOLSAS DE RECURSOS Y LAS ASIGNAMOS---
-        for (const key in maps.recursos) {
-            let bolsa = [];
-            const r = maps.recursos[key];
-            r.tipos.forEach((tipo, i) => {
-                for (let c = 0; c < r.cantidades[i]; c++) bolsa.push(tipo);
-            });
-
-            // Mezclamos la bolsa
-            bolsa = bolsa.sort(() => Math.random() - 0.5);
-
-            // Asignamos tipos a hexágonos que usan esta bolsa
-            maps.hexagono.filter(h => Array.isArray(h.tipo) && h.tipo.includes(key)).forEach((h, index) => {
-                if (bolsa[index]) {
-                    // Reemplazamos "aleatorio_1" por el recurso real (ej: "bosque")
-                    h.tipoReal = h.tipo.map(t => t === key ? bolsa[index] : t);
-                }
-            });
-        }
-
-        // --- 2. ASIGNAR NÚMEROS POR ÓRDENES ---
-        // Procesamos cada grupo de orden (orden_1, orden_2...)
-
-        if (maps.numeros){ // Si no hay números, salimos
-            for (const ordenKey in maps.numeros) {
-                const infoOrden = maps.numeros[ordenKey];
-                let listaNumeros = [...infoOrden.valores];
-                
-                if (infoOrden.tipo === "aleatorio") {
-                    listaNumeros = listaNumeros.sort(() => Math.random() - 0.5);
+        async function cargarMapa(nombreMapa, contenedor = document.getElementById('tablero'), esJuego = true) {
+            try {
+                // Remove editing cursor if loading into main board
+                if (esJuego) {
+                    document.body.classList.remove('modo-edicion');
+                    document.getElementById('tablero').classList.remove('pintando');
+                    // Restauramos el tamaño de los hexágonos al valor del input de calibración
+                    let pxGuardados = document.getElementById('input-calibracion-px').value;
+                    document.documentElement.style.setProperty('--hex_wpx', pxGuardados + 'px');
                 }
 
-                // Filtramos hexágonos que pertenecen a este orden y NO son hexagonos sin número.
-                const hexsValidos = maps.hexagono
-                    .filter(h => {
-                        const tipoActual = h.tipoReal || h.tipo;
-                        const nombreTipo = Array.isArray(tipoActual) ? tipoActual[0] : tipoActual;
-                        return h[ordenKey] > 0 && !terrenosSinNumero.includes(nombreTipo);
-                    })
-                    .sort((a, b) => a[ordenKey] - b[ordenKey]);
+                const respuesta = await fetch(`maps/${nombreMapa}`);
+                if (!respuesta.ok) {
+                    throw new Error(`No se pudo encontrar el archivo: ${nombreMapa}`);
+                }
 
-                // Asignamos el número de la lista según la posición
-                hexsValidos.forEach((h, index) => {
-                    h.numeroFinal = listaNumeros[index] || null;
+                const json = await respuesta.json();
+
+                if (esJuego) {
+                    // 1. Guardamos el Original
+                    mapa_original = structuredClone(json); // Copia profunda
+
+                    // 2. Procesamos para crear el Visual
+                    mapa_visual = procesarConfiguracion(structuredClone(json));
+
+                    renderizarMapa(mapa_visual, contenedor);
+                    inicializarDadosSegunMapa(mapa_visual);
+                    toggleMenu();
+                } else {
+                    // MODO PALETA / GENERIC LOAD
+                    let dataToRender = json;
+
+                    // Unificar estructura: usar json.hexagono o json.piezas (legacy)
+                    let hexs = json.hexagono || json.piezas || [];
+
+                    if (hexs.length > 0) {
+                        dataToRender = { hexagono: hexs };
+
+                        // Normalizar coordenadas ALWAYS para la paleta
+                        let minF = Infinity, minC = Infinity;
+                        hexs.forEach(p => {
+                            if (p.f < minF) minF = p.f; if (p.c < minC) minC = p.c;
+                        });
+
+                        dataToRender.hexagono = hexs.map(p => ({
+                            ...p,
+                            f: p.f - minF,
+                            c: p.c - minC
+                        }));
+                    }
+
+                    renderizarMapa(dataToRender, contenedor);
+
+                    // Si es la paleta, añadimos los eventos de click especiales
+                    if (contenedor.id === 'contenedor-mapa-piezas') {
+                        const hexs = contenedor.querySelectorAll('.hex');
+                        hexs.forEach(div => {
+                            div.onclick = () => {
+                                const tipo = div.dataset.tipo;
+
+                                // Reset visual anterior
+                                contenedor.querySelectorAll('.hex').forEach(h => {
+                                    h.style.borderColor = 'transparent';
+                                    h.style.zIndex = '100';
+                                });
+
+                                if (tipo && tipo !== 'vacio') {
+                                    piezaSeleccionada = tipo;
+                                    giroActual = 0;
+
+                                    // Marcar seleccionado
+                                    div.style.border = '2px solid #f1c40f';
+                                    div.style.zIndex = '1000';
+
+                                    document.getElementById('tablero').classList.add('pintando');
+                                }
+                            };
+                        });
+                    }
+                }
+
+            } catch (e) {
+                console.error("Error cargando el JSON:", e);
+                // alert(`Error: Asegúrate de que el archivo JSON existe: ${nombreMapa}`);
+            }
+        }
+
+        function procesarConfiguracion(maps) {
+            maps.hexagono.forEach(h => {
+                delete h.numeroFinal;
+            });
+            maps.hexagono.forEach(h => {
+                if (h.numero && h.numero > 0) {
+                    h.numeroFinal = h.numero;
+                }
+            });
+
+            // --- 1. PREPARAR BOLSAS DE RECURSOS Y LAS ASIGNAMOS---
+            for (const key in maps.recursos) {
+                let bolsa = [];
+                const r = maps.recursos[key];
+                r.tipos.forEach((tipo, i) => {
+                    for (let c = 0; c < r.cantidades[i]; c++) bolsa.push(tipo);
+                });
+
+                // Mezclamos la bolsa
+                bolsa = bolsa.sort(() => Math.random() - 0.5);
+
+                // Asignamos tipos a hexágonos que usan esta bolsa
+                maps.hexagono.filter(h => Array.isArray(h.tipo) && h.tipo.includes(key)).forEach((h, index) => {
+                    if (bolsa[index]) {
+                        // Reemplazamos "aleatorio_1" por el recurso real (ej: "bosque")
+                        h.tipoReal = h.tipo.map(t => t === key ? bolsa[index] : t);
+                    }
                 });
             }
-        }
-        return maps;
-    }
 
-    function renderizarMapa(maps) {
-        tablero.innerHTML = '';
-        const w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
-        const f_spacing = w * 1.1547 * 0.75; 
-        const c_spacing = w;
+            // --- 2. ASIGNAR NÚMEROS POR ÓRDENES ---
+            // Procesamos cada grupo de orden (orden_1, orden_2...)
 
-        let minF = Infinity, maxF = -Infinity, minC = Infinity, maxC = -Infinity;
-        maps.hexagono.forEach(h => {
-            if (h.f < minF) minF = h.f; if (h.f > maxF) maxF = h.f;
-            if (h.c < minC) minC = h.c; if (h.c > maxC) maxC = h.c;
-        });
-        const totalW = ((maxC - minC) * c_spacing) + w;
-        const totalH = ((maxF - minF) * f_spacing) + (w * 1.15);
-        tablero.style.width = totalW + 'px';
-        tablero.style.height = totalH + 'px';
+            if (maps.numeros) { // Si no hay números, salimos
+                for (const ordenKey in maps.numeros) {
+                    const infoOrden = maps.numeros[ordenKey];
+                    let listaNumeros = [...infoOrden.valores];
 
-        maps.hexagono.forEach(h => {
-            const div = document.createElement('div');
-            const tipoParaRender = h.tipoReal || h.tipo;
-            const tipoPrincipal = Array.isArray(tipoParaRender) ? tipoParaRender[0] : tipoParaRender;
-            div.className = `hex ${tipoPrincipal}`;
-            div.style.top = `calc((${h.f} - ${minF}) * (var(--hex_wpx) * 1.1547 * 0.75))`;
-            div.style.left = `calc((${h.c} - ${minC}) * var(--hex_wpx))`;
-            const listaCapas = Array.isArray(tipoParaRender) ? tipoParaRender : [tipoParaRender];
-            const listaGiros = Array.isArray(h.giros) ? h.giros : [h.giros || 0];
-            
-            listaCapas.forEach((capaNombre, index) => {
-                const capa = document.createElement('div');
-                capa.className = 'capa-hex';
-                
-                let nombreArchivo = capaNombre;
-                if (!nombreArchivo.includes('.')) {
-                    nombreArchivo += '.png';
+                    if (infoOrden.tipo === "aleatorio") {
+                        listaNumeros = listaNumeros.sort(() => Math.random() - 0.5);
+                    }
+
+                    // Filtramos hexágonos que pertenecen a este orden y NO son hexagonos sin número.
+                    const hexsValidos = maps.hexagono
+                        .filter(h => {
+                            const tipoActual = h.tipoReal || h.tipo;
+                            const nombreTipo = Array.isArray(tipoActual) ? tipoActual[0] : tipoActual;
+                            return h[ordenKey] > 0 && !terrenosSinNumero.includes(nombreTipo);
+                        })
+                        .sort((a, b) => a[ordenKey] - b[ordenKey]);
+
+                    // Asignamos el número de la lista según la posición
+                    hexsValidos.forEach((h, index) => {
+                        h.numeroFinal = listaNumeros[index] || null;
+                    });
                 }
-                
-                capa.style.backgroundImage = `url('images/${nombreArchivo}')`;
-                capa.style.zIndex = index; 
-                
-                // Aplicamos el giro si existe para esta capa
-                const gradosGiro = (listaGiros[index] || 0) * 60;
-                if (gradosGiro !== 0) {
-                    capa.style.transform = `rotate(${gradosGiro}deg)`;
-                }
-                div.appendChild(capa);
-            });
-            // Ficha numérica (siempre encima de todo)
-            if (h.numeroFinal) {
-                const ficha = document.createElement('div');
-                ficha.className = 'numero-ficha' + (h.numeroFinal === 6 || h.numeroFinal === 8 ? ' rojo' : '');
-                ficha.style.zIndex = 10;
-                ficha.innerText = h.numeroFinal;
-                div.appendChild(ficha);
             }
+            return maps;
+        }
 
-            tablero.appendChild(div);
-        });
-    }
+        function renderizarMapa(maps, contenedorDestino) {
+            contenedorDestino = contenedorDestino || document.getElementById('tablero');
+            contenedorDestino.innerHTML = '';
 
-    function toggleFullScreen() {
-        const btn = document.getElementById('toggle-fs');
-        if (!document.fullscreenElement) {
+            // Usar variable local si existe en el contenedor, sino global
+            const w = parseInt(contenedorDestino.style.getPropertyValue('--hex_wpx') || getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
+            const f_spacing = w * 1.1547 * 0.75;
+            const c_spacing = w;
+
+            let minF = Infinity, maxF = -Infinity, minC = Infinity, maxC = -Infinity;
+            maps.hexagono.forEach(h => {
+                if (h.f < minF) minF = h.f; if (h.f > maxF) maxF = h.f;
+                if (h.c < minC) minC = h.c; if (h.c > maxC) maxC = h.c;
+            });
+            const totalW = ((maxC - minC) * c_spacing) + w;
+            const totalH = ((maxF - minF) * f_spacing) + (w * 1.15);
+            contenedorDestino.style.width = totalW + 'px';
+            contenedorDestino.style.height = totalH + 'px';
+
+            maps.hexagono.forEach(h => {
+                const div = document.createElement('div');
+                div.className = 'hex';
+                // Guardar tipo en dataset para clicks
+                div.dataset.tipo = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
+                div.dataset.giros = JSON.stringify(h.giros || [0]);
+
+                div.style.top = `calc((${h.f} - ${minF}) * ${f_spacing}px)`;
+                div.style.left = `calc((${h.c} - ${minC}) * ${c_spacing}px)`;
+
+                // NOTA IMPORTANTE: Si estamos en el editor de piezas (palette), sobreescribimos tamaño
+                if (contenedorDestino.id === 'contenedor-mapa-piezas') {
+                    div.style.width = w + 'px';
+                    div.style.height = (w * 1.1547) + 'px';
+                }
+
+                // --- GESTION DE CAPAS VISUALES ---
+                // Interpretamos 'h.tipoReal' o 'h.tipo' como capas. 
+                // Si es array: [fondo, detalle...]. Si es string: [fondo]
+                const tipoParaRender = h.tipoReal || h.tipo;
+                const capasLista = Array.isArray(tipoParaRender) ? tipoParaRender : [tipoParaRender];
+                const girosLista = Array.isArray(h.giros) ? h.giros : [h.giros || 0];
+
+                // 1. CAPA VISUAL FONDO (La primera imagen)
+                const divFondo = document.createElement('div');
+                divFondo.className = 'capa-visual-fondo';
+                if (capasLista[0]) {
+                    let nombre = capasLista[0].includes('.') ? capasLista[0] : capasLista[0] + '.png';
+                    divFondo.style.backgroundImage = `url('images/${nombre}')`;
+                    const giro = (girosLista[0] || 0) * 60;
+                    if (giro !== 0) divFondo.style.transform = `rotate(${giro}deg)`;
+                }
+                div.appendChild(divFondo);
+
+                // 2. CAPA VISUAL DETALLE (Las siguientes imágenes, si las hay)
+                const divDetalle = document.createElement('div');
+                divDetalle.className = 'capa-visual-detalle';
+                // Si hay más capas, las pintamos aquí. 
+                // Podríamos crear múltiples divs dentro de detalle si hay muchas, 
+                // o simplemente usar la segunda como "detalle principal".
+                // Para ser flexible, añadiremos sub-elementos si hay más de 1 capa.
+                if (capasLista.length > 1) {
+                    for (let i = 1; i < capasLista.length; i++) {
+                        const subCapa = document.createElement('div');
+                        subCapa.style.position = 'absolute';
+                        subCapa.style.top = '0'; subCapa.style.left = '0';
+                        subCapa.style.width = '100%'; subCapa.style.height = '100%';
+                        subCapa.style.backgroundSize = 'cover';
+
+                        let nombre = capasLista[i].includes('.') ? capasLista[i] : capasLista[i] + '.png';
+                        subCapa.style.backgroundImage = `url('images/${nombre}')`;
+
+                        const giro = (girosLista[i] || 0) * 60;
+                        if (giro !== 0) subCapa.style.transform = `rotate(${giro}deg)`;
+
+                        divDetalle.appendChild(subCapa);
+                    }
+                }
+                div.appendChild(divDetalle);
+
+                // 3. CAPA INTERACTIVA (Bruma, Ladrón, Clicks)
+                const divInteraccion = document.createElement('div');
+                divInteraccion.className = 'capa-interaccion';
+                divInteraccion.title = `F: ${h.f}, C: ${h.c}`; // Tooltip simple para debug
+
+                // Lógica para Bruma o Ladrón (PLACEHOLDERS por ahora, se activarán si el JSON lo dice)
+                if (h.tieneBruma) {
+                    divInteraccion.classList.add('bruma');
+                }
+                if (h.tieneLadron) {
+                    // Podríamos poner un icono de ladrón aquí
+                    const iconoLadron = document.createElement('div');
+                    iconoLadron.innerText = '💂'; // Icono temporal
+                    iconoLadron.style.fontSize = '30px';
+                    divInteraccion.appendChild(iconoLadron);
+                }
+
+                div.appendChild(divInteraccion);
+
+
+                // Ficha numérica (siempre visualmente encima, pero en el DOM... 
+                // ¿debe tapar la interacción? No, la ficha suele ser "visual". 
+                // Pero si está encima de la capa interacción, bloqueará clicks.
+                // Solución: pointer-events: none en la ficha, o ponerla DEBAJO de interacción si la interacción es invisible.
+                // Dejémosla al final con z-index alto, y si molesta al click, le ponemos pointer-events: none)
+                if (h.numeroFinal) {
+                    const ficha = document.createElement('div');
+                    ficha.className = 'numero-ficha' + (h.numeroFinal === 6 || h.numeroFinal === 8 ? ' rojo' : '');
+                    ficha.style.zIndex = 50; // Encima de casi todo visualmente
+                    ficha.style.pointerEvents = 'none'; // Para que no bloquee clicks en la capa de interacción
+                    ficha.innerText = h.numeroFinal;
+                    div.appendChild(ficha);
+                }
+
+                contenedorDestino.appendChild(div);
+            });
+        }
+
+        function toggleFullScreen() {
+            const btn = document.getElementById('toggle-fs');
+            if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().then(() => {
-                    btn.innerText = "❐"; 
+                    btn.innerText = "❐";
                 }).catch(err => {
                     console.error(`Error al intentar entrar en pantalla completa: ${err.message}`);
                 });
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-                btn.innerText = "⛶";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    btn.innerText = "⛶";
+                }
             }
         }
-    }
 
-    window.onload = () => {
-        document.getElementById('input-calibracion-px').value = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
-        mostrarPantallaInicio();       
-    };
-</script>
+        window.onload = () => {
+            document.getElementById('input-calibracion-px').value = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
+            mostrarPantallaInicio();
+        };
+    </script>
 
 </body>
+
 </html>
