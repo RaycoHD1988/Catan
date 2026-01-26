@@ -7,7 +7,7 @@
     <style>
         :root {
             --linea-hex: #000000;
-            --hex_wpx: 99px;
+            --hex_wpx: 100px;
         }
 
         body {
@@ -100,7 +100,7 @@
             transform: translateZ(-25px);
         }
 
-        .cube__face {
+        .cube_face {
             position: absolute;
             width: 50px;
             height: 50px;
@@ -116,29 +116,12 @@
             box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
         }
 
-        .face-1 {
-            transform: rotateY(0deg) translateZ(25px);
-        }
-
-        .face-2 {
-            transform: rotateY(180deg) translateZ(25px);
-        }
-
-        .face-3 {
-            transform: rotateY(90deg) translateZ(25px);
-        }
-
-        .face-4 {
-            transform: rotateY(-90deg) translateZ(25px);
-        }
-
-        .face-5 {
-            transform: rotateX(90deg) translateZ(25px);
-        }
-
-        .face-6 {
-            transform: rotateX(-90deg) translateZ(25px);
-        }
+        .face-1 {transform: rotateY(0deg) translateZ(25px);}
+        .face-2 {transform: rotateY(180deg) translateZ(25px);}
+        .face-3 {transform: rotateY(90deg) translateZ(25px);}
+        .face-4 {transform: rotateY(-90deg) translateZ(25px);}
+        .face-5 {transform: rotateX(90deg) translateZ(25px);}
+        .face-6 {transform: rotateX(-90deg) translateZ(25px);}
 
         .btn-lanzar {
             width: 100%;
@@ -158,10 +141,7 @@
             transform: translateY(-2px);
         }
 
-        .btn-lanzar:active {
-            transform: scale(0.95);
-        }
-
+        .btn-lanzar:active {transform: scale(0.95);}
 
 
         /* MENU LATERAL DERECHO */
@@ -267,7 +247,6 @@
             cursor: grab;
         }
 
-
         #menu-creador {
             position: fixed;
             right: 0;
@@ -292,7 +271,7 @@
             position: relative;
             width: 100%;
             min-width: 100%;
-            min-height: 2000px; 
+            min-height: 1000px; 
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             margin-top: 40px;
@@ -372,14 +351,6 @@
             pointer-events: none;
         }
 
-        .capa-visual-fondo {
-            z-index: 1;
-        }
-
-        .capa-visual-detalle {
-            z-index: 2;
-        }
-
         .capa-interaccion {
             position: absolute;
             top: 0;
@@ -390,11 +361,15 @@
             z-index: 100;
             pointer-events: auto;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .bruma {
-            background: rgba(200, 200, 200, 0.8);
-            filter: blur(5px);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s;
         }
 
         .capa-interaccion:hover {
@@ -446,7 +421,6 @@
             padding: 20px;
             border-radius: 15px;
             display: none;
-            /* Oculto por defecto */
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             z-index: 2000;
@@ -483,10 +457,7 @@
             z-index: 1999;
         }
 
-        .rojo {
-            color: red;
-            font-size: 18px;
-        }
+        .rojo {color: red; font-size: 18px;}
 
         .btn {
             width: 100%;
@@ -504,6 +475,29 @@
             width: 30px !important;
             height: calc(30px * 1.1547) !important;
             outline: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modo-edicion .ficha-orden-0 { background-color: #2980b9 !important; color: black; border-color: #000; }
+        .modo-edicion .ficha-orden-1 { background-color: #f1c40f !important; color: black; border-color: #000; }
+        .modo-edicion .ficha-orden-2 { background-color: #27ae60 !important; color: black; border-color: #000; }
+
+    
+        .btn-orden-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.3s;
+        }
+
+        .btn-orden-selector.activo {
+            border: 2px solid #fff;
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
         }
 
         .paleta-editor {
@@ -551,28 +545,31 @@
             Paleta de Piezas
         </div>
         <div id="contenedor-mapa-piezas"></div>
+        <div id="contenedor-gestor-aleatorios" style="display:none;"></div>
     </div>
 
     <!-- Menú Creador (Derecha) -->
     <div id="menu-creador">
-        <h2 style="color: #e67e22; border-bottom: 1px solid #eba166; padding-bottom: 10px;">🛠️ Editor</h2>
+        <h2 style="color: #e67e22; border-bottom: 1px solid #eba166; padding-bottom: 5px;">🛠️ Editor</h2>
 
-        <div class="input-group" style="margin-bottom: 20px;">
+        <div class="input-group" style="margin-bottom: 5px;">
             <label style="display: block; font-size: 0.8em; margin-bottom: 5px; color: #ccc;">Nombre del Mapa</label>
             <input type="text" id="input-nombre-mapa" value="Mapa Nuevo"
                 style="width: 100%; padding: 10px; background: transparent; border: 1px solid #666; color: white; border-radius: 5px;">
         </div>
 
-        <button class="btn" style="background: #8e44ad;" onclick="activarPincelOrden()"><span id="lbl-btn-orden">🔢
-                Marcar Orden 1</span></button>
-        <button id="btn-siguiente-orden" class="btn" style="background: #2c3e50; display: none;"
-            onclick="finalizarOrdenActual()">✅ Siguiente Orden</button>
-
-        <hr style="border-color: #444; width: 100%;">
+        <div id="selector-capas" style="margin-bottom: 20px; border-top: 1px solid #444; padding-top: 10px;">
+            <label style="display: block; font-size: 0.8em; margin-bottom: 10px; color: #ccc;">Capa de Trabajo</label>
+            <div style="display: flex; gap: 5px;">
+                <button id="btn-capa-0" class="btn" style="background: #2980b9; flex: 1;" onclick="seleccionarCapa(0)">Capa 1</button>
+                <button id="btn-capa-1" class="btn" style="background: #444; flex: 1;" onclick="seleccionarCapa(1)">Capa 2</button>
+                <button id="btn-capa-2" class="btn" style="background: #444; flex: 1;" onclick="seleccionarCapa(2)">Capa 3</button>
+            </div>
+        </div>
 
         <button class="btn" style="background: #27ae60;" onclick="jugarMapaActual()">🎮 Jugar este Mapa</button>
 
-        <div id="contenedor-gestor-ordenes" style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
+        <div id="contenedor-gestor-ordenes" style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px;">
         </div>
 
         <div style="margin-top: auto;">
@@ -646,6 +643,22 @@
         let configNumerosOrdenes = {}; // Almacena los arrays de números para cada orden
         let configRecursosAleatorios = {}; // Almacena qué recursos salen de cada bolsa de aleatorios
 
+        let capaActiva = 0; // Por defecto Capa 1 (índice 0)
+        let piezaSeleccionada = null;
+        let giroSeleccionado = 0;
+
+        function seleccionarCapa(n) {
+            capaActiva = n;
+            // Actualizar UI de botones
+            for (let i = 0; i < 3; i++) {
+                const btn = document.getElementById(`btn-capa-${i}`);
+                btn.style.background = (i === n) ? '#2980b9' : '#444';
+            }
+            // Si estábamos en modo orden, lo desactivamos al cambiar de capa
+            nivelOrdenActivo = 0;
+            actualizarUIOrdenes();
+        }
+
         async function activarModoCreador() {
             // 1. UI Updates
             document.body.classList.add('modo-edicion');
@@ -664,24 +677,23 @@
 
             // 3. Load EXISTING data into grid (Center it)
             if (mapa_original && mapa_original.hexagono) {
-                // If we are re-entering or loading a map, we overlay it on the fresh grid
-                let minF = Infinity, maxF = -Infinity, minC = Infinity, maxC = -Infinity;
-                mapa_original.hexagono.forEach(h => {
-                    if (h.f < minF) minF = h.f; if (h.f > maxF) maxF = h.f;
-                    if (h.c < minC) minC = h.c; if (h.c > maxC) maxC = h.c;
-                });
-
-                const widthOriginal = maxC - minC;
-                const heightOriginal = maxF - minF;
-
-                const offsetF = Math.floor((20 - heightOriginal) / 2) - minF;
-                const offsetC = Math.floor((20 - widthOriginal) / 2) - minC;
+                let minF = Math.min(...mapa_original.hexagono.map(h => h.f));
+                let maxF = Math.max(...mapa_original.hexagono.map(h => h.f));
+                let minC = Math.min(...mapa_original.hexagono.map(h => h.c));
+                let maxC = Math.max(...mapa_original.hexagono.map(h => h.c));
+                const anchoMapa = maxC - minC;
+                const altoMapa = maxF - minF;
+                
+                const offsetF = Math.floor(10 - (altoMapa / 2)) - minF;
+                const offsetC = Math.floor(10 - (anchoMapa / 2)) - minC;
 
                 mapa_original.hexagono.forEach(h => {
                     const nuevoF = h.f + offsetF;
                     const nuevoC = h.c + offsetC;
-                    // Find target in the new grid
-                    const target = nuevaRejilla.find(d => d.f === nuevoF && Math.abs(d.c - nuevoC) < 0.1);
+                    
+                    // Buscamos con un margen de tolerancia para decimales (0.1)
+                    const target = nuevaRejilla.find(d =>  d.f === nuevoF && Math.abs(d.c - nuevoC) < 0.1);
+                    
                     if (target) {
                         target.tipo = h.tipo;
                         target.giros = h.giros;
@@ -690,7 +702,8 @@
                         });
                     }
                 });
-                // Preserve other props
+
+
                 if (mapa_original.nombre) document.getElementById('input-nombre-mapa').value = mapa_original.nombre;
                 if (mapa_original.numeros) {
                     Object.keys(mapa_original.numeros).forEach(k => {
@@ -698,19 +711,12 @@
                     });
                 }
             }
-
-            // 4. UNIFY: mapa_original NOW BECOMES THE GRID
-            // We create a new object to ensure it's clean, inheriting config from previous if needed
             mapa_original = {
                 nombre: document.getElementById('input-nombre-mapa').value,
                 hexagono: nuevaRejilla,
                 recursos: (mapa_original && mapa_original.recursos) ? mapa_original.recursos : {},
                 numeros: (mapa_original && mapa_original.numeros) ? mapa_original.numeros : {}
             };
-
-            // 5. Render Editor
-            document.documentElement.style.setProperty('--hex_wpx', '35px');
-            document.getElementById('input-calibracion-px').value = 35;
 
             mapa_visual = mapa_original; // Visual points to the editable grid
             renderizarMapa(mapa_visual, tablero);
@@ -720,30 +726,7 @@
 
             // 6. Render Palette using generic loader
             document.getElementById('menu-piezas-creador').style.display = 'block';
-            await cargarYRenderizarPaleta();
-        }
-
-        // Adapted to just reuse cargarMapa
-        async function cargarYRenderizarPaleta() {
-            const contenedor = document.getElementById('contenedor-mapa-piezas');
-            try {
-                const response = await fetch('Piezas.json');
-                const datos = await response.json();
-                
-                // Limpiamos el contenedor
-                contenedor.innerHTML = '';
-                
-                // Forzamos un tamaño de hexágono pequeño para la paleta
-                // Si no quieres que afecte al tablero, lo aplicamos solo al estilo del contenedor
-                contenedor.style.setProperty('--hex_wpx', '40px'); 
-
-                // Renderizamos usando tu función existente pero dirigida al contenedor de la paleta
-                renderizarMapa(datos, contenedor);
-                
-                console.log("Paleta cargada con " + datos.hexagono.length + " piezas");
-            } catch (e) {
-                console.error("Error al cargar la paleta:", e);
-            }
+            await cargarMapa("Piezas.json", document.getElementById('contenedor-mapa-piezas'), esJuego = false);
         }
 
         // IMPLEMENTACIÓN DE CARGA DE ARCHIVOS
@@ -768,74 +751,6 @@
             // Reset input para permitir recargar el mismo archivo
             input.value = '';
         }
-
-        function actualizarUIOrdenes() {
-            const container = document.getElementById('contenedor-gestor-ordenes');
-            container.innerHTML = '<h3 style="font-size:1em; color:#ccc;">Fichas por Orden</h3>';
-
-            // Detectar qué órdenes existen en el mapa actual
-            const ordenesEnUso = new Set();
-            if (mapa_visual && mapa_visual.hexagono) {
-                mapa_visual.hexagono.forEach(h => {
-                    Object.keys(h).forEach(k => {
-                        if (k.startsWith('orden_')) ordenesEnUso.add(k);
-                    });
-                });
-            }
-
-            // Añadir también las que tengamos en memoria aunque no estén pintadas aún (por si acaso)
-            // Object.keys(configNumerosOrdenes).forEach(k => ordenesEnUso.add(k));
-
-            if (ordenesEnUso.size === 0 && !modoOrdenActivo) {
-                container.innerHTML += '<p style="font-size:0.8em; color:#666;">No hay órdenes marcados.</p>';
-                return;
-            }
-
-            ordenesEnUso.forEach(ordenKey => {
-                const div = document.createElement('div');
-                div.style.marginBottom = '10px';
-
-                const label = document.createElement('label');
-                label.innerText = `${ordenKey.replace('orden_', 'Orden ')}:`;
-                label.style.display = 'block';
-                label.style.fontSize = '0.8em';
-                label.style.color = '#f1c40f';
-
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.placeholder = 'Ej: 5,2,6,8...';
-                input.style.width = '100%';
-                input.style.background = 'rgba(0,0,0,0.3)';
-                input.style.border = '1px solid #555';
-                input.style.color = 'white';
-                input.style.padding = '5px';
-                input.style.fontSize = '0.9em';
-
-                // Pre-rellenar
-                if (configNumerosOrdenes[ordenKey]) {
-                    input.value = configNumerosOrdenes[ordenKey].join(',');
-                }
-
-
-                input.onchange = (e) => {
-                    // Guardar valores
-                    const val = e.target.value.trim();
-                    if (val) {
-                        configNumerosOrdenes[ordenKey] = val.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-                    } else {
-                        configNumerosOrdenes[ordenKey] = [];
-                    }
-                };
-
-                div.appendChild(label);
-                div.appendChild(input);
-                container.appendChild(div);
-            });
-        }
-
-        // Variable global para almacenar config de recursos
-        // Estructura: { "aleatorio_1": { "bosque": 10, "trigo": 5 }, ... } 
-        // Simplificado para UI: guardaremos texto y luego parseamos.
 
         function actualizarUIRecursosAleatorios() {
             const container = document.getElementById('contenedor-gestor-aleatorios');
@@ -913,81 +828,7 @@
                 container.appendChild(div);
             });
         }
-        // Función para cargar y mostrar las piezas en el menú lateral
-        // Reemplaza tu función actual por esta
-        async function cargarYRenderizarPaleta() {
-            const contenedor = document.getElementById('contenedor-mapa-piezas');
-            if (!contenedor) return;
 
-            try {
-                const response = await fetch('Piezas.json');
-                const datos = await response.json();
-                
-                contenedor.innerHTML = ''; // Limpiar
-                
-                // IMPORTANTE: Definimos el tamaño de la pieza para la paleta aquí
-                const tamanoPieza = 50; 
-                contenedor.style.setProperty('--hex_wpx', tamanoPieza + 'px');
-
-                datos.hexagono.forEach(h => {
-                    const div = document.createElement('div');
-                    div.className = 'hex';
-                    
-                    // Calculamos la posición basada en el tamaño local
-                    const w = tamanoPieza;
-                    const h_px = w * 1.1547;
-                    
-                    // Ajustamos las coordenadas del JSON para que queden compactas en el menú
-                    div.style.left = (h.c * w * 0.9) + 'px'; 
-                    div.style.top = (h.f * h_px * 0.75) + 'px';
-                    
-                    // Imagen de fondo (asegúrate de que la ruta img/ sea correcta)
-                    div.style.backgroundImage = `url('img/${h.tipo}.png')`;
-                    
-                    if (h.giros && h.giros[0]) {
-                        div.style.transform = `rotate(${h.giros[0] * 60}deg)`;
-                    }
-
-                    contenedor.appendChild(div);
-                });
-                
-                console.log("Paleta cargada correctamente");
-            } catch (error) {
-                console.error("Error cargando Piezas.json:", error);
-            }
-        }
-
-        // Asegúrate de que tu función renderizarMapa acepte un contenedor y tamaño opcional
-        function renderizarMapa(datos, contenedorDestino, tamanoHex = null) {
-            if (!datos || !datos.hexagono) return;
-
-            // Si pasamos un tamaño, actualizamos la variable CSS solo para este contexto
-            if (tamanoHex) {
-                contenedorDestino.style.setProperty('--hex_wpx', tamanoHex + 'px');
-            }
-
-            datos.hexagono.forEach(h => {
-                const div = document.createElement('div');
-                div.className = 'hex';
-                
-                // Cálculo de posición basado en filas (f) y columnas (c)
-                const w = tamanoHex || parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
-                const h_px = w * 1.1547;
-                
-                div.style.left = (h.c * w) + 'px';
-                div.style.top = (h.f * h_px * 0.75) + 'px';
-                
-                // Aplicar imagen de fondo según el tipo (madera, trigo, etc.)
-                div.style.backgroundImage = `url('img/${h.tipo}.png')`; 
-                
-                // Si tiene rotación
-                if (h.giros && h.giros[0]) {
-                    div.style.transform = `rotate(${h.giros[0] * 60}deg)`;
-                }
-
-                contenedorDestino.appendChild(div);
-            });
-        }
 
         function jugarMapaActual() {
             // CONVERTIR EDITABLE A JUGABLE
@@ -1003,8 +844,6 @@
                     valores: configNumerosOrdenes[k]
                 };
             });
-
-
 
             // GESTION DE RECURSOS FINAL
             // Usamos configRecursosAleatorios como fuente de verdad
@@ -1051,9 +890,6 @@
             renderizarMapa(mapa_visual, tablero);
             inicializarDadosSegunMapa(mapa_visual);
 
-            // Ajustar zoom para juego (más grande)
-            document.documentElement.style.setProperty('--hex_wpx', '99px');
-            document.getElementById('input-calibracion-px').value = 99;
             // Re-render con nuevo zoom
             renderizarMapa(mapa_visual, tablero);
         }
@@ -1128,44 +964,136 @@
             actualizarUIOrdenes();
         }
 
+        // Ordenes del modo creación.
+        let nivelOrdenActivo = 0; // 1, 2 o 3
+
+        function actualizarUIOrdenes() {
+            const container = document.getElementById('contenedor-gestor-ordenes');
+            container.innerHTML = '<h3 style="font-size:1em; color:#ccc; margin-bottom:15px;">Fichas por Orden</h3>';
+
+            for (let i = 1; i <= 3; i++) {
+                const ordenKey = `orden_${i}`;
+                const esActivo = nivelOrdenActivo === i;
+                
+                const divGrupo = document.createElement('div');
+                divGrupo.className = `btn-orden-selector ${esActivo ? 'activo' : ''}`;
+                
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.style.background = i === 1 ? '#2980b9' : (i === 2 ? '#f1c40f' : '#27ae60');
+                btn.style.color = i === 2 ? 'black' : 'white';
+                btn.innerHTML = esActivo ? `🖌️ Pintando O${i}...` : `🔢 Marcar Orden ${i}`;
+                btn.onclick = () => seleccionarNivelOrden(i);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Números: 2,5,9...';
+                input.value = configNumerosOrdenes[ordenKey] ? configNumerosOrdenes[ordenKey].join(',') : '';
+                input.style.width = '100%';
+                input.style.marginTop = '5px';
+                input.style.padding = '5px';
+                input.style.background = '#000';
+                input.style.color = '#fff';
+                input.style.border = '1px solid #444';
+
+                input.onchange = (e) => {
+                    configNumerosOrdenes[ordenKey] = e.target.value.split(',')
+                        .map(n => parseInt(n.trim()))
+                        .filter(n => !isNaN(n));
+                };
+
+                divGrupo.appendChild(btn);
+                divGrupo.appendChild(input);
+                container.appendChild(divGrupo);
+            }
+        }
+
+        function seleccionarNivelOrden(nivel) {
+            // Si pulsamos el que ya está activo, lo desactivamos
+            if (nivelOrdenActivo === nivel) {
+                nivelOrdenActivo = 0;
+            } else {
+                nivelOrdenActivo = nivel;
+                piezaSeleccionada = null; // Desactivar otros pinceles
+            }
+            
+            actualizarUIOrdenes();
+            document.getElementById('tablero').classList.toggle('pintando', nivelOrdenActivo !== 0);
+            
+            // IMPORTANTE: Dibujamos las fichas actuales en el mapa para ver el progreso
+            dibujarFichasDeOrden();
+        }
+
+        function dibujarFichasDeOrden() {
+            const hexsEnPantalla = document.querySelectorAll('#tablero .hex');
+            
+            hexsEnPantalla.forEach((div, index) => {
+                const h = mapa_visual.hexagono[index];
+                // Limpiamos fichas previas de edición para no duplicar
+                const fichaPrevia = div.querySelector('.numero-ficha');
+                if (fichaPrevia) fichaPrevia.remove();
+
+                // Si no estamos en modo orden, no dibujamos nada extra (limpieza)
+                if (nivelOrdenActivo === 0) return;
+
+                // Buscamos si este hexágono tiene algún orden asignado (1, 2 o 3)
+                for (let i = 1; i <= 3; i++) {
+                    const valOrden = h[`orden_${i}`];
+                    if (valOrden) {
+                        const ficha = document.createElement('div');
+                        ficha.className = `numero-ficha ficha-orden-${i}`;
+                        ficha.innerText = valOrden;
+                        ficha.style.pointerEvents = 'none';
+                        div.appendChild(ficha);
+                    }
+                }
+            });
+        }
+
         function actualizarEventosPintado() {
-            const hexsEnPantalla = document.querySelectorAll('.hex');
+            const hexsEnPantalla = document.querySelectorAll('#tablero .hex');
             hexsEnPantalla.forEach((div, index) => {
                 div.onclick = (e) => {
-                    if (modoOrdenActivo) {
-                        // ASIGNAR ORDEN DINÁMICO (orden_1, orden_2, etc.)
-                        const propiedadOrden = `orden_${nivelOrdenActual}`;
-                        mapa_visual.hexagono[index][propiedadOrden] = contadorOrden;
-
-                        // Mostrar visualmente el número y el nivel en el editor
-                        let ficha = div.querySelector('.numero-ficha');
-                        if (!ficha) {
-                            ficha = document.createElement('div');
-                            ficha.className = 'numero-ficha';
-                            div.appendChild(ficha);
+                    
+                    if (nivelOrdenActivo > 0) {
+                        const prop = `orden_${nivelOrdenActivo}`;
+                        
+                        // Si el hexágono ya tiene ESTE mismo orden, lo quitamos (borrar)
+                        if (mapa_visual.hexagono[index][prop]) {
+                            delete mapa_visual.hexagono[index][prop];
+                        } else {
+                            // Si no, calculamos el siguiente número correlativo para este orden
+                            const maxActual = mapa_visual.hexagono.reduce((max, h) => Math.max(max, h[prop] || 0), 0);
+                            mapa_visual.hexagono[index][prop] = maxActual + 1;
                         }
-                        // Mostramos "O1-1", "O1-2"... para diferenciar en el editor
-                        ficha.innerText = contadorOrden;
-                        ficha.title = `Grupo: ${propiedadOrden}`;
+                        
+                        // Refrescamos visualmente las fichas
+                        dibujarFichasDeOrden();
+                    } else if (piezaSeleccionada) {
 
-                        contadorOrden++;
-                        const lbl = document.getElementById('lbl-btn-orden') || document.getElementById('btn-orden');
-                        if (lbl) lbl.innerText = `🔢 Marcando O${nivelOrdenActual} (Nº ${contadorOrden})`;
+                        let h = mapa_visual.hexagono[index];
+                        // Asegurar que existan las 3 capas en el objeto
+                        if (!Array.isArray(h.tipo)) {
+                            h.tipo = [h.tipo || 'vacio', null, null];
+                            h.giros = [Array.isArray(h.giros) ? h.giros[0] : (h.giros || 0), 0, 0];
+                        }
 
-                    } else {
-                        // ... (Mantén tu lógica de pintar terreno igual)
-                        mapa_visual.hexagono[index].tipo = piezaSeleccionada;
-                        mapa_visual.hexagono[index].giros = [giroActual];
-
+                        // Guardar en la capaActiva (0, 1 o 2)
+                        if (h.tipo[capaActiva] === piezaSeleccionada) {
+                            h.tipo[capaActiva] = (capaActiva === 0) ? 'vacio' : null;
+                            h.giros[capaActiva] = 0;
+                        } else {
+                            h.tipo[capaActiva] = piezaSeleccionada;
+                            h.giros[capaActiva] = giroSeleccionado;
+                        }
                         renderizarMapa(mapa_visual, tablero);
                         actualizarEventosPintado();
-                        // Refrescar paneles por si pusimos un nuevo aleatorio
-                        actualizarUIRecursosAleatorios();
-                        actualizarUIOrdenes();
                     }
                 };
             });
         }
+
+
         // LÓGICA DE DADOS 3D
         let rotacionBase = 0;
         function inicializarDadosSegunMapa(mapa) {
@@ -1189,7 +1117,7 @@
                     <div class="scene">
                         <div id="${idUnico}" class="cube">
                             ${dado.caras_contenido.map((cont, i) => `
-                                <div class="cube__face face-${i + 1}" style="background-color: ${dado.caras_fondo[i]}">
+                                <div class="cube_face face-${i + 1}" style="background-color: ${dado.caras_fondo[i]}">
                                     ${formatearContenidoCara(cont)}
                                 </div>
                             `).join('')}
@@ -1424,7 +1352,6 @@
                 if (!respuesta.ok) {
                     throw new Error(`No se pudo encontrar el archivo: ${nombreMapa}`);
                 }
-
                 const json = await respuesta.json();
 
                 if (esJuego) {
@@ -1440,14 +1367,11 @@
                 } else {
                     // MODO PALETA / GENERIC LOAD
                     let dataToRender = json;
-
-                    // Unificar estructura: usar json.hexagono o json.piezas (legacy)
-                    let hexs = json.hexagono || json.piezas || [];
+                    let hexs = json.hexagono || [];
 
                     if (hexs.length > 0) {
-                        dataToRender = { hexagono: hexs };
+                        dataToRender = {hexagono: hexs};
 
-                        // Normalizar coordenadas ALWAYS para la paleta
                         let minF = Infinity, minC = Infinity;
                         hexs.forEach(p => {
                             if (p.f < minF) minF = p.f; if (p.c < minC) minC = p.c;
@@ -1468,8 +1392,8 @@
                         hexs.forEach(div => {
                             div.onclick = () => {
                                 const tipo = div.dataset.tipo;
+                                const girosData = JSON.parse(div.dataset.giros || "[0]");
 
-                                // Reset visual anterior
                                 contenedor.querySelectorAll('.hex').forEach(h => {
                                     h.style.borderColor = 'transparent';
                                     h.style.zIndex = '100';
@@ -1477,13 +1401,13 @@
 
                                 if (tipo && tipo !== 'vacio') {
                                     piezaSeleccionada = tipo;
-                                    giroActual = 0;
-
-                                    // Marcar seleccionado
+                                    giroSeleccionado = girosData[0] || 0;
                                     div.style.border = '2px solid #f1c40f';
                                     div.style.zIndex = '1000';
 
                                     document.getElementById('tablero').classList.add('pintando');
+                                    nivelOrdenActivo = 0; // Desactivar pincel de números
+                                    actualizarUIOrdenes();
                                 }
                             };
                         });
@@ -1556,34 +1480,36 @@
             return maps;
         }
 
-        function renderizarMapa(maps, contenedorDestino) {
-            contenedorDestino = contenedorDestino || document.getElementById('tablero');
+        function renderizarMapa(maps, contenedorDestino = document.getElementById('tablero')) {
             contenedorDestino.innerHTML = '';
-
-            // Usar variable local si existe en el contenedor, sino global
-            const w = parseInt(contenedorDestino.style.getPropertyValue('--hex_wpx') || getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
-            const f_spacing = w * 1.1547 * 0.75;
-            const c_spacing = w;
-
             let minF = Infinity, maxF = -Infinity, minC = Infinity, maxC = -Infinity;
             maps.hexagono.forEach(h => {
                 if (h.f < minF) minF = h.f; if (h.f > maxF) maxF = h.f;
                 if (h.c < minC) minC = h.c; if (h.c > maxC) maxC = h.c;
             });
-            const totalW = ((maxC - minC) * c_spacing) + w;
-            const totalH = ((maxF - minF) * f_spacing) + (w * 1.15);
+
+            let w;
+            if (contenedorDestino.id === 'contenedor-mapa-piezas') {
+                w = 40;
+            } else if (document.body.classList.contains('modo-edicion')) {
+                w = 35;
+            } else {
+                w = parseInt(contenedorDestino.style.getPropertyValue('--hex_wpx')) || parseInt(document.getElementById('input-calibracion-px').value) || 100;
+            }
+
+            const totalW = ((maxC - minC) * w) + w;
+            const totalH = ((maxF - minF) * w * 1.1547 * 0.75) + (w * 1.1547);
             contenedorDestino.style.width = totalW + 'px';
             contenedorDestino.style.height = totalH + 'px';
 
             maps.hexagono.forEach(h => {
                 const div = document.createElement('div');
                 div.className = 'hex';
-                // Guardar tipo en dataset para clicks
                 div.dataset.tipo = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
                 div.dataset.giros = JSON.stringify(h.giros || [0]);
 
-                div.style.top = `calc((${h.f} - ${minF}) * ${f_spacing}px)`;
-                div.style.left = `calc((${h.c} - ${minC}) * ${c_spacing}px)`;
+                div.style.top = `calc((${h.f} - ${minF}) * ${w * 1.1547 * 0.75}px)`;
+                div.style.left = `calc((${h.c} - ${minC}) * ${w}px)`;
 
                 // NOTA IMPORTANTE: Si estamos en el editor de piezas (palette), sobreescribimos tamaño
                 if (contenedorDestino.id === 'contenedor-mapa-piezas') {
@@ -1598,61 +1524,90 @@
                 const capasLista = Array.isArray(tipoParaRender) ? tipoParaRender : [tipoParaRender];
                 const girosLista = Array.isArray(h.giros) ? h.giros : [h.giros || 0];
 
-                // 1. CAPA VISUAL FONDO (La primera imagen)
-                const divFondo = document.createElement('div');
-                divFondo.className = 'capa-visual-fondo';
-                if (capasLista[0]) {
-                    let nombre = capasLista[0].includes('.') ? capasLista[0] : capasLista[0] + '.png';
-                    divFondo.style.backgroundImage = `url('images/${nombre}')`;
-                    const giro = (girosLista[0] || 0) * 60;
-                    if (giro !== 0) divFondo.style.transform = `rotate(${giro}deg)`;
-                }
-                div.appendChild(divFondo);
-
-                // 2. CAPA VISUAL DETALLE (Las siguientes imágenes, si las hay)
-                const divDetalle = document.createElement('div');
-                divDetalle.className = 'capa-visual-detalle';
-                // Si hay más capas, las pintamos aquí. 
-                // Podríamos crear múltiples divs dentro de detalle si hay muchas, 
-                // o simplemente usar la segunda como "detalle principal".
-                // Para ser flexible, añadiremos sub-elementos si hay más de 1 capa.
-                if (capasLista.length > 1) {
-                    for (let i = 1; i < capasLista.length; i++) {
-                        const subCapa = document.createElement('div');
-                        subCapa.style.position = 'absolute';
-                        subCapa.style.top = '0'; subCapa.style.left = '0';
-                        subCapa.style.width = '100%'; subCapa.style.height = '100%';
-                        subCapa.style.backgroundSize = 'cover';
-
-                        let nombre = capasLista[i].includes('.') ? capasLista[i] : capasLista[i] + '.png';
-                        subCapa.style.backgroundImage = `url('images/${nombre}')`;
-
+                div.innerHTML = '';
+                // Renderizar las 3 capas visuales
+                capasLista.forEach((nombrePieza, i) => {
+                    if (nombrePieza && nombrePieza !== 'vacio') {
+                        const capaDiv = document.createElement('div');
+                        capaDiv.className = i === 0 ? 'capa-visual-fondo' : 'capa-visual-detalle';
+                        
+                        let archivo = nombrePieza.includes('.') ? nombrePieza : nombrePieza + '.png';
+                        capaDiv.style.backgroundImage = `url('images/${archivo}')`;
+                        
                         const giro = (girosLista[i] || 0) * 60;
-                        if (giro !== 0) subCapa.style.transform = `rotate(${giro}deg)`;
-
-                        divDetalle.appendChild(subCapa);
+                        if (giro !== 0) capaDiv.style.transform = `rotate(${giro}deg)`;
+                        div.appendChild(capaDiv);
                     }
-                }
-                div.appendChild(divDetalle);
+                });
 
-                // 3. CAPA INTERACTIVA (Bruma, Ladrón, Clicks)
+                // NUEVA CAPA "EXTRA" CLICABLE Y EFECTOS
                 const divInteraccion = document.createElement('div');
                 divInteraccion.className = 'capa-interaccion';
-                divInteraccion.title = `F: ${h.f}, C: ${h.c}`; // Tooltip simple para debug
 
-                // Lógica para Bruma o Ladrón (PLACEHOLDERS por ahora, se activarán si el JSON lo dice)
-                if (h.tieneBruma) {
-                    divInteraccion.classList.add('bruma');
-                }
-                if (h.tieneLadron) {
-                    // Podríamos poner un icono de ladrón aquí
-                    const iconoLadron = document.createElement('div');
-                    iconoLadron.innerText = '💂'; // Icono temporal
-                    iconoLadron.style.fontSize = '30px';
-                    divInteraccion.appendChild(iconoLadron);
+                // Lógica: Si alguna capa contiene "bruma" o "ladron"
+                const tieneBruma = capasLista.some(t => t && String(t).includes('bruma'));
+                const tieneLadron = capasLista.some(t => t && String(t).includes('ladron'));
+
+                if (tieneBruma) divInteraccion.classList.add('bruma');
+                if (tieneLadron) {
+                    const icon = document.createElement('div');
+                    icon.innerHTML = '💂'; // O una imagen de ladrón
+                    icon.style.fontSize = (w * 0.4) + 'px';
+                    divInteraccion.appendChild(icon);
                 }
 
                 div.appendChild(divInteraccion);
+
+
+                // // 1. CAPA VISUAL FONDO (La primera imagen)
+                // if (capasLista[0]) {
+                //     let nombre = capasLista[0].includes('.') ? capasLista[0] : capasLista[0] + '.png';
+                //     divFondo.style.backgroundImage = `url('images/${nombre}')`;
+                //     const giro = (girosLista[0] || 0) * 60;
+                //     if (giro !== 0) divFondo.style.transform = `rotate(${giro}deg)`;
+                // }
+                // div.appendChild(divFondo);
+
+                // // 2. CAPA VISUAL DETALLE (Las siguientes imágenes, si las hay)
+                // const divDetalle = document.createElement('div');
+                // divDetalle.className = 'capa-visual-detalle';
+                // if (capasLista.length > 1) {
+                //     for (let i = 1; i < capasLista.length; i++) {
+                //         const subCapa = document.createElement('div');
+                //         subCapa.style.position = 'absolute';
+                //         subCapa.style.top = '0'; subCapa.style.left = '0';
+                //         subCapa.style.width = '100%'; subCapa.style.height = '100%';
+                //         subCapa.style.backgroundSize = 'cover';
+
+                //         let nombre = capasLista[i].includes('.') ? capasLista[i] : capasLista[i] + '.png';
+                //         subCapa.style.backgroundImage = `url('images/${nombre}')`;
+
+                //         const giro = (girosLista[i] || 0) * 60;
+                //         if (giro !== 0) subCapa.style.transform = `rotate(${giro}deg)`;
+
+                //         divDetalle.appendChild(subCapa);
+                //     }
+                // }
+                // div.appendChild(divDetalle);
+
+                // // 3. CAPA INTERACTIVA (Bruma, Ladrón, Clicks)
+                // const divInteraccion = document.createElement('div');
+                // divInteraccion.className = 'capa-interaccion';
+                // divInteraccion.title = `F: ${h.f}, C: ${h.c}`; // Tooltip simple para debug
+
+                // // Lógica para Bruma o Ladrón (PLACEHOLDERS por ahora, se activarán si el JSON lo dice)
+                // if (h.tieneBruma) {
+                //     divInteraccion.classList.add('bruma');
+                // }
+                // if (h.tieneLadron) {
+                //     // Podríamos poner un icono de ladrón aquí
+                //     const iconoLadron = document.createElement('div');
+                //     iconoLadron.innerText = '💂'; // Icono temporal
+                //     iconoLadron.style.fontSize = '30px';
+                //     divInteraccion.appendChild(iconoLadron);
+                // }
+
+                // div.appendChild(divInteraccion);
 
 
                 // Ficha numérica (siempre visualmente encima, pero en el DOM... 
@@ -1670,6 +1625,9 @@
                 }
 
                 contenedorDestino.appendChild(div);
+                if (document.body.classList.contains('modo-edicion') && nivelOrdenActivo > 0) {
+                    dibujarFichasDeOrden();
+                }
             });
         }
 

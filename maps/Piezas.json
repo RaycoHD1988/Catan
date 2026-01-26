@@ -1,580 +1,81 @@
 {
   "hexagono": [
-    {
-      "f": 0,
-      "c": 0.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 0,
-      "c": 1.5,
-      "tipo": "borde esquina",
-      "giros": [
-        5
-      ]
-    },
-    {
-      "f": 0,
-      "c": 2.5,
-      "tipo": "borde recto",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 0,
-      "c": 3.5,
-      "tipo": "borde esquina",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 0,
-      "c": 4.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 0,
-      "c": 5.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 1,
-      "c": 1,
-      "tipo": "borde recto",
-      "giros": [
-        5
-      ]
-    },
-    {
-      "f": 1,
-      "c": 2,
-      "tipo": "puerto_3_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 1,
-      "c": 3,
-      "tipo": "puerto_3_1",
-      "giros": [
-        1
-      ]
-    },
-    {
-      "f": 1,
-      "c": 4,
-      "tipo": "borde recto",
-      "giros": [
-        1
-      ]
-    },
-    {
-      "f": 1,
-      "c": 5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 2,
-      "c": 0.5,
-      "tipo": "borde esquina",
-      "giros": [
-        4
-      ]
-    },
-    {
-      "f": 2,
-      "c": 1.5,
-      "tipo": "puerto_3_1",
-      "giros": [
-        5
-      ]
-    },
-    {
-      "f": 2,
-      "c": 2.5,
-      "tipo": "agua",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 2,
-      "c": 3.5,
-      "tipo": "puerto_3_1",
-      "giros": [
-        2
-      ]
-    },
-    {
-      "f": 2,
-      "c": 4.5,
-      "tipo": "borde esquina",
-      "giros": [
-        1
-      ]
-    },
-    {
-      "f": 2,
-      "c": 5.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 3,
-      "c": 1,
-      "tipo": "borde recto",
-      "giros": [
-        4
-      ]
-    },
-    {
-      "f": 3,
-      "c": 2,
-      "tipo": "puerto_3_1",
-      "giros": [
-        4
-      ]
-    },
-    {
-      "f": 3,
-      "c": 3,
-      "tipo": "puerto_3_1",
-      "giros": [
-        3
-      ]
-    },
-    {
-      "f": 3,
-      "c": 4,
-      "tipo": "borde recto",
-      "giros": [
-        2
-      ]
-    },
-    {
-      "f": 3,
-      "c": 5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 4,
-      "c": 0.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 4,
-      "c": 1.5,
-      "tipo": "borde esquina",
-      "giros": [
-        3
-      ]
-    },
-    {
-      "f": 4,
-      "c": 2.5,
-      "tipo": "borde recto",
-      "giros": [
-        3
-      ]
-    },
-    {
-      "f": 4,
-      "c": 3.5,
-      "tipo": "borde esquina",
-      "giros": [
-        2
-      ]
-    },
-    {
-      "f": 4,
-      "c": 4.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 4,
-      "c": 5.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 5,
-      "c": 1,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 5,
-      "c": 2,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 5,
-      "c": 3,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 5,
-      "c": 4,
-      "tipo": "bosque",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 5,
-      "c": 5,
-      "tipo": "bosque",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 6,
-      "c": 0.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 6,
-      "c": 1.5,
-      "tipo": "oveja",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 6,
-      "c": 2.5,
-      "tipo": "oveja",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 6,
-      "c": 3.5,
-      "tipo": "bosque",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 6,
-      "c": 5.5,
-      "tipo": "bosque",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 7,
-      "c": 1,
-      "tipo": "oveja",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 7,
-      "c": 3,
-      "tipo": "oveja",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 7,
-      "c": 4,
-      "tipo": "bosque",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 7,
-      "c": 5,
-      "tipo": "bosque",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 8,
-      "c": 0.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 8,
-      "c": 1.5,
-      "tipo": "oveja",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 8,
-      "c": 2.5,
-      "tipo": "oveja",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 8,
-      "c": 3.5,
-      "tipo": "trigo",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 8,
-      "c": 4.5,
-      "tipo": "trigo",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 8,
-      "c": 5.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 9,
-      "c": 1,
-      "tipo": "piedra",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 9,
-      "c": 2,
-      "tipo": "piedra",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 9,
-      "c": 3,
-      "tipo": "trigo",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 9,
-      "c": 5,
-      "tipo": "trigo",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 10,
-      "c": 0.5,
-      "tipo": "piedra",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 10,
-      "c": 2.5,
-      "tipo": "piedra",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 10,
-      "c": 3.5,
-      "tipo": "trigo",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 10,
-      "c": 4.5,
-      "tipo": "trigo",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 10,
-      "c": 5.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 11,
-      "c": 1,
-      "tipo": "piedra",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 11,
-      "c": 2,
-      "tipo": "piedra",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 11,
-      "c": 3,
-      "tipo": "barro",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 11,
-      "c": 4,
-      "tipo": "barro",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 11,
-      "c": 5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 12,
-      "c": 0.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 12,
-      "c": 1.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 12,
-      "c": 2.5,
-      "tipo": "barro",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 12,
-      "c": 4.5,
-      "tipo": "barro",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 12,
-      "c": 5.5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 13,
-      "c": 1,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 13,
-      "c": 2,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 13,
-      "c": 3,
-      "tipo": "barro",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 13,
-      "c": 4,
-      "tipo": "barro",
-      "giros": [
-        0
-      ]
-    },
-    {
-      "f": 13,
-      "c": 5,
-      "tipo": "aleatorio_1",
-      "giros": [
-        0
-      ]
-    }
+    {"f": 0,"c": 0.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 0,"c": 1.5,"tipo": "borde esquina","giros": [5]},
+    {"f": 0,"c": 2.5,"tipo": "borde recto","giros": [0]},
+    {"f": 0,"c": 3.5,"tipo": "borde esquina","giros": [0]},
+    {"f": 0,"c": 4.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 0,"c": 5.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 1,"c": 1,"tipo": "borde recto","giros": [5]},
+    {"f": 1,"c": 2,"tipo": "puerto_3_1","giros": [0]},
+    {"f": 1,"c": 3,"tipo": "puerto_3_1","giros": [1]},
+    {"f": 1,"c": 4,"tipo": "borde recto","giros": [1]},
+    {"f": 1,"c": 5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 2,"c": 0.5,"tipo": "borde esquina","giros": [4]},
+    {"f": 2,"c": 1.5,"tipo": "puerto_3_1","giros": [5]},
+    {"f": 2,"c": 2.5,"tipo": "agua","giros": [0]},
+    {"f": 2,"c": 3.5,"tipo": "puerto_3_1","giros": [2]},
+    {"f": 2,"c": 4.5,"tipo": "borde esquina","giros": [1]},
+    {"f": 2,"c": 5.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 3,"c": 1,"tipo": "borde recto","giros": [4]},
+    {"f": 3,"c": 2,"tipo": "puerto_3_1","giros": [4]},
+    {"f": 3,"c": 3,"tipo": "puerto_3_1","giros": [3]},
+    {"f": 3,"c": 4,"tipo": "borde recto","giros": [2]},
+    {"f": 3,"c": 5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 4,"c": 0.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 4,"c": 1.5,"tipo": "borde esquina","giros": [3]},
+    {"f": 4,"c": 2.5,"tipo": "borde recto","giros": [3]},
+    {"f": 4,"c": 3.5,"tipo": "borde esquina","giros": [2]},
+    {"f": 4,"c": 4.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 4,"c": 5.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 5,"c": 1,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 5,"c": 2,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 5,"c": 3,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 5,"c": 4,"tipo": "puerto_2_1_madera","giros": [0]},
+    {"f": 5,"c": 5,"tipo": "puerto_2_1_madera","giros": [1]},
+    {"f": 6,"c": 0.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 6,"c": 1.5,"tipo": "puerto_2_1_oveja","giros": [0]},
+    {"f": 6,"c": 2.5,"tipo": "puerto_2_1_oveja","giros": [1]},
+    {"f": 6,"c": 3.5,"tipo": "puerto_2_1_madera","giros": [5]},
+    {"f": 6,"c": 4.5,"tipo": "bosque","giros": [0]},
+    {"f": 6,"c": 5.5,"tipo": "puerto_2_1_madera","giros": [2]},
+    {"f": 7,"c": 1,"tipo": "puerto_2_1_oveja","giros": [5]},
+    {"f": 7,"c": 2,"tipo": "oveja","giros": [0]},
+    {"f": 7,"c": 3,"tipo": "puerto_2_1_oveja","giros": [2]},
+    {"f": 7,"c": 4,"tipo": "puerto_2_1_madera","giros": [4]},
+    {"f": 7,"c": 5,"tipo": "puerto_2_1_madera","giros": [3]},
+    {"f": 8,"c": 0.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 8,"c": 1.5,"tipo": "puerto_2_1_oveja","giros": [4]},
+    {"f": 8,"c": 2.5,"tipo": "puerto_2_1_oveja","giros": [3]},
+    {"f": 8,"c": 3.5,"tipo": "puerto_2_1_trigo","giros": [0]},
+    {"f": 8,"c": 4.5,"tipo": "puerto_2_1_trigo","giros": [1]},
+    {"f": 8,"c": 5.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 9,"c": 1,"tipo": "puerto_2_1_piedra","giros": [0]},
+    {"f": 9,"c": 2,"tipo": "puerto_2_1_piedra","giros": [1]},
+    {"f": 9,"c": 3,"tipo": "puerto_2_1_trigo","giros": [5]},
+    {"f": 9,"c": 4,"tipo": "trigo","giros": [0]},
+    {"f": 9,"c": 5,"tipo": "puerto_2_1_trigo","giros": [2]},
+    {"f": 10,"c": 0.5,"tipo": "puerto_2_1_piedra","giros": [5]},
+    {"f": 10,"c": 1.5,"tipo": "piedra","giros": [0]},
+    {"f": 10,"c": 2.5,"tipo": "puerto_2_1_piedra","giros": [2]},
+    {"f": 10,"c": 3.5,"tipo": "puerto_2_1_trigo","giros": [4]},
+    {"f": 10,"c": 4.5,"tipo": "puerto_2_1_trigo","giros": [3]},
+    {"f": 10,"c": 5.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 11,"c": 1,"tipo": "puerto_2_1_piedra","giros": [4]},
+    {"f": 11,"c": 2,"tipo": "puerto_2_1_piedra","giros": [3]},
+    {"f": 11,"c": 3,"tipo": "puerto_2_1_barro","giros": [0]},
+    {"f": 11,"c": 4,"tipo": "puerto_2_1_barro","giros": [1]},
+    {"f": 11,"c": 5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 12,"c": 0.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 12,"c": 1.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 12,"c": 2.5,"tipo": "puerto_2_1_barro","giros": [5]},
+    {"f": 12,"c": 3.5,"tipo": "barro","giros": [0]},
+    {"f": 12,"c": 4.5,"tipo": "puerto_2_1_barro","giros": [2]},
+    {"f": 12,"c": 5.5,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 13,"c": 1,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 13,"c": 2,"tipo": "aleatorio_1","giros": [0]},
+    {"f": 13,"c": 3,"tipo": "puerto_2_1_barro","giros": [4]},
+    {"f": 13,"c": 4,"tipo": "puerto_2_1_barro","giros": [3]},
+    {"f": 13,"c": 5,"tipo": "aleatorio_1","giros": [0]}
   ]
 }
