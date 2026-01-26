@@ -477,9 +477,26 @@
             outline: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .modo-edicion .ficha-orden-0 { background-color: #2980b9 !important; color: black; border-color: #000; }
-        .modo-edicion .ficha-orden-1 { background-color: #f1c40f !important; color: black; border-color: #000; }
-        .modo-edicion .ficha-orden-2 { background-color: #27ae60 !important; color: black; border-color: #000; }
+        .ficha-orden-visual {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            border: 2px solid #000 !important;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            pointer-events: none; /* Para que no bloquee los clicks */
+        }        
+        .ficha-orden-1 { background-color: #2980b9 !important; color: white !important; }
+        .ficha-orden-2 { background-color: #f1c40f !important; color: black !important; }
+        .ficha-orden-3 { background-color: #27ae60 !important; color: white !important; }
 
     
         .btn-orden-selector {
@@ -523,6 +540,13 @@
 
         .pintando {
             cursor: crosshair !important;
+        }
+        .modo-edicion #tablero.pintando .hex {
+            cursor: copy !important;
+        }
+        .modo-edicion #tablero.pintando .hex:hover {
+            outline: 2px solid #f1c40f;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -718,18 +742,15 @@
                 numeros: (mapa_original && mapa_original.numeros) ? mapa_original.numeros : {}
             };
 
-            mapa_visual = mapa_original; // Visual points to the editable grid
+            mapa_visual = mapa_original;
             renderizarMapa(mapa_visual, tablero);
-            actualizarEventosPintado(); // Updates clicks on mapa_visual
             actualizarUIOrdenes();
             actualizarUIRecursosAleatorios();
 
-            // 6. Render Palette using generic loader
             document.getElementById('menu-piezas-creador').style.display = 'block';
             await cargarMapa("Piezas.json", document.getElementById('contenedor-mapa-piezas'), esJuego = false);
         }
 
-        // IMPLEMENTACIÓN DE CARGA DE ARCHIVOS
         function cargarMapaDesdeArchivo(input) {
             const file = input.files[0];
             if (!file) return;
@@ -770,17 +791,14 @@
             }
 
             aleatoriosEnUso.forEach(nombreBolsa => {
-                // Recuperar config previa si existe (del mapa cargado o de la sesión)
                 let configActual = { tipos: ["bosque"], cantidades: [0] };
 
-                // Si ya tenemos en memoria local
                 if (configRecursosAleatorios[nombreBolsa]) {
                     configActual = configRecursosAleatorios[nombreBolsa];
                 }
-                // Si no, mirar en mapa_original (si cargamos uno)
                 else if (mapa_original && mapa_original.recursos && mapa_original.recursos[nombreBolsa]) {
                     configActual = mapa_original.recursos[nombreBolsa];
-                    configRecursosAleatorios[nombreBolsa] = configActual; // Sync global
+                    configRecursosAleatorios[nombreBolsa] = configActual;
                 }
 
                 const div = document.createElement('div');
@@ -795,7 +813,6 @@
                 label.style.color = '#3498db';
                 div.appendChild(label);
 
-                // Input para Tipos (completar)
                 const inputTipos = document.createElement('input');
                 inputTipos.placeholder = 'Tipos (ej: bosque,trigo)';
                 inputTipos.value = configActual.tipos.join(',');
@@ -805,7 +822,6 @@
                 inputTipos.style.border = '1px solid #555';
                 inputTipos.style.color = 'white';
 
-                // Input para Cantidades
                 const inputCantidades = document.createElement('input');
                 inputCantidades.placeholder = 'Cantidades (ej: 4,5)';
                 inputCantidades.value = configActual.cantidades.join(',');
@@ -814,7 +830,6 @@
                 inputCantidades.style.border = '1px solid #555';
                 inputCantidades.style.color = 'white';
 
-                // Guardar cambios
                 const guardar = () => {
                     const tipos = inputTipos.value.split(',').map(s => s.trim()).filter(s => s);
                     const cants = inputCantidades.value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
@@ -831,12 +846,7 @@
 
 
         function jugarMapaActual() {
-            // CONVERTIR EDITABLE A JUGABLE
-            // 1. Filtrar vacíos
             const hexsReales = mapa_visual.hexagono.filter(h => h.tipo !== 'vacio');
-
-            // 2. Construir objeto mapa
-            // Construir objeto de números final
             const numerosFinales = {};
             Object.keys(configNumerosOrdenes).forEach(k => {
                 numerosFinales[k] = {
@@ -845,11 +855,7 @@
                 };
             });
 
-            // GESTION DE RECURSOS FINAL
-            // Usamos configRecursosAleatorios como fuente de verdad
             const recursosFinales = {};
-
-            // Recorrer hexs para ver qué se necesita
             hexsReales.forEach(h => {
                 const tipo = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
                 if (tipo.startsWith('aleatorio_')) {
@@ -858,7 +864,6 @@
                     } else if (mapa_original && mapa_original.recursos && mapa_original.recursos[tipo]) {
                         recursosFinales[tipo] = JSON.parse(JSON.stringify(mapa_original.recursos[tipo]));
                     } else {
-                        // Default dummy
                         recursosFinales[tipo] = { tipos: ["bosque"], cantidades: [1] };
                     }
                 }
@@ -871,30 +876,20 @@
                 recursos: recursosFinales,
                 numeros: numerosFinales
             };
-
-            // Preservar lógica de recursos aleatorios y números si existen en los hexs
-            // (La lógica de `descargarJSONCreado` ya hace esto bien, podríamos reutilizarla o extraerla)
-            // Por simplicidad, usaremos la estructura actual de los hexs que ya tienen 'orden_x', etc.
-
-            // 3. Modificamos mapa_original global
             mapa_original = nuevoMapa;
 
-            // 4. Salir de modo creador
             document.body.classList.remove('modo-edicion');
             document.getElementById('menu-creador').classList.remove('abierto');
             document.getElementById('menu-piezas-creador').style.display = 'none';
             document.getElementById('tablero').classList.remove('pintando');
 
-            // 5. Procesar y Jugar
             mapa_visual = procesarConfiguracion(structuredClone(mapa_original));
             renderizarMapa(mapa_visual, tablero);
             inicializarDadosSegunMapa(mapa_visual);
 
-            // Re-render con nuevo zoom
             renderizarMapa(mapa_visual, tablero);
         }
 
-        // Reemplazo de abrirSubmenu para aceptar anchor optional
         function abrirSubmenu(tipo, anchorElement) {
             const submenu = document.getElementById('submenu-giros');
             const overlay = document.getElementById('overlay-editor');
@@ -969,6 +964,7 @@
 
         function actualizarUIOrdenes() {
             const container = document.getElementById('contenedor-gestor-ordenes');
+            if (!container) return;
             container.innerHTML = '<h3 style="font-size:1em; color:#ccc; margin-bottom:15px;">Fichas por Orden</h3>';
 
             for (let i = 1; i <= 3; i++) {
@@ -1009,44 +1005,37 @@
         }
 
         function seleccionarNivelOrden(nivel) {
-            // Si pulsamos el que ya está activo, lo desactivamos
-            if (nivelOrdenActivo === nivel) {
-                nivelOrdenActivo = 0;
-            } else {
-                nivelOrdenActivo = nivel;
-                piezaSeleccionada = null; // Desactivar otros pinceles
-            }
-            
+            nivelOrdenActivo = (nivelOrdenActivo === nivel) ? 0 : nivel;
             actualizarUIOrdenes();
-            document.getElementById('tablero').classList.toggle('pintando', nivelOrdenActivo !== 0);
-            
-            // IMPORTANTE: Dibujamos las fichas actuales en el mapa para ver el progreso
+            const tablero = document.getElementById('tablero');
+            if (tablero) {
+                tablero.classList.toggle('pintando', nivelOrdenActivo !== 0);
+            }
             dibujarFichasDeOrden();
         }
 
         function dibujarFichasDeOrden() {
-            const hexsEnPantalla = document.querySelectorAll('#tablero .hex');
+            document.querySelectorAll('.ficha-orden-visual').forEach(f => f.remove());
             
-            hexsEnPantalla.forEach((div, index) => {
-                const h = mapa_visual.hexagono[index];
-                // Limpiamos fichas previas de edición para no duplicar
-                const fichaPrevia = div.querySelector('.numero-ficha');
-                if (fichaPrevia) fichaPrevia.remove();
+            if (!document.body.classList.contains('modo-edicion')) return;
 
-                // Si no estamos en modo orden, no dibujamos nada extra (limpieza)
-                if (nivelOrdenActivo === 0) return;
-
-                // Buscamos si este hexágono tiene algún orden asignado (1, 2 o 3)
-                for (let i = 1; i <= 3; i++) {
-                    const valOrden = h[`orden_${i}`];
-                    if (valOrden) {
-                        const ficha = document.createElement('div');
-                        ficha.className = `numero-ficha ficha-orden-${i}`;
-                        ficha.innerText = valOrden;
-                        ficha.style.pointerEvents = 'none';
-                        div.appendChild(ficha);
+            mapa_visual.hexagono.forEach(h => {
+                [1, 2, 3].forEach(nivel => {
+                    const valor = h[`orden_${nivel}`];
+                    if (valor && valor > 0) {
+                        const idHex = `hex_${h.f}_${h.c.toString().replace('.', '_')}`;
+                        const divHex = document.getElementById(idHex);
+                        
+                        if (divHex) {
+                            const ficha = document.createElement('div');
+                            ficha.className = `numero-ficha ficha-orden-visual ficha-orden-${nivel}`;
+                            ficha.innerText = valor;
+                            ficha.style.zIndex = 150; 
+                            ficha.style.pointerEvents = "none";
+                            divHex.appendChild(ficha);
+                        }
                     }
-                }
+                });
             });
         }
 
@@ -1054,31 +1043,31 @@
             const hexsEnPantalla = document.querySelectorAll('#tablero .hex');
             hexsEnPantalla.forEach((div, index) => {
                 div.onclick = (e) => {
-                    
+                    let h = mapa_visual.hexagono[index];
                     if (nivelOrdenActivo > 0) {
                         const prop = `orden_${nivelOrdenActivo}`;
                         
                         // Si el hexágono ya tiene ESTE mismo orden, lo quitamos (borrar)
-                        if (mapa_visual.hexagono[index][prop]) {
-                            delete mapa_visual.hexagono[index][prop];
+                        if (h[prop]) {
+                            delete h[prop];
                         } else {
-                            // Si no, calculamos el siguiente número correlativo para este orden
-                            const maxActual = mapa_visual.hexagono.reduce((max, h) => Math.max(max, h[prop] || 0), 0);
-                            mapa_visual.hexagono[index][prop] = maxActual + 1;
+                            delete h.orden_1;
+                            delete h.orden_2;
+                            delete h.orden_3;
+
+                            const maxActual = mapa_visual.hexagono.reduce((max, hex) => Math.max(max, hex[prop] || 0), 0);
+                            h[prop] = maxActual + 1;
                         }
                         
-                        // Refrescamos visualmente las fichas
+                        // Refrescamos visualmente las fichas de orden
                         dibujarFichasDeOrden();
                     } else if (piezaSeleccionada) {
-
-                        let h = mapa_visual.hexagono[index];
-                        // Asegurar que existan las 3 capas en el objeto
+                        // ... (el resto de tu lógica de pintado de terrenos se mantiene igual)
                         if (!Array.isArray(h.tipo)) {
                             h.tipo = [h.tipo || 'vacio', null, null];
                             h.giros = [Array.isArray(h.giros) ? h.giros[0] : (h.giros || 0), 0, 0];
                         }
 
-                        // Guardar en la capaActiva (0, 1 o 2)
                         if (h.tipo[capaActiva] === piezaSeleccionada) {
                             h.tipo[capaActiva] = (capaActiva === 0) ? 'vacio' : null;
                             h.giros[capaActiva] = 0;
@@ -1163,7 +1152,6 @@
             };
 
             const r = rotaciones[valor];
-            // Sumamos la rotación base (las vueltas completas) para que el giro sea fluido
             cubo.style.transform = `translateZ(-25px) rotateX(${r.x + rotacionBase}deg) rotateY(${r.y + rotacionBase}deg)`;
         }
         function lanzarGrupo(idBoton) {
@@ -1172,7 +1160,6 @@
             let sumaNumerica = 0;
             let esTiradaNumerica = false;
 
-            // 1. Limpiar iluminación previa inmediatamente al lanzar
             document.querySelectorAll('.hex').forEach(h => h.classList.remove('iluminado'));
 
             btnConfig.dados.forEach((dado, idx) => {
@@ -1187,17 +1174,13 @@
                 }
             });
             if (esTiradaNumerica) {
-                // Esperamos a que la animación de los dados (1s) termine
                 setTimeout(() => {
                     const display = document.getElementById('resultado-suma');
                     display.innerText = sumaNumerica;
                     display.style.color = (sumaNumerica === 7) ? '#ff4d4d' : '#f1c40f';
-
-                    // 2. BUSCAR E ILUMINAR: Ahora que tenemos la suma final
                     const hexs = document.querySelectorAll('.hex');
                     hexs.forEach(div => {
                         const ficha = div.querySelector('.numero-ficha');
-                        // Comparación estricta del número
                         if (ficha && parseInt(ficha.innerText) === sumaNumerica) {
                             div.classList.add('iluminado');
                         }
@@ -1208,7 +1191,6 @@
 
         function descargarJSONCreado() {
             try {
-                // 1. Filtrar solo los hexágonos que no están vacíos
                 if (!mapa_visual || !mapa_visual.hexagono) {
                     throw new Error("No hay datos de mapa para exportar.");
                 }
@@ -1222,8 +1204,6 @@
 
                 const recursosDinamicos = {};
                 const numerosDinamicos = {};
-
-                // 2. Mapear los hexágonos y detectar dinámicamente cuántos órdenes existen
                 const hexagonosParaExportar = hexagonosActivos.map(h => {
                     const hexExport = {
                         f: h.f,
@@ -1232,7 +1212,6 @@
                         giros: h.giros || [0]
                     };
 
-                    // Gestionar Recursos Aleatorios (bolsas)
                     if (typeof h.tipo === 'string' && h.tipo.startsWith('aleatorio_')) {
                         const bolsaNombre = h.tipo;
                         if (!recursosDinamicos[bolsaNombre]) {
@@ -1241,13 +1220,11 @@
                             } else if (mapa_original && mapa_original.recursos && mapa_original.recursos[bolsaNombre]) {
                                 recursosDinamicos[bolsaNombre] = mapa_original.recursos[bolsaNombre];
                             } else {
-                                // Default
                                 recursosDinamicos[bolsaNombre] = { tipos: ["bosque"], cantidades: [1] };
                             }
                         }
                     }
 
-                    // Gestionar TODOS los órdenes
                     Object.keys(h).forEach(prop => {
                         if (prop.startsWith('orden_')) {
                             hexExport[prop] = h[prop];
@@ -1339,11 +1316,9 @@
         }
         async function cargarMapa(nombreMapa, contenedor = document.getElementById('tablero'), esJuego = true) {
             try {
-                // Remove editing cursor if loading into main board
                 if (esJuego) {
                     document.body.classList.remove('modo-edicion');
                     document.getElementById('tablero').classList.remove('pintando');
-                    // Restauramos el tamaño de los hexágonos al valor del input de calibración
                     let pxGuardados = document.getElementById('input-calibracion-px').value;
                     document.documentElement.style.setProperty('--hex_wpx', pxGuardados + 'px');
                 }
@@ -1355,17 +1330,14 @@
                 const json = await respuesta.json();
 
                 if (esJuego) {
-                    // 1. Guardamos el Original
-                    mapa_original = structuredClone(json); // Copia profunda
+                    mapa_original = structuredClone(json);
 
-                    // 2. Procesamos para crear el Visual
                     mapa_visual = procesarConfiguracion(structuredClone(json));
 
                     renderizarMapa(mapa_visual, contenedor);
                     inicializarDadosSegunMapa(mapa_visual);
                     toggleMenu();
                 } else {
-                    // MODO PALETA / GENERIC LOAD
                     let dataToRender = json;
                     let hexs = json.hexagono || [];
 
@@ -1386,7 +1358,6 @@
 
                     renderizarMapa(dataToRender, contenedor);
 
-                    // Si es la paleta, añadimos los eventos de click especiales
                     if (contenedor.id === 'contenedor-mapa-piezas') {
                         const hexs = contenedor.querySelectorAll('.hex');
                         hexs.forEach(div => {
@@ -1406,7 +1377,7 @@
                                     div.style.zIndex = '1000';
 
                                     document.getElementById('tablero').classList.add('pintando');
-                                    nivelOrdenActivo = 0; // Desactivar pincel de números
+                                    nivelOrdenActivo = 0;
                                     actualizarUIOrdenes();
                                 }
                             };
@@ -1416,7 +1387,6 @@
 
             } catch (e) {
                 console.error("Error cargando el JSON:", e);
-                // alert(`Error: Asegúrate de que el archivo JSON existe: ${nombreMapa}`);
             }
         }
 
@@ -1430,7 +1400,6 @@
                 }
             });
 
-            // --- 1. PREPARAR BOLSAS DE RECURSOS Y LAS ASIGNAMOS---
             for (const key in maps.recursos) {
                 let bolsa = [];
                 const r = maps.recursos[key];
@@ -1438,22 +1407,16 @@
                     for (let c = 0; c < r.cantidades[i]; c++) bolsa.push(tipo);
                 });
 
-                // Mezclamos la bolsa
                 bolsa = bolsa.sort(() => Math.random() - 0.5);
 
-                // Asignamos tipos a hexágonos que usan esta bolsa
                 maps.hexagono.filter(h => Array.isArray(h.tipo) && h.tipo.includes(key)).forEach((h, index) => {
                     if (bolsa[index]) {
-                        // Reemplazamos "aleatorio_1" por el recurso real (ej: "bosque")
                         h.tipoReal = h.tipo.map(t => t === key ? bolsa[index] : t);
                     }
                 });
             }
 
-            // --- 2. ASIGNAR NÚMEROS POR ÓRDENES ---
-            // Procesamos cada grupo de orden (orden_1, orden_2...)
-
-            if (maps.numeros) { // Si no hay números, salimos
+            if (maps.numeros) { 
                 for (const ordenKey in maps.numeros) {
                     const infoOrden = maps.numeros[ordenKey];
                     let listaNumeros = [...infoOrden.valores];
@@ -1466,7 +1429,7 @@
                     const hexsValidos = maps.hexagono
                         .filter(h => {
                             const tipoActual = h.tipoReal || h.tipo;
-                            const nombreTipo = Array.isArray(tipoActual) ? tipoActual[0] : tipoActual;
+                            const nombreTipo = String(Array.isArray(tipoActual) ? tipoActual[0] : tipoActual);
                             return h[ordenKey] > 0 && !terrenosSinNumero.includes(nombreTipo);
                         })
                         .sort((a, b) => a[ordenKey] - b[ordenKey]);
@@ -1494,7 +1457,7 @@
             } else if (document.body.classList.contains('modo-edicion')) {
                 w = 35;
             } else {
-                w = parseInt(contenedorDestino.style.getPropertyValue('--hex_wpx')) || parseInt(document.getElementById('input-calibracion-px').value) || 100;
+                w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx')) || 100;
             }
 
             const totalW = ((maxC - minC) * w) + w;
@@ -1505,27 +1468,53 @@
             maps.hexagono.forEach(h => {
                 const div = document.createElement('div');
                 div.className = 'hex';
+                div.id = `hex_${h.f}_${h.c.toString().replace('.', '_')}`;
                 div.dataset.tipo = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
                 div.dataset.giros = JSON.stringify(h.giros || [0]);
-
+                div.onclick = () => {
+                    if (nivelOrdenActivo > 0) {
+                        const prop = `orden_${nivelOrdenActivo}`;
+                        if (h[prop]) {
+                            delete h[prop];
+                        } else {
+                            delete h.orden_1; delete h.orden_2; delete h.orden_3;
+                            const maxActual = maps.hexagono.reduce((max, hex) => Math.max(max, hex[prop] || 0), 0);
+                            h[prop] = maxActual + 1;
+                        }
+                        dibujarFichasDeOrden();
+                    } else if (piezaSeleccionada && document.body.classList.contains('modo-edicion')) {
+                        if (!Array.isArray(h.tipo)) {
+                            h.tipo = [h.tipo || 'vacio', null, null];
+                            h.giros = [Array.isArray(h.giros) ? h.giros[0] : (h.giros || 0), 0, 0];
+                        }
+                        if (h.tipo[capaActiva] === piezaSeleccionada) {
+                            h.tipo[capaActiva] = (capaActiva === 0) ? 'vacio' : null;
+                            h.giros[capaActiva] = 0;
+                        } else {
+                            h.tipo[capaActiva] = piezaSeleccionada;
+                            h.giros[capaActiva] = giroSeleccionado;
+                        }
+                        renderizarMapa(maps, contenedorDestino);
+                    } else if (contenedorDestino.id === 'contenedor-mapa-piezas') {
+                        // Lógica de la paleta
+                        piezaSeleccionada = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
+                        giroSeleccionado = (h.giros && h.giros[0]) || 0;
+                        document.getElementById('tablero').classList.add('pintando');
+                    }
+                };
                 div.style.top = `calc((${h.f} - ${minF}) * ${w * 1.1547 * 0.75}px)`;
                 div.style.left = `calc((${h.c} - ${minC}) * ${w}px)`;
 
-                // NOTA IMPORTANTE: Si estamos en el editor de piezas (palette), sobreescribimos tamaño
                 if (contenedorDestino.id === 'contenedor-mapa-piezas') {
                     div.style.width = w + 'px';
                     div.style.height = (w * 1.1547) + 'px';
                 }
 
-                // --- GESTION DE CAPAS VISUALES ---
-                // Interpretamos 'h.tipoReal' o 'h.tipo' como capas. 
-                // Si es array: [fondo, detalle...]. Si es string: [fondo]
                 const tipoParaRender = h.tipoReal || h.tipo;
                 const capasLista = Array.isArray(tipoParaRender) ? tipoParaRender : [tipoParaRender];
                 const girosLista = Array.isArray(h.giros) ? h.giros : [h.giros || 0];
 
                 div.innerHTML = '';
-                // Renderizar las 3 capas visuales
                 capasLista.forEach((nombrePieza, i) => {
                     if (nombrePieza && nombrePieza !== 'vacio') {
                         const capaDiv = document.createElement('div');
@@ -1557,75 +1546,17 @@
                 }
 
                 div.appendChild(divInteraccion);
-
-
-                // // 1. CAPA VISUAL FONDO (La primera imagen)
-                // if (capasLista[0]) {
-                //     let nombre = capasLista[0].includes('.') ? capasLista[0] : capasLista[0] + '.png';
-                //     divFondo.style.backgroundImage = `url('images/${nombre}')`;
-                //     const giro = (girosLista[0] || 0) * 60;
-                //     if (giro !== 0) divFondo.style.transform = `rotate(${giro}deg)`;
-                // }
-                // div.appendChild(divFondo);
-
-                // // 2. CAPA VISUAL DETALLE (Las siguientes imágenes, si las hay)
-                // const divDetalle = document.createElement('div');
-                // divDetalle.className = 'capa-visual-detalle';
-                // if (capasLista.length > 1) {
-                //     for (let i = 1; i < capasLista.length; i++) {
-                //         const subCapa = document.createElement('div');
-                //         subCapa.style.position = 'absolute';
-                //         subCapa.style.top = '0'; subCapa.style.left = '0';
-                //         subCapa.style.width = '100%'; subCapa.style.height = '100%';
-                //         subCapa.style.backgroundSize = 'cover';
-
-                //         let nombre = capasLista[i].includes('.') ? capasLista[i] : capasLista[i] + '.png';
-                //         subCapa.style.backgroundImage = `url('images/${nombre}')`;
-
-                //         const giro = (girosLista[i] || 0) * 60;
-                //         if (giro !== 0) subCapa.style.transform = `rotate(${giro}deg)`;
-
-                //         divDetalle.appendChild(subCapa);
-                //     }
-                // }
-                // div.appendChild(divDetalle);
-
-                // // 3. CAPA INTERACTIVA (Bruma, Ladrón, Clicks)
-                // const divInteraccion = document.createElement('div');
-                // divInteraccion.className = 'capa-interaccion';
-                // divInteraccion.title = `F: ${h.f}, C: ${h.c}`; // Tooltip simple para debug
-
-                // // Lógica para Bruma o Ladrón (PLACEHOLDERS por ahora, se activarán si el JSON lo dice)
-                // if (h.tieneBruma) {
-                //     divInteraccion.classList.add('bruma');
-                // }
-                // if (h.tieneLadron) {
-                //     // Podríamos poner un icono de ladrón aquí
-                //     const iconoLadron = document.createElement('div');
-                //     iconoLadron.innerText = '💂'; // Icono temporal
-                //     iconoLadron.style.fontSize = '30px';
-                //     divInteraccion.appendChild(iconoLadron);
-                // }
-
-                // div.appendChild(divInteraccion);
-
-
-                // Ficha numérica (siempre visualmente encima, pero en el DOM... 
-                // ¿debe tapar la interacción? No, la ficha suele ser "visual". 
-                // Pero si está encima de la capa interacción, bloqueará clicks.
-                // Solución: pointer-events: none en la ficha, o ponerla DEBAJO de interacción si la interacción es invisible.
-                // Dejémosla al final con z-index alto, y si molesta al click, le ponemos pointer-events: none)
                 if (h.numeroFinal) {
                     const ficha = document.createElement('div');
                     ficha.className = 'numero-ficha' + (h.numeroFinal === 6 || h.numeroFinal === 8 ? ' rojo' : '');
-                    ficha.style.zIndex = 50; // Encima de casi todo visualmente
-                    ficha.style.pointerEvents = 'none'; // Para que no bloquee clicks en la capa de interacción
+                    ficha.style.zIndex = 50; 
+                    ficha.style.pointerEvents = 'none';
                     ficha.innerText = h.numeroFinal;
                     div.appendChild(ficha);
                 }
 
                 contenedorDestino.appendChild(div);
-                if (document.body.classList.contains('modo-edicion') && nivelOrdenActivo > 0) {
+                if (document.body.classList.contains('modo-edicion')) {
                     dibujarFichasDeOrden();
                 }
             });
