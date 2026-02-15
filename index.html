@@ -1,3 +1,12 @@
+<!-- 
+Falta los dados, los recursos aleatorios en el modo creador. 
+Además, al cargar un mapa en modo creador, no se renderiza ni se muestran los dados. 
+Al guardar el mapa, no se guardan las configuraciones de dados ni los recursos aleatorios.
+Al cargar un mapa en modo creador, no se cargan los ordenes de los números ni los recursos aleatorios.
+-->
+
+
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -7,7 +16,7 @@
     <style>
         :root {
             --linea-hex: #000000;
-            --hex_wpx: 100px;
+            --hex_wpx: 99px;
         }
 
         body {
@@ -210,6 +219,52 @@
             opacity: 1;
         }
 
+        .filtro-jugadores {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+            margin-bottom: 15px;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+        }
+
+        .btn-filtro {
+            flex: 1;
+            padding: 8px 0;
+            border: none;
+            background: transparent;
+            color: #888;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 0.8em;
+        }
+
+        .btn-filtro.activo {
+            background: #f1c40f;
+            color: #000;
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.3);
+        }
+
+        /* Contenedor de lista con scroll fino */
+        #lista-mapas-dinamica {
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 5px;
+        }
+
+        #lista-mapas-dinamica::-webkit-scrollbar {
+            width: 4px;
+        }
+        #lista-mapas-dinamica::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
         .btn-cerrar-piezas {
             position: absolute;
             top: 10px;
@@ -229,15 +284,15 @@
 
         #menu-piezas-creador {
             position: fixed;
-            left: 20px;
-            top: 80px;
-            bottom: 20px;
-            width: 350px;
+            left: 10px;
+            top: 10px;
+            width: 250px;
+            height:420px;
             background: rgba(20, 20, 20, 0.95);
             backdrop-filter: blur(10px);
             border: 2px solid #444;
             border-radius: 15px;
-            z-index: 10000;
+            z-index: 100;
             display: none;
             overflow-y: auto;
             overflow-x: hidden;
@@ -271,7 +326,6 @@
             position: relative;
             width: 100%;
             min-width: 100%;
-            min-height: 1000px; 
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             margin-top: 40px;
@@ -366,12 +420,6 @@
             justify-content: center;
         }
 
-        .bruma {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(4px);
-            transition: all 0.3s;
-        }
-
         .capa-interaccion:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
@@ -409,22 +457,6 @@
             border-color: white;
             box-shadow: 0 0 10px white;
             transform: scale(1.2);
-        }
-
-        #submenu-giros {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(20, 20, 20, 0.95);
-            border: 2px solid #f1c40f;
-            padding: 20px;
-            border-radius: 15px;
-            display: none;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            z-index: 2000;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
         }
 
         .opcion-giro {
@@ -482,8 +514,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
+            width: 15px;
+            height: 15px;
             border: 2px solid #000 !important;
             border-radius: 50%;
             display: flex;
@@ -534,8 +566,8 @@
         }
 
         .pincel-opcion.activo {
-            border: 2px solid #f1c40f;
             transform: scale(1.1);
+            border: 2px solid #f1c40f;
         }
 
         .pintando {
@@ -576,61 +608,51 @@
     <div id="menu-creador">
         <h2 style="color: #e67e22; border-bottom: 1px solid #eba166; padding-bottom: 5px;">🛠️ Editor</h2>
 
-        <div class="input-group" style="margin-bottom: 5px;">
-            <label style="display: block; font-size: 0.8em; margin-bottom: 5px; color: #ccc;">Nombre del Mapa</label>
-            <input type="text" id="input-nombre-mapa" value="Mapa Nuevo"
-                style="width: 100%; padding: 10px; background: transparent; border: 1px solid #666; color: white; border-radius: 5px;">
-        </div>
-
-        <div id="selector-capas" style="margin-bottom: 20px; border-top: 1px solid #444; padding-top: 10px;">
-            <label style="display: block; font-size: 0.8em; margin-bottom: 10px; color: #ccc;">Capa de Trabajo</label>
-            <div style="display: flex; gap: 5px;">
-                <button id="btn-capa-0" class="btn" style="background: #2980b9; flex: 1;" onclick="seleccionarCapa(0)">Capa 1</button>
-                <button id="btn-capa-1" class="btn" style="background: #444; flex: 1;" onclick="seleccionarCapa(1)">Capa 2</button>
-                <button id="btn-capa-2" class="btn" style="background: #444; flex: 1;" onclick="seleccionarCapa(2)">Capa 3</button>
-            </div>
-        </div>
-
-        <button class="btn" style="background: #27ae60;" onclick="jugarMapaActual()">🎮 Jugar este Mapa</button>
-
-        <div id="contenedor-gestor-ordenes" style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px;">
-        </div>
-
-        <div style="margin-top: auto;">
+        <div style="margin-top: 10;">
             <hr style="border-color: #444; width: 100%;">
-            <label style="display: block; font-size: 0.8em; margin-bottom: 5px; color: #ccc;">Importar /
-                Exportar</label>
-            <button class="btn" style="background: #34495e;" onclick="document.getElementById('file-upload').click()">📂
-                Cargar JSON</button>
-            <input type="file" id="file-upload" accept=".json" style="display: none;"
-                onchange="cargarMapaDesdeArchivo(this)">
-            <button class="btn" style="background: #2980b9;" onclick="descargarJSONCreado()">💾 Descargar JSON</button>
+            <button class="btn" style="background: #27ae60;" onclick="jugarMapaActual()">🎮 Jugar este Mapa</button>
+            <button class="btn" style="background: #c0392b;" onclick="confirmarNuevoMapa()">🆕 Crear nuevo mapa</button>
+            <button class="btn" style="background: #34495e;" onclick="document.getElementById('file-upload').click()">📂 Cargar Mapa</button>
+            <input type="file" id="file-upload" accept=".json" style="display: none;" onchange="cargarMapaDesdeArchivo(this)">
+            <button class="btn" style="background: #2980b9;" onclick="descargarMapaCreado()">💾 Descargar Mapa</button>
+        </div>
+
+        
+        <div style="margin-top: 10;border-top: 1px solid #444; padding-top: 10px;">
+            <label style="display: block; font-size: 1.5em; margin-bottom: 5px; color: #ccc;">Zona de trabajo</label>
+            <div class="input-group" style="margin-bottom: 5px;">
+                <label style="display: block; font-size: 0.8em; margin-bottom: 5px; color: #ccc;">Nombre del Mapa</label>
+                <input type="text" id="input-nombre-mapa" value="Mapa Nuevo"
+                    style="width: 100%; padding: 10px; background: transparent; border: 1px solid #666; color: white; border-radius: 5px;">
+            </div>
+            <div id="contenedor-gestor-ordenes"></div>
         </div>
     </div>
 
     <div id="menu-lateral">
         <h2 style="margin-top: 40px; border-bottom: 1px solid #444;">Catan TV</h2>
-
         <div class="seccion-colapsable activa">
             <div class="cabecera-seccion" onclick="toggleSeccion(this)">🗺️ Seleccionar Mapa</div>
             <div class="contenido-seccion">
-                <button class="btn" style="background: #d35400; font-weight: bold; border-left: 5px solid #e67e22;"
-                    onclick="activarModoCreador()">🎨 Modo Creador</button>
+                <button class="btn" style="background: #d35400; font-weight: bold; border-left: 5px solid #e67e22;" onclick="activarModoCreador()">🎨 Modo Creador</button>
                 <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
-                <button class="btn" onclick="cargarMapa('Catan básico (3-4).json')">Catan básico (3-4)</button>
-                <button class="btn" onclick="cargarMapa('Catan básico (5-6).json')">Catan básico (5-6)</button>
-                <button class="btn" onclick="cargarMapa('Rumbo a nuevas orillas (3-4).json')">Rumbo a nuevas orillas
-                    (3-4)</button>
-                <button class="btn" onclick="cargarMapa('Ataque de los bárbaros (3-4).json')">Ataque de los bárbaros
-                    (3-4)</button>
+                <button class="btn" style="background: #34495e;" onclick="document.getElementById('file-upload').click()">📂 Cargar Mapa</button>
+                <input type="file" id="file-upload" accept=".json" style="display: none;" onchange="cargarMapaDesdeArchivo(this)">
+                <div class="filtro-jugadores">
+                    <button class="btn-filtro activo" onclick="filtrarMapas(this, 'todos')">ALL</button>
+                    <button class="btn-filtro" onclick="filtrarMapas(this, '3')">3J</button>
+                    <button class="btn-filtro" onclick="filtrarMapas(this, '4')">4J</button>
+                    <button class="btn-filtro" onclick="filtrarMapas(this, '5')">5J</button>
+                    <button class="btn-filtro" onclick="filtrarMapas(this, '6')">6J</button>
+                </div>
+                <div id="lista-mapas-dinamica"></div>
             </div>
         </div>
 
         <div class="seccion-colapsable">
             <div class="cabecera-seccion" onclick="toggleSeccion(this)">📏 Tamaño Hexagono</div>
             <div class="contenido-seccion">
-                <p style="font-size: 0.8em; color: #888; margin-bottom: 10px;">
-                </p>
+                <p style="font-size: 0.8em; color: #888; margin-bottom: 10px;"></p>
                 <div
                     style="display: flex; align-items: center; justify-content: center; gap: 5px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
                     <button class="btn" style="width: 40px; margin:0; background: #e74c3c;"
@@ -651,46 +673,41 @@
     <div class="contenedor-tablero">
         <div id="tablero"></div>
     </div>
-    <div id="overlay-editor" class="overlay-giro" onclick="cerrarSubmenu()"></div>
-    <div id="submenu-giros"></div>
 
     <!-- ----------------------------------------------------------------------------------------------------- -->
 
     <script>
+        let pantallaActual = "Juego";
         const terrenosSinNumero = ['vacio', 'agua', 'desierto', 'puerto_comercial', 'oasis', 'puerto_2_1_madera', 'puerto_2_1_barro', 'puerto_2_1_oveja', 'puerto_2_1_trigo', 'puerto_2_1_piedra', 'puerto_3_1', 'borde recto', 'borde esquina'];
         const tablero = document.getElementById('tablero');
         const menu = document.getElementById('menu-lateral');
+        const bibliotecaMapas = [
+            { nombre: "Catan básico", archivo: "Catan básico (3-4).json", jugadores: ["3", "4"] },
+            { nombre: "Catan básico", archivo: "Catan básico (5-6).json", jugadores: ["5", "6"] },
+            { nombre: "Nav:Rumbo a nuevas orillas", archivo: "Rumbo a nuevas orillas (3).json", jugadores: ["3"] },
+            { nombre: "Nav:Rumbo a nuevas orillas", archivo: "Rumbo a nuevas orillas (4).json", jugadores: ["4"] },
+            { nombre: "Nav:Las cuatro islas", archivo: "Las cuatro islas (3).json", jugadores: ["3"] },
+            { nombre: "Nav:Las cuatro islas", archivo: "Las cuatro islas (4).json", jugadores: ["4"] },
+            { nombre: "Mer:Ataque Bárbaro", archivo: "Ataque de los bárbaros (3-4).json", jugadores: ["3", "4"] },
+            { nombre: "Mer:Ataque Bárbaro", archivo: "Ataque de los bárbaros (5-6).json", jugadores: ["5", "6"] },
+            // Añade aquí todos los que quieras...
+        ];
 
-        // NUEVA ESTRUCTURA DE VARIABLES
-        let mapa_original = null; // El JSON crudo sin modificar
-        let mapa_visual = null; // El estado actual procesado (fichas fijadas, etc)
-        let configNumerosOrdenes = {}; // Almacena los arrays de números para cada orden
-        let configRecursosAleatorios = {}; // Almacena qué recursos salen de cada bolsa de aleatorios
+        let mapa_original = null;
+        let mapa_visual = null;
+        let configNumerosOrdenes = {};
+        let configRecursosAleatorios = {};
 
-        let capaActiva = 0; // Por defecto Capa 1 (índice 0)
-        let piezaSeleccionada = null;
-        let giroSeleccionado = 0;
-
-        function seleccionarCapa(n) {
-            capaActiva = n;
-            // Actualizar UI de botones
-            for (let i = 0; i < 3; i++) {
-                const btn = document.getElementById(`btn-capa-${i}`);
-                btn.style.background = (i === n) ? '#2980b9' : '#444';
-            }
-            // Si estábamos en modo orden, lo desactivamos al cambiar de capa
-            nivelOrdenActivo = 0;
-            actualizarUIOrdenes();
-        }
+        let piezaCompletaSeleccionada = null;
 
         async function activarModoCreador() {
-            // 1. UI Updates
+            pantallaActual = "Creador";
             document.body.classList.add('modo-edicion');
             document.getElementById('menu-lateral').classList.remove('abierto');
             document.getElementById('menu-creador').classList.add('abierto');
             document.getElementById('menu-piezas-creador').style.display = 'block';
+            document.getElementById('panel-dados-external').style.display = 'none';
 
-            // 2. Init Grid 20x20 (Temporary variable, will become mapa_original)
             let nuevaRejilla = [];
             for (let f = 0; f < 20; f++) {
                 for (let c = 0; c < 20; c++) {
@@ -699,7 +716,6 @@
                 }
             }
 
-            // 3. Load EXISTING data into grid (Center it)
             if (mapa_original && mapa_original.hexagono) {
                 let minF = Math.min(...mapa_original.hexagono.map(h => h.f));
                 let maxF = Math.max(...mapa_original.hexagono.map(h => h.f));
@@ -714,8 +730,6 @@
                 mapa_original.hexagono.forEach(h => {
                     const nuevoF = h.f + offsetF;
                     const nuevoC = h.c + offsetC;
-                    
-                    // Buscamos con un margen de tolerancia para decimales (0.1)
                     const target = nuevaRejilla.find(d =>  d.f === nuevoF && Math.abs(d.c - nuevoC) < 0.1);
                     
                     if (target) {
@@ -737,9 +751,10 @@
             }
             mapa_original = {
                 nombre: document.getElementById('input-nombre-mapa').value,
-                hexagono: nuevaRejilla,
+                config_dados: (mapa_original && mapa_original.config_dados) ? mapa_original.config_dados : {},
+                numeros: (mapa_original && mapa_original.numeros) ? mapa_original.numeros : configNumerosOrdenes,
                 recursos: (mapa_original && mapa_original.recursos) ? mapa_original.recursos : {},
-                numeros: (mapa_original && mapa_original.numeros) ? mapa_original.numeros : {}
+                hexagono: nuevaRejilla
             };
 
             mapa_visual = mapa_original;
@@ -748,7 +763,29 @@
             actualizarUIRecursosAleatorios();
 
             document.getElementById('menu-piezas-creador').style.display = 'block';
-            await cargarMapa("Piezas.json", document.getElementById('contenedor-mapa-piezas'), esJuego = false);
+            await cargarMapa("Piezas.json", document.getElementById('contenedor-mapa-piezas'));
+        }
+
+        // 2. Función para renderizar la lista filtrada
+        function filtrarMapas(boton, num) {
+            // Estética de los botones
+            document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('activo'));
+            boton.classList.add('activo');
+
+            const contenedor = document.getElementById('lista-mapas-dinamica');
+            contenedor.innerHTML = ''; // Limpiar lista
+
+            const mapasFiltrados = num === 'todos' 
+                ? bibliotecaMapas 
+                : bibliotecaMapas.filter(m => m.jugadores.includes(num));
+
+            mapasFiltrados.forEach(mapa => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-menu-item';
+                btn.innerHTML = `<span>${mapa.nombre}</span> <small style="opacity:0.5; float:right;">${mapa.jugadores.join('-')}J</small>`;
+                btn.onclick = () => cargarMapa(mapa.archivo);
+                contenedor.appendChild(btn);
+            });
         }
 
         function cargarMapaDesdeArchivo(input) {
@@ -759,17 +796,22 @@
             reader.onload = function (e) {
                 try {
                     const json = JSON.parse(e.target.result);
-                    mapa_original = json;
-                    // Reiniciar editor con este mapa
-                    activarModoCreador();
-                    alert("Mapa cargado correctamente en el editor.");
+                    mapa_original = structuredClone(json);
+                    if (pantallaActual === "Creador") {
+                        activarModoCreador();
+                    } else if (pantallaActual === "Juego") {
+                        mapa_visual = procesarConfiguracion(structuredClone(mapa_original));
+                        renderizarMapa(mapa_visual, tablero);
+                        Pantalla_dados(mapa_visual);
+                    } else {
+                        alert("Estado desconocido: No se sabe qué hacer con el mapa.");
+                    }
                 } catch (err) {
                     console.error("Error al leer el archivo:", err);
-                    alert("Error al leer el archivo JSON.");
+                    alert("El archivo no es un JSON de Catan válido.");
                 }
             };
             reader.readAsText(file);
-            // Reset input para permitir recargar el mismo archivo
             input.value = '';
         }
 
@@ -777,7 +819,6 @@
             const container = document.getElementById('contenedor-gestor-aleatorios');
             container.innerHTML = '<h3 style="font-size:1em; color:#ccc;">Config. Aleatorios</h3>';
 
-            // 1. Detectar qué tipos de 'aleatorio_X' hay en el mapa pintado
             const aleatoriosEnUso = new Set();
             mapa_visual.hexagono.forEach(h => {
                 if (h.tipo !== 'vacio' && typeof h.tipo === 'string' && h.tipo.startsWith('aleatorio_')) {
@@ -846,6 +887,7 @@
 
 
         function jugarMapaActual() {
+            pantallaActual = "Juego";
             const hexsReales = mapa_visual.hexagono.filter(h => h.tipo !== 'vacio');
             const numerosFinales = {};
             Object.keys(configNumerosOrdenes).forEach(k => {
@@ -872,9 +914,10 @@
 
             const nuevoMapa = {
                 nombre: document.getElementById('input-nombre-mapa').value,
-                hexagono: hexsReales,
+                config_dados: mapa_original.config_dados || {},
                 recursos: recursosFinales,
-                numeros: numerosFinales
+                numeros: numerosFinales,
+                hexagono: hexsReales
             };
             mapa_original = nuevoMapa;
 
@@ -882,90 +925,49 @@
             document.getElementById('menu-creador').classList.remove('abierto');
             document.getElementById('menu-piezas-creador').style.display = 'none';
             document.getElementById('tablero').classList.remove('pintando');
+            document.getElementById('panel-dados-external').style.display = 'flex';
 
             mapa_visual = procesarConfiguracion(structuredClone(mapa_original));
             renderizarMapa(mapa_visual, tablero);
-            inicializarDadosSegunMapa(mapa_visual);
+            Pantalla_dados(mapa_visual);
 
             renderizarMapa(mapa_visual, tablero);
         }
 
-        function abrirSubmenu(tipo, anchorElement) {
-            const submenu = document.getElementById('submenu-giros');
-            const overlay = document.getElementById('overlay-editor');
-            submenu.innerHTML = '';
+        function guardarCambiosOrden(nivel) {
+            const ordenKey = `orden_${nivel}`;
+            const valorInput = document.getElementById(`input-orden-${nivel}`).value;
+            
+            // Convertir el texto del input en un array de números
+            const nuevosNumeros = valorInput.split(',')
+                .map(n => parseInt(n.trim()))
+                .filter(n => !isNaN(n));
 
-            for (let i = 0; i < 6; i++) {
-                const contenedorGiro = document.createElement('div');
-                contenedorGiro.className = 'opcion-giro hex';
-                contenedorGiro.style.position = 'relative';
+            // 1. Actualizar la variable de configuración temporal
+            configNumerosOrdenes[ordenKey] = nuevosNumeros;
 
-                const capa = document.createElement('div');
-                capa.className = 'capa-hex';
-                capa.style.backgroundImage = `url('images/${tipo}.png')`;
-                capa.style.transform = `rotate(${i * 60}deg)`;
+            // 2. Sincronizar con mapa_original inmediatamente
+            if (!mapa_original.numeros) mapa_original.numeros = {};
+            mapa_original.numeros[ordenKey] = {
+                tipo: "fijo",
+                valores: nuevosNumeros
+            };
 
-                contenedorGiro.appendChild(capa);
+            console.log(`✅ Orden ${nivel} guardado en mapa_original:`, nuevosNumeros);
 
-                contenedorGiro.onclick = () => {
-                    piezaSeleccionada = tipo;
-                    giroActual = i;
-                    cerrarSubmenu();
-                    document.getElementById('tablero').classList.add('pintando');
-                };
-                submenu.appendChild(contenedorGiro);
-            }
-            submenu.style.display = 'grid';
-            overlay.style.display = 'block';
-        }
-
-        function activarPincelOrden() {
-            modoOrdenActivo = !modoOrdenActivo;
-            const btn = document.getElementById('btn-orden');
-            const btnSiguiente = document.getElementById('btn-siguiente-orden');
-
-            if (modoOrdenActivo) {
-                btn.style.background = "#f1c40f";
-                btn.style.color = "#000";
-                btnSiguiente.style.display = "block"; // Mostrar el botón de finalizar
-                document.getElementById('tablero').classList.add('pintando');
-            } else {
-                btn.style.background = "#8e44ad";
-                btn.style.color = "#fff";
-                btn.innerText = `🔢 Marcar Orden ${nivelOrdenActual} (Nº ${contadorOrden})`;
-            }
-        }
-
-        function finalizarOrdenActual() {
-            // 1. Preguntar confirmación para no perder el progreso del orden actual
-            if (!confirm(`¿Finalizar el Orden ${nivelOrdenActual}? Ya no podrás añadir más números a este grupo.`)) return;
-
-            // 2. Incrementar el nivel de orden y resetear el contador de piezas
-            nivelOrdenActual++;
-            contadorOrden = 1;
-
-            // 3. Actualizar la interfaz
-            modoOrdenActivo = false;
+            // 3. Desactivar el modo edición y refrescar UI
+            nivelOrdenActivo = 0;
             document.getElementById('tablero').classList.remove('pintando');
-
-            const btn = document.getElementById('btn-orden');
-            btn.style.background = "#8e44ad";
-            btn.style.color = "#fff";
-            btn.innerText = `🔢 Marcar Orden ${nivelOrdenActual}`;
-
-            document.getElementById('btn-siguiente-orden').style.display = "none";
-
-            alert(`Ahora puedes empezar a marcar el Orden ${nivelOrdenActual}`);
             actualizarUIOrdenes();
+            renderizarMapa(mapa_visual, tablero);
+            dibujarFichasDeOrden();
         }
 
-        // Ordenes del modo creación.
-        let nivelOrdenActivo = 0; // 1, 2 o 3
-
+        let nivelOrdenActivo = 0;
         function actualizarUIOrdenes() {
             const container = document.getElementById('contenedor-gestor-ordenes');
             if (!container) return;
-            container.innerHTML = '<h3 style="font-size:1em; color:#ccc; margin-bottom:15px;">Fichas por Orden</h3>';
+            container.innerHTML = '<h3 style="font-size:0.8em; color:#ccc; margin-bottom:10px;">Fichas por Orden</h3>';
 
             for (let i = 1; i <= 3; i++) {
                 const ordenKey = `orden_${i}`;
@@ -978,24 +980,29 @@
                 btn.className = 'btn';
                 btn.style.background = i === 1 ? '#2980b9' : (i === 2 ? '#f1c40f' : '#27ae60');
                 btn.style.color = i === 2 ? 'black' : 'white';
-                btn.innerHTML = esActivo ? `🖌️ Pintando O${i}...` : `🔢 Marcar Orden ${i}`;
-                btn.onclick = () => seleccionarNivelOrden(i);
+                btn.innerHTML = esActivo ? `💾 Guardar Orden ${i}` : `🔢 Editar Orden ${i}`;
 
                 const input = document.createElement('input');
+                input.id = `input-orden-${i}`;
                 input.type = 'text';
                 input.placeholder = 'Números: 2,5,9...';
-                input.value = configNumerosOrdenes[ordenKey] ? configNumerosOrdenes[ordenKey].join(',') : '';
+                const valoresMapa = (mapa_original.numeros && mapa_original.numeros[ordenKey]) 
+                            ? mapa_original.numeros[ordenKey].valores 
+                            : (configNumerosOrdenes[ordenKey] || []);
+                input.value = valoresMapa.join(',');
                 input.style.width = '100%';
-                input.style.marginTop = '5px';
-                input.style.padding = '5px';
-                input.style.background = '#000';
-                input.style.color = '#fff';
-                input.style.border = '1px solid #444';
-
-                input.onchange = (e) => {
-                    configNumerosOrdenes[ordenKey] = e.target.value.split(',')
-                        .map(n => parseInt(n.trim()))
-                        .filter(n => !isNaN(n));
+                input.style.background = esActivo ? '#222' : '#000';
+                input.style.color = esActivo ? '#fff' : '#666';
+                input.style.border = esActivo ? '1px solid #f1c40f' : '1px solid #333';
+                
+                // BLOQUEO: Solo habilitado si este nivel es el activo
+                input.disabled = !esActivo;
+                btn.onclick = () => {
+                    if (esActivo) {
+                        guardarCambiosOrden(i);
+                    } else {
+                        seleccionarNivelOrden(i);
+                    }
                 };
 
                 divGrupo.appendChild(btn);
@@ -1039,61 +1046,17 @@
             });
         }
 
-        function actualizarEventosPintado() {
-            const hexsEnPantalla = document.querySelectorAll('#tablero .hex');
-            hexsEnPantalla.forEach((div, index) => {
-                div.onclick = (e) => {
-                    let h = mapa_visual.hexagono[index];
-                    if (nivelOrdenActivo > 0) {
-                        const prop = `orden_${nivelOrdenActivo}`;
-                        
-                        // Si el hexágono ya tiene ESTE mismo orden, lo quitamos (borrar)
-                        if (h[prop]) {
-                            delete h[prop];
-                        } else {
-                            delete h.orden_1;
-                            delete h.orden_2;
-                            delete h.orden_3;
-
-                            const maxActual = mapa_visual.hexagono.reduce((max, hex) => Math.max(max, hex[prop] || 0), 0);
-                            h[prop] = maxActual + 1;
-                        }
-                        
-                        // Refrescamos visualmente las fichas de orden
-                        dibujarFichasDeOrden();
-                    } else if (piezaSeleccionada) {
-                        // ... (el resto de tu lógica de pintado de terrenos se mantiene igual)
-                        if (!Array.isArray(h.tipo)) {
-                            h.tipo = [h.tipo || 'vacio', null, null];
-                            h.giros = [Array.isArray(h.giros) ? h.giros[0] : (h.giros || 0), 0, 0];
-                        }
-
-                        if (h.tipo[capaActiva] === piezaSeleccionada) {
-                            h.tipo[capaActiva] = (capaActiva === 0) ? 'vacio' : null;
-                            h.giros[capaActiva] = 0;
-                        } else {
-                            h.tipo[capaActiva] = piezaSeleccionada;
-                            h.giros[capaActiva] = giroSeleccionado;
-                        }
-                        renderizarMapa(mapa_visual, tablero);
-                        actualizarEventosPintado();
-                    }
-                };
-            });
-        }
-
 
         // LÓGICA DE DADOS 3D
         let rotacionBase = 0;
-        function inicializarDadosSegunMapa(mapa) {
+        function Pantalla_dados(mapa) {
             const contenedor = document.getElementById('panel-dados-external');
             if (!mapa.config_dados) {
                 contenedor.style.display = 'none';
                 return;
             }
             contenedor.style.display = 'flex';
-            contenedor.innerHTML = '<div id="resultado-suma">--</div>'; // Limpiar
-            // Recorremos cada botón definido en el JSON
+            contenedor.innerHTML = '<div id="resultado-suma">--</div>';
             Object.keys(mapa.config_dados).forEach((idBoton) => {
                 const btnConfig = mapa.config_dados[idBoton];
                 const wrapperId = `wrapper-${idBoton}`;
@@ -1125,30 +1088,28 @@
             if (!isNaN(tipo)) return tipo;
             // Si es un color, dibujamos un círculo (punto)
             const coloresMap = {
-                "verde": "#27ae60",
-                "azul": "#2980b9",
+                "verde":    "#27ae60",
+                "azul":     "#2980b9",
                 "amarillo": "#f1c40f",
-                "rojo": "#c0392b",
-                "marron": "#784212",
-                "violeta": "#8e44ad"
+                "rojo":     "#c0392b",
+                "marron":   "#784212",
+                "violeta":  "#8e44ad"
             };
             if (coloresMap[tipo]) {
                 return `<div style="width:25px; height:25px; border-radius:50%; background:${coloresMap[tipo]}; border:2px solid rgba(0,0,0,0.2)"></div>`;
             }
-            // Si es pirata u otros iconos
             if (tipo === "pirata") return "⛵";
             return tipo;
         }
         function aplicarRotacion(id, valor, rotacionBase) {
             const cubo = document.getElementById(id);
-            // Definimos las rotaciones extra para cada cara (X, Y)
             const rotaciones = {
                 1: { x: 0, y: 0 },   // Frontal
                 2: { x: 0, y: 180 }, // Trasera
                 3: { x: 0, y: -90 }, // Derecha
                 4: { x: 0, y: 90 },  // Izquierda
-                5: { x: -90, y: 0 },   // Superior
-                6: { x: 90, y: 0 }    // Inferior
+                5: { x: -90, y: 0 }, // Superior
+                6: { x: 90, y: 0 }   // Inferior
             };
 
             const r = rotaciones[valor];
@@ -1189,118 +1150,67 @@
             }
         }
 
-        function descargarJSONCreado() {
+
+        function confirmarNuevoMapa() {
+            if (confirm("¿Estás seguro de que quieres vaciar el mapa actual? Se perderán todos los cambios no descargados.")) {
+                mapa_original = null;
+                configNumerosOrdenes = {};
+                configRecursosAleatorios = {};
+                document.getElementById('input-nombre-mapa').value = "Mapa Nuevo";
+                activarModoCreador();
+            }
+        }
+        function descargarMapaCreado() {
             try {
-                if (!mapa_visual || !mapa_visual.hexagono) {
-                    throw new Error("No hay datos de mapa para exportar.");
+                if (!mapa_original || !mapa_original.hexagono) {
+                    alert("No hay datos de mapa para exportar.");
+                    return;
                 }
 
-                const hexagonosActivos = mapa_visual.hexagono.filter(h => h.tipo !== 'vacio');
-
-                if (hexagonosActivos.length === 0) {
+                const resultado = JSON.parse(JSON.stringify(mapa_original));
+                resultado.hexagono = resultado.hexagono.filter(h => {
+                    const tipoPrincipal = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
+                    return tipoPrincipal !== 'vacio';
+                });
+                if (resultado.hexagono.length === 0) {
                     alert("El mapa está vacío. Dibuja algo antes de descargar.");
                     return;
                 }
 
-                const recursosDinamicos = {};
-                const numerosDinamicos = {};
-                const hexagonosParaExportar = hexagonosActivos.map(h => {
-                    const hexExport = {
-                        f: h.f,
-                        c: h.c,
-                        tipo: h.tipo,
-                        giros: h.giros || [0]
-                    };
+                resultado.nombre = document.getElementById('input-nombre-mapa').value || "Mapa Personalizado";
 
-                    if (typeof h.tipo === 'string' && h.tipo.startsWith('aleatorio_')) {
-                        const bolsaNombre = h.tipo;
-                        if (!recursosDinamicos[bolsaNombre]) {
-                            if (configRecursosAleatorios[bolsaNombre]) {
-                                recursosDinamicos[bolsaNombre] = configRecursosAleatorios[bolsaNombre];
-                            } else if (mapa_original && mapa_original.recursos && mapa_original.recursos[bolsaNombre]) {
-                                recursosDinamicos[bolsaNombre] = mapa_original.recursos[bolsaNombre];
-                            } else {
-                                recursosDinamicos[bolsaNombre] = { tipos: ["bosque"], cantidades: [1] };
-                            }
-                        }
-                    }
-
-                    Object.keys(h).forEach(prop => {
-                        if (prop.startsWith('orden_')) {
-                            hexExport[prop] = h[prop];
-                            if (!numerosDinamicos[prop]) {
-                                numerosDinamicos[prop] = { "tipo": "fijo", "valores": [] };
-                            }
-                        }
-                    });
-
-                    return hexExport;
-                });
-
-                // 3. Rellenar los arrays de valores
-                Object.keys(numerosDinamicos).forEach(ordenKey => {
-                    const cantidadFichas = hexagonosParaExportar.filter(h => h[ordenKey]).length;
-                    if (configNumerosOrdenes[ordenKey] && configNumerosOrdenes[ordenKey].length > 0) {
-                        numerosDinamicos[ordenKey].valores = configNumerosOrdenes[ordenKey];
-                    } else {
-                        numerosDinamicos[ordenKey].valores = new Array(cantidadFichas).fill(null);
-                    }
-                });
-
-                const nombreMapa = document.getElementById('input-nombre-mapa').value || "Mapa Personalizado";
-
-                const resultado = {
-                    nombre: nombreMapa,
-                    hexagono: hexagonosParaExportar,
-                    recursos: recursosDinamicos,
-                    numeros: numerosDinamicos
-                };
-
-                // 4. Ejecutar descarga
-                const blob = new Blob([JSON.stringify(resultado, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${nombreMapa.replace(/\s+/g, '_')}.json`;
-                a.click();
-
+                const dataStr = JSON.stringify(resultado, null, 2);const link = document.createElement('a');
+                link.href = URL.createObjectURL(new Blob([dataStr], { type: 'application/json' }));
+                link.download = `${resultado.nombre}.json`;
+                link.click();
             } catch (e) {
-                console.error("Error al descargar JSON:", e);
-                alert("Error al descargar el mapa: " + e.message);
+                console.error("Error al exportar el JSON:", e);
+                alert("Ocurrió un error al generar el archivo.");
             }
-        }
-
-        // Inicio de la aplicación.
-        function iniciarTodo() {
-            // 1. Ponemos la pantalla completa despues de que el usuario haya interactuado.
-            toggleFullScreen();
-            // 2. Cargamos el mapa del catan más básico.
-            cargarMapa('Catan básico (3-4).json');
         }
 
         function cambiarPixeles(delta) {
             let valorActual = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx'));
             let nuevoValor = valorActual + delta;
-
-            if (nuevoValor < 10) nuevoValor = 10; // Límite mínimo
+            if (nuevoValor < 10) nuevoValor = 10;
             setPixelesDirecto(nuevoValor);
         }
 
         function setPixelesDirecto(valor) {
             let num = parseInt(valor);
             if (!isNaN(num) && num > 0) {
-                // 1. Aplicamos el cambio directamente al CSS
                 document.documentElement.style.setProperty('--hex_wpx', num + 'px');
-
-                // 2. Sincronizamos el input visualmente
                 const input = document.getElementById('input-calibracion-px');
                 if (input) input.value = num;
-
-                // 3. Re-renderizamos el mapa
                 if (mapa_visual) renderizarMapa(mapa_visual, tablero);
             }
         }
 
+
+        function iniciarTodo() {
+            toggleFullScreen();
+            cargarMapa('Catan básico (3-4).json');
+        }
         function toggleMenu() { menu.classList.toggle('abierto'); }
         function toggleSeccion(el) { el.parentElement.classList.toggle('activa'); }
         function mostrarPantallaInicio() {
@@ -1314,9 +1224,9 @@
                 <p style="font-size: 0.5em; opacity: 0.6; margin-top: 15px;">
             </div>`;
         }
-        async function cargarMapa(nombreMapa, contenedor = document.getElementById('tablero'), esJuego = true) {
+        async function cargarMapa(nombreMapa, contenedor = document.getElementById('tablero')) {
             try {
-                if (esJuego) {
+                if (pantallaActual === "Juego") {
                     document.body.classList.remove('modo-edicion');
                     document.getElementById('tablero').classList.remove('pintando');
                     let pxGuardados = document.getElementById('input-calibracion-px').value;
@@ -1329,60 +1239,44 @@
                 }
                 const json = await respuesta.json();
 
-                if (esJuego) {
+                if (pantallaActual === "Juego") {
                     mapa_original = structuredClone(json);
-
                     mapa_visual = procesarConfiguracion(structuredClone(json));
-
                     renderizarMapa(mapa_visual, contenedor);
-                    inicializarDadosSegunMapa(mapa_visual);
+                    Pantalla_dados(mapa_visual);
                     toggleMenu();
-                } else {
-                    let dataToRender = json;
+                }else if (pantallaActual === "Creador" && nombreMapa !== "Piezas.json") {
+                    mapa_original = structuredClone(json);
+                    activarModoCreador()
+                } else if (pantallaActual === "Creador" && nombreMapa === "Piezas.json")  {
                     let hexs = json.hexagono || [];
-
                     if (hexs.length > 0) {
-                        dataToRender = {hexagono: hexs};
-
-                        let minF = Infinity, minC = Infinity;
-                        hexs.forEach(p => {
-                            if (p.f < minF) minF = p.f; if (p.c < minC) minC = p.c;
-                        });
-
-                        dataToRender.hexagono = hexs.map(p => ({
+                        const minF = Math.min(...hexs.map(p => p.f));
+                        const minC = Math.min(...hexs.map(p => p.c));
+                        json.hexagono = hexs.map(p => ({
                             ...p,
                             f: p.f - minF,
                             c: p.c - minC
                         }));
                     }
 
-                    renderizarMapa(dataToRender, contenedor);
+                    renderizarMapa(json, contenedor);
 
-                    if (contenedor.id === 'contenedor-mapa-piezas') {
-                        const hexs = contenedor.querySelectorAll('.hex');
-                        hexs.forEach(div => {
-                            div.onclick = () => {
-                                const tipo = div.dataset.tipo;
-                                const girosData = JSON.parse(div.dataset.giros || "[0]");
-
-                                contenedor.querySelectorAll('.hex').forEach(h => {
-                                    h.style.borderColor = 'transparent';
-                                    h.style.zIndex = '100';
-                                });
-
-                                if (tipo && tipo !== 'vacio') {
-                                    piezaSeleccionada = tipo;
-                                    giroSeleccionado = girosData[0] || 0;
-                                    div.style.border = '2px solid #f1c40f';
-                                    div.style.zIndex = '1000';
-
-                                    document.getElementById('tablero').classList.add('pintando');
-                                    nivelOrdenActivo = 0;
-                                    actualizarUIOrdenes();
-                                }
-                            };
-                        });
-                    }
+                    contenedor.onclick = (e) => {
+                        const div = e.target.closest('.hex');
+                        if (!div) return;
+                        contenedor.querySelectorAll('.hex').forEach(h => h.style.outline = 'none');
+                        div.style.outline = '2px solid #f1c40f';
+                        piezaCompletaSeleccionada = {
+                            tipo: JSON.parse(div.dataset.tipoArray),
+                            giros: JSON.parse(div.dataset.giros)
+                        };
+                        document.getElementById('tablero').classList.add('pintando');
+                        nivelOrdenActivo = 0;
+                        actualizarUIOrdenes()
+                    };
+                }else{
+                    console.warn("Pantalla desconocida al cargar mapa:", pantallaActual);
                 }
 
             } catch (e) {
@@ -1425,7 +1319,6 @@
                         listaNumeros = listaNumeros.sort(() => Math.random() - 0.5);
                     }
 
-                    // Filtramos hexágonos que pertenecen a este orden y NO son hexagonos sin número.
                     const hexsValidos = maps.hexagono
                         .filter(h => {
                             const tipoActual = h.tipoReal || h.tipo;
@@ -1433,8 +1326,6 @@
                             return h[ordenKey] > 0 && !terrenosSinNumero.includes(nombreTipo);
                         })
                         .sort((a, b) => a[ordenKey] - b[ordenKey]);
-
-                    // Asignamos el número de la lista según la posición
                     hexsValidos.forEach((h, index) => {
                         h.numeroFinal = listaNumeros[index] || null;
                     });
@@ -1453,11 +1344,11 @@
 
             let w;
             if (contenedorDestino.id === 'contenedor-mapa-piezas') {
-                w = 40;
+                w = 30;
             } else if (document.body.classList.contains('modo-edicion')) {
                 w = 35;
             } else {
-                w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx')) || 100;
+                w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hex_wpx')) || 99;
             }
 
             const totalW = ((maxC - minC) * w) + w;
@@ -1469,37 +1360,46 @@
                 const div = document.createElement('div');
                 div.className = 'hex';
                 div.id = `hex_${h.f}_${h.c.toString().replace('.', '_')}`;
-                div.dataset.tipo = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
-                div.dataset.giros = JSON.stringify(h.giros || [0]);
+                div.dataset.tipoArray = JSON.stringify(Array.isArray(h.tipo) ? h.tipo : [h.tipo, null, null]);
+                div.dataset.giros = JSON.stringify(Array.isArray(h.giros) ? h.giros : [h.giros || 0, 0, 0]);
                 div.onclick = () => {
                     if (nivelOrdenActivo > 0) {
                         const prop = `orden_${nivelOrdenActivo}`;
-                        if (h[prop]) {
-                            delete h[prop];
-                        } else {
+                        if (h[prop]) delete h[prop];
+                        else {
                             delete h.orden_1; delete h.orden_2; delete h.orden_3;
                             const maxActual = maps.hexagono.reduce((max, hex) => Math.max(max, hex[prop] || 0), 0);
                             h[prop] = maxActual + 1;
                         }
                         dibujarFichasDeOrden();
-                    } else if (piezaSeleccionada && document.body.classList.contains('modo-edicion')) {
+                    } else if (contenedorDestino.id === 'contenedor-mapa-piezas') {
+                        piezaCompletaSeleccionada = { 
+                            tipo: Array.isArray(h.tipo) ? [...h.tipo] : [h.tipo], 
+                            giros: Array.isArray(h.giros) ? [...h.giros] : [h.giros || 0] 
+                        };
+                        contenedorDestino.querySelectorAll('.hex').forEach(hx => hx.style.outline = 'none');
+                        div.style.outline = '2px solid #f1c40f';
+                        document.getElementById('tablero').classList.add('pintando');
+                        return;
+                    } else if (piezaCompletaSeleccionada && document.body.classList.contains('modo-edicion')) {
                         if (!Array.isArray(h.tipo)) {
                             h.tipo = [h.tipo || 'vacio', null, null];
                             h.giros = [Array.isArray(h.giros) ? h.giros[0] : (h.giros || 0), 0, 0];
                         }
-                        if (h.tipo[capaActiva] === piezaSeleccionada) {
-                            h.tipo[capaActiva] = (capaActiva === 0) ? 'vacio' : null;
-                            h.giros[capaActiva] = 0;
-                        } else {
-                            h.tipo[capaActiva] = piezaSeleccionada;
-                            h.giros[capaActiva] = giroSeleccionado;
-                        }
+                        piezaCompletaSeleccionada.tipo.forEach((nuevoTipo, i) => {
+                            if (nuevoTipo !== null) {
+                                if (h.tipo[i] === nuevoTipo) {
+                                    h.tipo[i] = (i === 0) ? 'vacio' : null;
+                                    h.giros[i] = 0;
+                                } else {
+                                    h.tipo[i] = nuevoTipo;
+                                    h.giros[i] = piezaCompletaSeleccionada.giros[i] || 0;
+                                }
+                            }
+                        });
                         renderizarMapa(maps, contenedorDestino);
-                    } else if (contenedorDestino.id === 'contenedor-mapa-piezas') {
-                        // Lógica de la paleta
-                        piezaSeleccionada = Array.isArray(h.tipo) ? h.tipo[0] : h.tipo;
-                        giroSeleccionado = (h.giros && h.giros[0]) || 0;
-                        document.getElementById('tablero').classList.add('pintando');
+                        actualizarUIRecursosAleatorios();
+                        dibujarFichasDeOrden();
                     }
                 };
                 div.style.top = `calc((${h.f} - ${minF}) * ${w * 1.1547 * 0.75}px)`;
@@ -1529,18 +1429,16 @@
                     }
                 });
 
-                // NUEVA CAPA "EXTRA" CLICABLE Y EFECTOS
                 const divInteraccion = document.createElement('div');
                 divInteraccion.className = 'capa-interaccion';
 
-                // Lógica: Si alguna capa contiene "bruma" o "ladron"
                 const tieneBruma = capasLista.some(t => t && String(t).includes('bruma'));
                 const tieneLadron = capasLista.some(t => t && String(t).includes('ladron'));
 
                 if (tieneBruma) divInteraccion.classList.add('bruma');
                 if (tieneLadron) {
                     const icon = document.createElement('div');
-                    icon.innerHTML = '💂'; // O una imagen de ladrón
+                    icon.innerHTML = '💂';
                     icon.style.fontSize = (w * 0.4) + 'px';
                     divInteraccion.appendChild(icon);
                 }

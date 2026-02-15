@@ -1,5 +1,5 @@
 {
-  "nombre": "Catan Ampliación (5-6)",
+  "nombre": "Ataque de los bárbaros (5-6)",
   "config_dados": {
     "boton_1": {
       "nombre": "Lanzar Dados",
@@ -41,47 +41,67 @@
           ]
         }
       ]
+    },
+    "boton_evento": {
+      "nombre": "¿Que caballero fallece?",
+      "dados": [
+        {
+          "caras_fondo": [
+            "white",
+            "white",
+            "white",
+            "white",
+            "white",
+            "white"
+          ],
+          "caras_contenido": [
+            "verde",
+            "verde",
+            "marron",
+            "marron",
+            "violeta",
+            "violeta"
+          ]
+        }
+      ]
     }
   },
   "numeros": {
     "orden_1": {
       "tipo": "fijo",
       "valores": [
-        2,
-        5,
-        4,
+        9,
+        10,
+        11,
         6,
-        3,
+        11,
         9,
+        5,
         8,
-        11,
-        11,
+        3,
+        4,
+        8,
+        4,
+        2,
+        3,
         10,
         6,
-        3,
-        8,
-        4,
-        8,
         10,
+        3,
+        6,
+        9,
+        5,
         11,
+        8,
         12,
-        10,
-        5,
         4,
-        9,
-        5,
-        9,
-        12,
-        3,
-        2,
-        6
+        5
       ]
     }
   },
   "recursos": {
     "aleatorio_1": {
       "tipos": [
-        "desierto",
         "sembrado",
         "cerro",
         "montaña",
@@ -90,11 +110,26 @@
       ],
       "cantidades": [
         2,
-        6,
-        5,
-        5,
-        6,
-        6
+        3,
+        2,
+        2,
+        3
+      ]
+    },
+    "aleatorio_2": {
+      "tipos": [
+        "bosque",
+        "cerro",
+        "pasto",
+        "montaña",
+        "sembrado"
+      ],
+      "cantidades": [
+        2,
+        2,
+        3,
+        3,
+        4
       ]
     }
   },
@@ -187,7 +222,7 @@
       "f": 7,
       "c": 8.5,
       "tipo": [
-        "aleatorio_1",
+        "castillo",
         null,
         null
       ],
@@ -195,8 +230,7 @@
         0,
         0,
         0
-      ],
-      "orden_1": 6
+      ]
     },
     {
       "f": 7,
@@ -211,7 +245,7 @@
         0,
         0
       ],
-      "orden_1": 5
+      "orden_1": 1
     },
     {
       "f": 7,
@@ -226,7 +260,7 @@
         0,
         0
       ],
-      "orden_1": 4
+      "orden_1": 2
     },
     {
       "f": 7,
@@ -275,7 +309,7 @@
       "f": 8,
       "c": 8,
       "tipo": [
-        "aleatorio_1",
+        "desierto",
         null,
         null
       ],
@@ -283,14 +317,13 @@
         0,
         0,
         0
-      ],
-      "orden_1": 7
+      ]
     },
     {
       "f": 8,
       "c": 9,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
@@ -299,13 +332,13 @@
         0,
         0
       ],
-      "orden_1": 20
+      "orden_1": 4
     },
     {
       "f": 8,
       "c": 10,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
@@ -314,13 +347,13 @@
         0,
         0
       ],
-      "orden_1": 19
+      "orden_1": 5
     },
     {
       "f": 8,
       "c": 11,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
@@ -329,7 +362,7 @@
         0,
         0
       ],
-      "orden_1": 18
+      "orden_1": 6
     },
     {
       "f": 8,
@@ -344,7 +377,7 @@
         0,
         0
       ],
-      "orden_1": 2
+      "orden_1": 7
     },
     {
       "f": 8,
@@ -393,7 +426,7 @@
       "f": 9,
       "c": 8.5,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
@@ -402,13 +435,13 @@
         0,
         0
       ],
-      "orden_1": 21
+      "orden_1": 9
     },
     {
       "f": 9,
       "c": 9.5,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
@@ -417,13 +450,13 @@
         0,
         0
       ],
-      "orden_1": 28
+      "orden_1": 10
     },
     {
       "f": 9,
       "c": 10.5,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
@@ -432,13 +465,13 @@
         0,
         0
       ],
-      "orden_1": 27
+      "orden_1": 11
     },
     {
       "f": 9,
       "c": 11.5,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
@@ -447,7 +480,7 @@
         0,
         0
       ],
-      "orden_1": 17
+      "orden_1": 12
     },
     {
       "f": 9,
@@ -462,7 +495,7 @@
         0,
         0
       ],
-      "orden_1": 1
+      "orden_1": 13
     },
     {
       "f": 9,
@@ -505,13 +538,13 @@
         0,
         0
       ],
-      "orden_1": 9
+      "orden_1": 14
     },
     {
       "f": 10,
       "c": 8,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
@@ -520,52 +553,52 @@
         0,
         0
       ],
-      "orden_1": 22
+      "orden_1": 15
     },
     {
       "f": 10,
       "c": 9,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
       "giros": [
-        2,
+        0,
         0,
         0
       ],
-      "orden_1": 29
+      "orden_1": 16
     },
     {
       "f": 10,
       "c": 10,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
       "giros": [
-        3,
+        0,
         0,
         0
       ],
-      "orden_1": 30
+      "orden_1": 17
     },
     {
       "f": 10,
       "c": 11,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
         null,
         null
       ],
       "giros": [
-        4,
+        0,
         0,
         0
       ],
-      "orden_1": 26
+      "orden_1": 18
     },
     {
       "f": 10,
@@ -580,7 +613,7 @@
         0,
         0
       ],
-      "orden_1": 16
+      "orden_1": 19
     },
     {
       "f": 10,
@@ -623,13 +656,43 @@
         0,
         0
       ],
-      "orden_1": 10
+      "orden_1": 20
     },
     {
       "f": 11,
       "c": 8.5,
       "tipo": [
-        "aleatorio_1",
+        "aleatorio_2",
+        null,
+        null
+      ],
+      "giros": [
+        0,
+        0,
+        0
+      ],
+      "orden_1": 21
+    },
+    {
+      "f": 11,
+      "c": 9.5,
+      "tipo": [
+        "aleatorio_2",
+        null,
+        null
+      ],
+      "giros": [
+        0,
+        0,
+        0
+      ],
+      "orden_1": 22
+    },
+    {
+      "f": 11,
+      "c": 10.5,
+      "tipo": [
+        "aleatorio_2",
         null,
         null
       ],
@@ -642,48 +705,17 @@
     },
     {
       "f": 11,
-      "c": 9.5,
-      "tipo": [
-        "aleatorio_1",
-        null,
-        null
-      ],
-      "giros": [
-        0,
-        0,
-        0
-      ],
-      "orden_1": 24
-    },
-    {
-      "f": 11,
-      "c": 10.5,
-      "tipo": [
-        "aleatorio_1",
-        null,
-        null
-      ],
-      "giros": [
-        0,
-        0,
-        0
-      ],
-      "orden_1": 25
-    },
-    {
-      "f": 11,
       "c": 11.5,
       "tipo": [
-        "aleatorio_1",
+        "desierto",
         null,
         null
       ],
       "giros": [
-        4,
+        0,
         0,
         0
-      ],
-      "orden_1": 15
+      ]
     },
     {
       "f": 11,
@@ -726,7 +758,7 @@
         0,
         0
       ],
-      "orden_1": 11
+      "orden_1": 24
     },
     {
       "f": 12,
@@ -741,7 +773,7 @@
         0,
         0
       ],
-      "orden_1": 12
+      "orden_1": 25
     },
     {
       "f": 12,
@@ -756,13 +788,13 @@
         0,
         0
       ],
-      "orden_1": 13
+      "orden_1": 26
     },
     {
       "f": 12,
       "c": 11,
       "tipo": [
-        "aleatorio_1",
+        "castillo",
         null,
         null
       ],
@@ -770,8 +802,7 @@
         0,
         0,
         0
-      ],
-      "orden_1": 14
+      ]
     },
     {
       "f": 12,
