@@ -1,5 +1,26 @@
 {
   "nombre": "Ataque de los bárbaros (3-4)",
+  "fin_juego": {"puntos":12},
+  "reglas_especiales": [
+      "El jugador recibe 6 caballeros de su color.",
+      "En los hexágonos con número 2 y 12 se pone un bárbaro en cada uno.",
+      "Se usan las cartas de desarrollo de este escenario. Las cartas de desarrollo del juego básico no se usan.",
+      "La carta de 'Mayor ejército' no se usa.",
+      "El ladrón no se usa.",
+      "Cada jugador funda primero un poblado y luego una ciudad.",
+      "Cada vez que un jugador construye un poblado o ciudad llegan los bárbaros.",
+      "Las cartas de desarrollo se juega inmediatamente.",
+      "Mover caballeros (al final del turno, después de la fase de construcción)",
+      "Expulsar bárbaros, después del turno del jugador",
+      "Llegada de los bárbaros: El jugador hace una pausa y tira tres números diferentes del 7, pone un bárbaro en esos hexágonos (MAX 3). Si se llega a tres, se giran el número del hexagono.",
+      "...continuará..."
+  ],
+  "tabla_recursos":[
+    {"nombre":"Camino","recursos":["madera","barro"]},
+    {"nombre":"Poblado","recursos":["madera","barro","trigo","oveja"]},
+    {"nombre":"Ciudad","recursos":["trigo","trigo","piedra","piedra","piedra"]},
+    {"nombre":"Carta desarrollo","recursos":["trigo","oveja","piedra"]}
+  ],
   "config_dados": {
     "boton_1": {
       "nombre": "Lanzar Dados",

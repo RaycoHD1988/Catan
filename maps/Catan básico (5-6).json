@@ -1,5 +1,13 @@
 {
   "nombre": "Catan Ampliación (5-6)",
+  "fin_juego": {"puntos":10},
+  "reglas_especiales": [],
+  "tabla_recursos":[
+    {"nombre":"Camino","recursos":["madera","barro"]},
+    {"nombre":"Poblado","recursos":["madera","barro","trigo","oveja"]},
+    {"nombre":"Ciudad","recursos":["trigo","trigo","piedra","piedra","piedra"]},
+    {"nombre":"Carta desarrollo","recursos":["trigo","oveja","piedra"]}
+  ],
   "config_dados": {
     "boton_1": {
       "nombre": "Lanzar Dados",

@@ -1,5 +1,14 @@
 {
   "nombre": "Rumbo a nuevas orillas (4)",
+  "fin_juego": {"puntos":14},
+  "reglas_especiales": ["Los jugadores empiezan con 2 poblados, en la isla principal.","Se juega con pirata y ladrón, este último empieza en el desierto.","El primer poblado que cada jugador construya en cada islote, recibe 2 puntos de victoria debajo de su poblado."],
+  "tabla_recursos":[
+    {"nombre":"Camino","recursos":["madera","barro"]},
+    {"nombre":"Poblado","recursos":["madera","barro","trigo","oveja"]},
+    {"nombre":"Ciudad","recursos":["trigo","trigo","piedra","piedra","piedra"]},
+    {"nombre":"Carta desarrollo","recursos":["trigo","oveja","piedra"]},
+    {"nombre":"Barco","recursos":["madera","oveja"]}
+  ],
   "config_dados": {
     "boton_1": {
       "nombre": "Lanzar Dados",

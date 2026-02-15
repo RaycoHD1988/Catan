@@ -67,7 +67,7 @@ Al cargar un mapa en modo creador, no se cargan los ordenes de los números ni l
             position: fixed;
             bottom: 30px;
             left: 30px;
-            z-index: 2000;
+            z-index: 500;
             background: rgba(20, 20, 20, 0.85);
             backdrop-filter: blur(8px);
             padding: 20px;
@@ -580,19 +580,143 @@ Al cargar un mapa en modo creador, no se cargan los ordenes de los números ni l
             outline: 2px solid #f1c40f;
             z-index: 1000;
         }
+        /* Menú Reglas (Izquierda) */
+        #menu-reglas {
+            position: fixed;
+            left: -1050px;
+            top: 0;
+            width: 1000px;
+            height: 100vh;
+            background: rgba(13, 35, 51, 0.95);
+            backdrop-filter: blur(10px);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            padding: 0px 5px 5px 5px;
+            border-right: 2px solid #2980b9;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        #menu-reglas.abierto {
+            left: 0;
+        }
+
+        .regla-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            border-left: 3px solid #f1c40f;
+        }
+
+        #panel-fin-juego {
+            position: fixed;
+            bottom: 30px;
+            left: 230px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .titulo-fin {
+            color: #f1c40f;
+            text-transform: uppercase;
+            font-size: 0.6em;
+            font-weight: bold;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .puntos-objetivo {
+            font-size: 1.4em;
+            font-weight: 800;
+            color: white;
+        }
+
+        .contenedor-costes-normal, .contenedor-costes-invertido {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .contenedor-costes-normal {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .contenedor-costes-invertido {
+            top: 20px;
+            left: 20px;
+            transform: rotate(180deg);
+            transform-origin: center; /* Asegura que rote sobre sí mismo */
+        }
+
+        .fila-coste {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .edificio-nombre {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #eee;
+            width: 80px; /* Ajusta el ancho del nombre */
+        }
+
+        .lista-recursos {
+            display: flex;
+            gap: 4px;
+        }
+
+        .icono-pequeno {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
     </style>
 </head>
 
 <!-- ----------------------------------------------------------------------------------------------------- -->
 
 <body>
+    <div id="contenedor-costes-normal" class="contenedor-costes-normal" style="display: none;"></div>
+    <div id="contenedor-costes-invertido" class="contenedor-costes-invertido" style="display: none;"></div>
 
     <div class="controles-superiores">
-        <button id="toggle-fs" class="btn-flotante" onclick="toggleFullScreen()" title="Pantalla Completa">⛶</button>
-        <button id="toggle-menu" class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
+        <button id="toggle-reglas"  class="btn-flotante" onclick="toggleReglas()" title="Mostrar/Ocultar Reglas">📜 Reglas</button>
+        <button id="toggle-fs"      class="btn-flotante" onclick="toggleFullScreen()" title="Pantalla Completa">⛶</button>
+        <button id="toggle-menu"    class="btn-flotante" onclick="toggleMenu()">☰ Menú</button>
     </div>
 
     <div id="panel-dados-external" style="display: none;"></div>
+
+    <div id="menu-reglas">
+        <h2 style="color: #f1c40f; border-bottom: 1px solid #2980b9;">📜 Reglas Especiales</h2>
+        <div id="contenido-reglas"></div>
+    </div>
+
+    <div id="panel-fin-juego">
+        <span class="titulo-fin">Objetivo:</span>
+        <span id="texto-puntos-fin" class="puntos-objetivo">0</span>
+        <span class="titulo-fin">Puntos</span>
+    </div>
 
     <!-- Menú Piezas (Ahora visual) -->
     <div id="menu-piezas-creador">
@@ -707,6 +831,8 @@ Al cargar un mapa en modo creador, no se cargan los ordenes de los números ni l
             document.getElementById('menu-creador').classList.add('abierto');
             document.getElementById('menu-piezas-creador').style.display = 'block';
             document.getElementById('panel-dados-external').style.display = 'none';
+            document.getElementById('contenedor-costes-normal').style.display = 'none';
+            document.getElementById('contenedor-costes-invertido').style.display = 'none';
 
             let nuevaRejilla = [];
             for (let f = 0; f < 20; f++) {
@@ -766,6 +892,45 @@ Al cargar un mapa en modo creador, no se cargan los ordenes de los números ni l
             await cargarMapa("Piezas.json", document.getElementById('contenedor-mapa-piezas'));
         }
 
+        function toggleReglas() {
+            document.getElementById('menu-reglas').classList.toggle('abierto');
+        }
+
+        function generarHtmlRecursos(tabla) {
+            let html = '';
+            tabla.forEach(item => {
+                const nombreMostrar = item.nombre.replace(/_/g, ' ');
+                let recursosHtml = '';
+                item.recursos.forEach(res => {
+                    recursosHtml += `<img src="images/recursos_${res}.png" class="icono-pequeno">`;
+                });
+
+                html += `
+                    <div class="fila-coste">
+                        <div class="edificio-nombre">${nombreMostrar}</div>
+                        <div class="lista-recursos">${recursosHtml}</div>
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        function renderizarTablaRecursos(mapa) {
+            const contenedorNormal = document.getElementById('contenedor-costes-normal');
+            const contenedorInvertido = document.getElementById('contenedor-costes-invertido');
+            
+            // Solo mostrar si estamos en modo Juego y existe la tabla en el JSON
+            if (pantallaActual === "Juego" && mapa.tabla_recursos) {
+                const contenidoHtml = generarHtmlRecursos(mapa.tabla_recursos);
+                contenedorNormal.style.display = 'flex';
+                contenedorInvertido.style.display = 'flex';
+                contenedorNormal.innerHTML = contenidoHtml;
+                contenedorInvertido.innerHTML = contenidoHtml; 
+            } else {
+                contenedorNormal.style.display = 'none';
+                contenedorInvertido.style.display = 'none';
+            }
+        }
         // 2. Función para renderizar la lista filtrada
         function filtrarMapas(boton, num) {
             // Estética de los botones
@@ -930,7 +1095,7 @@ Al cargar un mapa en modo creador, no se cargan los ordenes de los números ni l
             mapa_visual = procesarConfiguracion(structuredClone(mapa_original));
             renderizarMapa(mapa_visual, tablero);
             Pantalla_dados(mapa_visual);
-
+            renderizarTablaRecursos(mapa_visual);
             renderizarMapa(mapa_visual, tablero);
         }
 
@@ -1053,35 +1218,56 @@ Al cargar un mapa en modo creador, no se cargan los ordenes de los números ni l
             const contenedor = document.getElementById('panel-dados-external');
             if (!mapa.config_dados) {
                 contenedor.style.display = 'none';
-                return;
-            }
-            contenedor.style.display = 'flex';
-            contenedor.innerHTML = '<div id="resultado-suma">--</div>';
-            Object.keys(mapa.config_dados).forEach((idBoton) => {
-                const btnConfig = mapa.config_dados[idBoton];
-                const wrapperId = `wrapper-${idBoton}`;
-                let btnHtml = `
-                <div class="dice-group" style="margin-bottom: 15px; text-align:center;">
-                    <div class="dice-wrapper" id="${wrapperId}" style="margin-bottom:10px; display:flex; gap:15px; justify-content:center;">`;
-                btnConfig.dados.forEach((dado, idxDado) => {
-                    const idUnico = `dado-${idBoton}-${idxDado}`;
+            }else {
+                contenedor.style.display = 'flex';
+                contenedor.innerHTML = '<div id="resultado-suma">--</div>';
+                Object.keys(mapa.config_dados).forEach((idBoton) => {
+                    const btnConfig = mapa.config_dados[idBoton];
+                    const wrapperId = `wrapper-${idBoton}`;
+                    let btnHtml = `
+                    <div class="dice-group" style="margin-bottom: 15px; text-align:center;">
+                        <div class="dice-wrapper" id="${wrapperId}" style="margin-bottom:10px; display:flex; gap:15px; justify-content:center;">`;
+                    btnConfig.dados.forEach((dado, idxDado) => {
+                        const idUnico = `dado-${idBoton}-${idxDado}`;
+                        btnHtml += `
+                        <div class="scene">
+                            <div id="${idUnico}" class="cube">
+                                ${dado.caras_contenido.map((cont, i) => `
+                                    <div class="cube_face face-${i + 1}" style="background-color: ${dado.caras_fondo[i]}">
+                                        ${formatearContenidoCara(cont)}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>`;
+                    });
                     btnHtml += `
-                    <div class="scene">
-                        <div id="${idUnico}" class="cube">
-                            ${dado.caras_contenido.map((cont, i) => `
-                                <div class="cube_face face-${i + 1}" style="background-color: ${dado.caras_fondo[i]}">
-                                    ${formatearContenidoCara(cont)}
-                                </div>
-                            `).join('')}
                         </div>
+                        <button class="btn-lanzar" onclick="lanzarGrupo('${idBoton}')">${btnConfig.nombre}</button>
                     </div>`;
+                    contenedor.insertAdjacentHTML('beforeend', btnHtml);
                 });
-                btnHtml += `
-                    </div>
-                    <button class="btn-lanzar" onclick="lanzarGrupo('${idBoton}')">${btnConfig.nombre}</button>
-                </div>`;
-                contenedor.insertAdjacentHTML('beforeend', btnHtml);
-            });
+            }
+            const panelFin = document.getElementById('panel-fin-juego');
+            if (mapa.fin_juego) {
+                panelFin.style.display = 'flex';
+                document.getElementById('texto-puntos-fin').innerText = mapa.fin_juego.puntos || 10;
+            } else {
+                panelFin.style.display = 'none';
+            }
+
+            // --- NUEVA LÓGICA: Reglas Especiales ---
+            const contReglas = document.getElementById('contenido-reglas');
+            contReglas.innerHTML = '';
+            if (mapa.reglas_especiales && mapa.reglas_especiales.length > 0) {
+                mapa.reglas_especiales.forEach(regla => {
+                    const div = document.createElement('div');
+                    div.className = 'regla-item';
+                    div.innerText = regla;
+                    contReglas.appendChild(div);
+                });
+            } else {
+                contReglas.innerHTML = '<p style="opacity:0.5">Sin reglas especiales para este mapa.</p>';
+            }
         }
         function formatearContenidoCara(tipo) {
             // Si es un número (del 1 al 6), lo devolvemos tal cual
@@ -1244,6 +1430,7 @@ Al cargar un mapa en modo creador, no se cargan los ordenes de los números ni l
                     mapa_visual = procesarConfiguracion(structuredClone(json));
                     renderizarMapa(mapa_visual, contenedor);
                     Pantalla_dados(mapa_visual);
+                    renderizarTablaRecursos(mapa_visual);
                     toggleMenu();
                 }else if (pantallaActual === "Creador" && nombreMapa !== "Piezas.json") {
                     mapa_original = structuredClone(json);
